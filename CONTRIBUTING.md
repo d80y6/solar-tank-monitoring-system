@@ -141,10 +141,18 @@ pnpm check
 What `pnpm check` runs:
 
 ```text
-typecheck -> lint -> test -> build
+typecheck -> lint -> test -> build -> build:webpack
 ```
 
 If any step fails, fix it before pushing.
+
+Both builds are required, and they are not redundant:
+
+- `pnpm build` is the fast Turbopack build;
+- `pnpm build:webpack` runs Next.js's own validation of route and page
+  exports. Turbopack does not run that check, so a stray `export` in a
+  `route.ts` file passes the first build and then **fails on the hosting
+  platform**. Keep helper functions in a feature module, not in a route file.
 
 ## Pull or Push Checklist
 

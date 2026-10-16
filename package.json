@@ -8,6 +8,7 @@
     "dev:lan": "next dev --hostname 0.0.0.0 -p 3000",
     "dev:webpack": "next dev --webpack",
     "build": "next build",
+    "build:webpack": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
@@ -39,7 +40,7 @@
     "db:migrations:check": "node scripts/check-mysql-migrations.mjs",
     "audit:sample-data": "node scripts/audit-sample-data.mjs",
     "auth:create-admin": "node scripts/create-auth-admin.mjs",
-    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm build:webpack"
   },
   "dependencies": {
     "argon2": "^0.44.0",

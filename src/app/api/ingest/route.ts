@@ -19,25 +19,14 @@ import {
   getRequestContext,
 } from "@/lib/request-context";
 import { metricNames, metrics } from "@/lib/metrics";
+import {
+  getIngestRateLimitPerMinute,
+  getMaxIngestBodyBytes,
+} from "@/features/monitoring/lib/ingest-limits";
 import type { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-const DEFAULT_MAX_BODY_BYTES = 16 * 1024;
-const INGEST_RATE_LIMIT_PER_MINUTE = 120;
-
-export function getMaxIngestBodyBytes(
-  envValue = process.env.INGEST_MAX_BODY_BYTES,
-): number {
-  const parsed = Number(envValue);
-
-  if (Number.isInteger(parsed) && parsed >= 1_024 && parsed <= 1_024 * 1_024) {
-    return parsed;
-  }
-
-  return DEFAULT_MAX_BODY_BYTES;
-}
 
 function getDeviceIdentifier(request: NextRequest): string {
   return request.headers.get("x-device-id")?.trim() || "unknown-device";
@@ -77,7 +66,7 @@ async function checkIngestRateLimit(
   const clientAddress = getRequestIpAddress(request.headers);
   const rateLimit = await checkRateLimit({
     key: `ingest:${deviceIdentifier}:${clientAddress}`,
-    limit: INGEST_RATE_LIMIT_PER_MINUTE,
+    limit: getIngestRateLimitPerMinute(),
     windowMs: 60_000,
   });
 
