@@ -25,8 +25,82 @@
 #include <ESP8266WebServer.h>
 #include <WiFiClientSecure.h>
 #include <ESP8266HTTPClient.h>
+#include <bearssl/bearssl_hmac.h>
 #include <time.h>
 #include <math.h>
+
+/*
+  ===================== Transport security =====================
+
+  Two independent decisions, both configurable per device:
+
+  1. TLS trust. Define SOLARTANK_TLS_CA_CERT (PEM text) to validate the server
+     certificate against a pinned CA, or SOLARTANK_TLS_CERT_FINGERPRINT
+     (SHA-1 hex of the server certificate) to pin the leaf. Without either, the
+     template falls back to an unvalidated TLS session and says so loudly on the
+     serial console — that fallback is a deliberate, documented limitation and
+     never a silent default in a production flash.
+
+  2. Request signing. SOLARTANK_ENABLE_REQUEST_SIGNING=1 makes the device sign
+     every POST with HMAC-SHA256 of "<unixSeconds>.<nonce>.<body>" using the
+     device key, so the server can reject replay and tampering when
+     INGEST_SIGNATURE_MODE is "optional" or "required". Signing needs a synced
+     clock; when the clock is not ready the request is sent unsigned and the
+     server decides (it rejects it only in "required" mode).
+*/
+
+#ifndef SOLARTANK_ENABLE_REQUEST_SIGNING
+  #define SOLARTANK_ENABLE_REQUEST_SIGNING 1
+#endif
+
+#ifndef SOLARTANK_TLS_CA_CERT
+  #define SOLARTANK_TLS_CA_CERT ""
+#endif
+
+#ifndef SOLARTANK_TLS_CERT_FINGERPRINT
+  #define SOLARTANK_TLS_CERT_FINGERPRINT ""
+#endif
+
+/* ===================== Request signing ===================== */
+String buildNonceHex() {
+  char buffer[33];
+
+  for (uint8_t index = 0; index < 16; index++) {
+    uint8_t byteValue = (uint8_t)(os_random() & 0xFF);
+
+    sprintf(buffer + (index * 2), "%02x", byteValue);
+  }
+
+  buffer[32] = '\0';
+  return String(buffer);
+}
+
+String hmacSha256Hex(const String &message, const String &key) {
+  uint8_t digest[32];
+  br_hmac_key_context keyContext;
+  br_hmac_context hmacContext;
+
+  br_hmac_key_init(&keyContext, &br_sha256_vtable, key.c_str(), key.length());
+  br_hmac_init(&hmacContext, &keyContext, 0);
+  br_hmac_update(&hmacContext, message.c_str(), message.length());
+  br_hmac_out(&hmacContext, digest);
+
+  char hex[65];
+
+  for (uint8_t index = 0; index < 32; index++) {
+    sprintf(hex + (index * 2), "%02x", digest[index]);
+  }
+
+  hex[64] = '\0';
+
+  return String(hex);
+}
+
+bool isClockReady() {
+  // NTP is configured in setup(); 16 hours after epoch means "no time yet".
+  return time(nullptr) > 16 * 3600;
+}
+
 
 #ifndef SOLARTANK_WIFI_SSID
   #define SOLARTANK_WIFI_SSID ""
@@ -503,6 +577,21 @@ bool postTelemetryWithClient(ClientType &client, const String &payload) {
   http.addHeader("X-Api-Key", apiKey);
   http.addHeader("X-Device-Key", apiKey);
 
+#if SOLARTANK_ENABLE_REQUEST_SIGNING
+  if (isClockReady()) {
+    const uint32_t signedAt = (uint32_t)time(nullptr);
+    const String nonce = buildNonceHex();
+    const String canonical =
+      String(signedAt) + "." + nonce + "." + payload;
+
+    http.addHeader("X-Request-Timestamp", String(signedAt));
+    http.addHeader("X-Request-Nonce", nonce);
+    http.addHeader("X-Request-Signature", hmacSha256Hex(canonical, apiKey));
+  } else {
+    Serial.println("Clock is not synchronized: sending unsigned telemetry.");
+  }
+#endif
+
   int code = http.POST(payload);
   Serial.print("POST ");
   Serial.print(apiUrl);
@@ -537,7 +626,20 @@ bool postTelemetry() {
 
   if (apiUrl.startsWith("https://")) {
     BearSSL::WiFiClientSecure client;
-    client.setInsecure();
+
+    // Prefer a pinned CA, then a pinned certificate fingerprint. Only when the
+    // build provides neither does the session run without validation, and that
+    // case is reported so it is visible in the field.
+    if (strlen(SOLARTANK_TLS_CA_CERT) > 0) {
+      static BearSSL::X509List trustAnchor(SOLARTANK_TLS_CA_CERT);
+      client.setTrustAnchors(&trustAnchor);
+    } else if (strlen(SOLARTANK_TLS_CERT_FINGERPRINT) > 0) {
+      client.setFingerprint(SOLARTANK_TLS_CERT_FINGERPRINT);
+    } else {
+      Serial.println("WARNING: TLS without certificate validation. Set SOLARTANK_TLS_CA_CERT or SOLARTANK_TLS_CERT_FINGERPRINT before field use.");
+      client.setInsecure();
+    }
+
     client.setBufferSizes(512, 512);
     client.setTimeout(HTTP_TIMEOUT_MS);
     return postTelemetryWithClient(client, payload);

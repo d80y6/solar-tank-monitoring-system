@@ -33,3 +33,55 @@ jobs:
 
       - name: Run project checks
         run: pnpm check
+
+  mysql-integration:
+    name: MySQL integration tests
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_DATABASE: solar_tank_ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      MYSQL_DATABASE_URL: mysql://root@127.0.0.1:3306/solar_tank_ci
+      MYSQL_INTEGRATION_URL: mysql://root@127.0.0.1:3306/solar_tank_ci
+      MYSQL_SSL_MODE: disabled
+      RUN_MYSQL_INTEGRATION_TESTS: "1"
+      SOLAR_TANK_STORAGE_DRIVER: mysql
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 9.15.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply every migration and the demo seed
+        run: pnpm db:setup:mysql
+
+      - name: Verify the migration ledger
+        run: pnpm db:migrations:check
+
+      - name: Run integration tests against MySQL
+        run: pnpm test

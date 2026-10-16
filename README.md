@@ -310,6 +310,11 @@ Priorities and readiness requirements are explained in the
 | [Deployment](docs/deployment.md) | Environments, migrations, readiness, and release flow |
 | [Vercel Deployment](docs/vercel-deploy.md) | Step-by-step vercel.app publish guide |
 | [Database Backup](docs/database-backup.md) | Backup, retention, and recovery limits |
+| [Disaster Recovery](docs/disaster-recovery-runbook.md) | Backup verification, restore procedure, drill log, migration ledger |
+| [Operational Runbook](docs/operational-runbook.md) | Daily schedule, health signals, and alert playbooks |
+| [Upgrade and Rollback](docs/upgrade-and-rollback.md) | Release procedure, migration rules, and rollback steps |
+| [Incident Response](docs/incident-response.md) | Severity levels, first five minutes, and playbooks |
+| [Production Go-Live Checklist](docs/production-go-live-checklist.md) | Gate for promoting the pilot to production |
 | [Safety and Limitations](docs/safety-and-limitations.md) | Software, data, physical device, and operational limits |
 | [Reviewer Quickstart](docs/reviewer-quickstart.md) | Technical review flow |
 | [User Manual](docs/ftm-user-manual.html) | End-user guidance |
