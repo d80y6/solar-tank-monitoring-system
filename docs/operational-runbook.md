@@ -7,7 +7,7 @@ what to do when an alert fires, and how to escalate.
 
 | Frequency | Task | Where |
 |---|---|---|
-| Continuous | Alerts evaluated every 10 minutes | `/api/cron/ops` (Vercel Cron) |
+| Continuous | Alerts evaluated every 10 minutes | `/api/cron/ops` (scheduled workflow or any external scheduler) |
 | Daily | Review the alert centre; acknowledge and resolve conditions | `/dashboard/admin/alerts` |
 | Daily | Confirm every active device is online or has a known reason | `/dashboard/admin/devices` |
 | Weekly | Review the security audit log for unexpected role or session changes | `/dashboard/admin/audit` |
@@ -124,6 +124,14 @@ The scheduler entry point is `/api/cron/ops` and it is protected by
 |---|---|
 | `alerts` | Evaluates every rule, updates the alert store, sends notifications |
 | `housekeeping` | Deletes expired tokens, stale rate-limit buckets, old ingest audit rows, old job runs, resolved alerts, and expired ingest nonces |
+
+Scheduling: the `Scheduled operations` GitHub workflow
+(`.github/workflows/ops-schedule.yml`) calls this endpoint every ten minutes
+using the `OPS_BASE_URL` and `OPS_CRON_SECRET` repository secrets. A platform cron
+works too — but note that Vercel restricts cron jobs to once per day on the hobby
+plan, which is why the repository ships the workflow instead. Whichever
+scheduler is used, its failure must be visible: the workflow fails loudly, and
+`/api/ready` reports a stale job run.
 
 Manual invocation:
 

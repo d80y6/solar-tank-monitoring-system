@@ -77,8 +77,11 @@ proves it, because "we believe it is configured" is not evidence.
 
 ## 5. Observability and Alerting
 
-- [ ] `OPS_CRON_SECRET` is set and Vercel Cron (or the equivalent scheduler) is
-      registered for `/api/cron/ops?tasks=alerts,housekeeping`.
+- [ ] `OPS_CRON_SECRET` is set and a scheduler calls
+      `/api/cron/ops?tasks=alerts,housekeeping` at least every 10 minutes — the
+      `Scheduled operations` GitHub workflow with the `OPS_BASE_URL` and
+      `OPS_CRON_SECRET` repository secrets, or a platform cron on a plan that
+      allows sub-daily schedules.
 - [ ] A manual evaluation succeeds from the alert centre and writes a job run.
 - [ ] `OPS_METRICS_TOKEN` is set and the monitoring system scrapes
       `GET /api/metrics` successfully.

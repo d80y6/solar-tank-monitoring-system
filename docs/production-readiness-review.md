@@ -182,7 +182,7 @@ this checkout and passed; a wave is only closed when `pnpm check` is green.
 | Wave | Scope | State | Evidence |
 |---|---|---|---|
 | 1 | Observability (O1–O4, H1) | Implemented | `src/lib/{logger,metrics,error-tracker,build-info,request-context,memory-rate-limit,api-observability}.ts`, `GET /api/metrics`, unit tests |
-| 2 | Alerting and scheduled ops (A1–A4) | Implemented | migration 010, `src/features/ops/**`, `/api/cron/ops`, `/dashboard/admin/alerts`, Vercel cron entry |
+| 2 | Alerting and scheduled ops (A1–A4) | Implemented | migration 010, `src/features/ops/**`, `/api/cron/ops`, `/dashboard/admin/alerts`, `.github/workflows/ops-schedule.yml` |
 | 3 | Device security (D1–D2) | Implemented | migration 011, `ingest-signature.ts`, `mysql-device-key-repository.ts`, `/dashboard/admin/devices` |
 | 4 | Backup and disaster recovery (B1–B4) | Implemented | `scripts/lib/backup-crypto.mjs`, `scripts/{backup,restore,verify}-mysql.mjs`, `schema_migrations` ledger, `pnpm db:migrations:check`, `docs/disaster-recovery-runbook.md` |
 | 5 | Access control (C1) | Implemented | migration 012, `src/features/auth/lib/site-scope.ts`, `/dashboard/admin/access-scopes`, scoped dashboard/API/export |
