@@ -99,6 +99,33 @@ Safety guards:
 - a checksum mismatch aborts the restore;
 - a truncated, tampered, or wrongly-keyed backup aborts the restore.
 
+### One-command drill
+
+`pnpm db:restore:drill` automates the repetitive part of a drill: it finds the
+newest backup, runs the restore into a scratch database, compares six tables
+against the operational database, prints a record, and (with `--record`) appends
+it to `docs/disaster-recovery-drills.md`.
+
+```powershell
+# Check what would be restored, without importing anything
+pnpm db:restore:drill --dry-run --operator "<name>"
+
+# Full drill into a scratch database
+pnpm db:restore:drill `
+  --target-url "mysql://user:pass@host:3306/ftm_restore_drill" `
+  --confirm ftm_restore_drill `
+  --operator "<name>" `
+  --record
+```
+
+Exit codes: `0` passed, `1` configuration or restore error, `2` row counts did
+not match. `monitoring_readings` is compared with a tolerance of 50 rows because
+the operational database keeps receiving telemetry during the drill; every other
+table must match exactly.
+
+The drill refuses to run when the target is the host and database in
+`MYSQL_DATABASE_URL`, so it cannot overwrite production by accident.
+
 ### Restore order for a full recovery
 
 1. Announce the incident and freeze device onboarding (`SOLAR_TANK_AUTO_PROVISION_DEVICES=false`).
@@ -113,15 +140,26 @@ Safety guards:
 
 ## 6. Drill Log
 
-Every drill is recorded here. A drill is complete only when the restored
-database passes the readiness check and the row counts below are compared.
+Drills are appended to `docs/disaster-recovery-drills.md` by
+`pnpm db:restore:drill --record`, which keeps the evidence next to the runbook
+without hand-editing this file.
 
-| Date | Backup file | Target | Verified checksum | Rows (readings / devices / users) | Result | Notes |
+Summary of the drills run so far:
+
+| Date | Backup file | Target | Verified checksum | Rows compared | Result | Notes |
 |---|---|---|---|---|---|---|
-| _pending first drill_ | | | | | | |
+| _no drill recorded yet_ | | | | | | |
 
-Column meanings: "Verified checksum" = `pnpm db:verify:backup` passed;
-"Rows" = counts compared between the source report and the restored database.
+A drill is only complete when the operator has also confirmed, by hand:
+
+1. the restored registry (`monitoring_sites`, `monitoring_tanks`,
+   `monitoring_devices`) matches the operational registry;
+2. `schema_migrations` lists the same migration files as the operational
+   database;
+3. the newest `monitoring_readings` row is no newer than the backup timestamp;
+4. every administrator account that should be able to sign in exists in
+   `auth_users`;
+5. the scratch database credentials used for the drill are deleted or rotated.
 
 ## 7. Migration Ledger
 

@@ -35,7 +35,9 @@
     "db:backup:mysql": "node scripts/backup-mysql.mjs",
     "db:restore:mysql": "node scripts/restore-mysql.mjs",
     "db:verify:backup": "node scripts/verify-backup.mjs",
+    "db:restore:drill": "node scripts/restore-drill.mjs",
     "db:migrations:check": "node scripts/check-mysql-migrations.mjs",
+    "audit:sample-data": "node scripts/audit-sample-data.mjs",
     "auth:create-admin": "node scripts/create-auth-admin.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },

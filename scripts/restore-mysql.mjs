@@ -232,19 +232,10 @@ async function runMysqlImport({ database, password, sqlFile, url }) {
   });
   let stderr = "";
 
-  child.stderr.on("data", (chunk) => {
-    stderr += chunk.toString("utf8");
-  });
-
-  await pipeline(createReadStream(sqlFile), child.stdin).catch(async (error) => {
-    if (error.code === "EPIPE") {
-      return;
-    }
-
-    throw error;
-  });
-
-  const exitCode = await new Promise((resolve, reject) => {
+  // The listener must exist before anything is piped: a spawn failure (no mysql
+  // binary) emits "error" immediately, and an unhandled event would abort with a
+  // stack trace instead of the actionable message below.
+  const processExit = new Promise((resolve, reject) => {
     child.on("error", (error) => {
       if (error.code === "ENOENT") {
         fail(
@@ -256,6 +247,21 @@ async function runMysqlImport({ database, password, sqlFile, url }) {
     });
     child.on("close", resolve);
   });
+
+  child.stderr.on("data", (chunk) => {
+    stderr += chunk.toString("utf8");
+  });
+
+  const exitCode = await Promise.all([
+    processExit,
+    pipeline(createReadStream(sqlFile), child.stdin).catch((error) => {
+      // A failed spawn closes stdin, which surfaces here as EPIPE; the process
+      // exit code carries the real reason.
+      if (error.code !== "EPIPE") {
+        throw error;
+      }
+    }),
+  ]).then(([code]) => code);
 
   if (exitCode !== 0) {
     fail(stderr.trim() || `mysql exited with code ${exitCode}.`);

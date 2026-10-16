@@ -27,14 +27,22 @@ export type GuardrailFinding = {
 
 export type GuardrailEnvironment = {
   APP_ENV?: string;
+  AUTH_CAPTCHA_PROVIDER?: string;
+  AUTH_CAPTCHA_SECRET_KEY?: string;
   AUTH_REQUIRE_ADMIN_OTP?: string;
   AUTH_SECRET?: string;
+  AUTH_COOKIE_SECURE?: string;
   DEVICE_PACKAGE_ENCRYPTION_KEY?: string;
   INGEST_SIGNATURE_MODE?: string;
   MYSQL_BACKUP_ENCRYPTION_KEY?: string;
   MYSQL_SSL_MODE?: string;
   NODE_ENV?: string;
   OPS_CRON_SECRET?: string;
+  SMTP_FROM?: string;
+  SMTP_HOST?: string;
+  SMTP_PASS?: string;
+  SMTP_PORT?: string;
+  SMTP_USER?: string;
   READINESS_CHECK_TOKEN?: string;
   SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK?: string;
   SOLAR_TANK_STORAGE_DRIVER?: string;
@@ -166,7 +174,62 @@ export function evaluateProductionGuardrails(
     });
   }
 
+  // Environments that contradict each other. An OTP factor without a mail
+  // transport locks administrators out, and a CAPTCHA provider without a secret
+  // rejects every public registration.
+  if (isEnabled(env.AUTH_REQUIRE_ADMIN_OTP) && !isSmtpConfigured(env)) {
+    findings.push({
+      key: "smtp-for-admin-otp",
+      message:
+        "AUTH_REQUIRE_ADMIN_OTP is enabled but SMTP_HOST and SMTP_FROM are not both set: the OTP e-mail cannot be delivered, so administrators cannot sign in.",
+      severity: "fatal",
+    });
+  }
+
+  const captchaProvider = env.AUTH_CAPTCHA_PROVIDER?.trim().toLowerCase();
+
+  if (captchaProvider === "turnstile" && !env.AUTH_CAPTCHA_SECRET_KEY?.trim()) {
+    findings.push({
+      key: "captcha-secret",
+      message:
+        "AUTH_CAPTCHA_PROVIDER is \"turnstile\" but AUTH_CAPTCHA_SECRET_KEY is empty: every public account request would be rejected because the challenge cannot be verified.",
+      severity: "fatal",
+    });
+  }
+
+  if (
+    captchaProvider &&
+    captchaProvider !== "disabled" &&
+    captchaProvider !== "turnstile"
+  ) {
+    findings.push({
+      key: "captcha-provider",
+      message: `AUTH_CAPTCHA_PROVIDER is "${env.AUTH_CAPTCHA_PROVIDER}": only "disabled" and "turnstile" are supported, so account protection would fail closed.`,
+      severity: "fatal",
+    });
+  }
+
+  const cookieSecure = env.AUTH_COOKIE_SECURE?.trim().toLowerCase();
+
+  if (cookieSecure === "false") {
+    findings.push({
+      key: "cookie-secure",
+      message:
+        "AUTH_COOKIE_SECURE is explicitly \"false\": session cookies would be sent over plain HTTP. Remove the variable or set it to \"true\" behind HTTPS.",
+      severity: "fatal",
+    });
+  }
+
   return findings;
+}
+
+export function isSmtpConfigured(
+  env: Pick<GuardrailEnvironment, "SMTP_FROM" | "SMTP_HOST"> = process.env as Pick<
+    GuardrailEnvironment,
+    "SMTP_FROM" | "SMTP_HOST"
+  >,
+): boolean {
+  return Boolean(env.SMTP_HOST?.trim() && env.SMTP_FROM?.trim());
 }
 
 export function formatGuardrailFinding(finding: GuardrailFinding): string {

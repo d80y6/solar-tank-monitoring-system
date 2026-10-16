@@ -13,6 +13,12 @@ type TurnstileResponse = {
   "error-codes"?: string[];
 };
 
+/**
+ * Verification must never hang a sign-up or sign-in request. A slow provider
+ * fails closed with a retryable message rather than holding the connection open.
+ */
+const CAPTCHA_TIMEOUT_MS = 8_000;
+
 export async function verifyCaptchaToken({
   token,
   remoteIp,
@@ -60,13 +66,24 @@ export async function verifyCaptchaToken({
     form.set("remoteip", remoteIp);
   }
 
-  const response = await fetch(
-    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-    {
-      method: "POST",
-      body: form,
-    },
-  );
+  let response: Response;
+
+  try {
+    response = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        body: form,
+        method: "POST",
+        signal: AbortSignal.timeout(CAPTCHA_TIMEOUT_MS),
+      },
+    );
+  } catch {
+    return {
+      ok: false,
+      enforced: true,
+      error: "Security verification could not be processed yet.",
+    };
+  }
 
   if (!response.ok) {
     return {

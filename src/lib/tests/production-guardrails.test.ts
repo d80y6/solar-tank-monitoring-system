@@ -19,6 +19,8 @@ const safeProductionEnv: GuardrailEnvironment = {
   MYSQL_SSL_MODE: "required",
   NODE_ENV: "production",
   OPS_CRON_SECRET: "cron-secret",
+  SMTP_FROM: "FTM <noreply@example.com>",
+  SMTP_HOST: "smtp.example.com",
   SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK: "false",
   SOLAR_TANK_STORAGE_DRIVER: "mysql",
 };
@@ -70,6 +72,63 @@ describe("evaluateProductionGuardrails", () => {
       "storage-driver",
     ]);
     expect(findings.every((finding) => finding.severity === "fatal")).toBe(true);
+  });
+
+  it("refuses an OTP factor without a mail transport", () => {
+    const findings = evaluateProductionGuardrails({
+      ...safeProductionEnv,
+      SMTP_FROM: undefined,
+      SMTP_HOST: undefined,
+    });
+
+    expect(keys(findings)).toEqual(["smtp-for-admin-otp"]);
+    expect(findings[0]?.severity).toBe("fatal");
+  });
+
+  it("refuses a CAPTCHA provider that cannot verify challenges", () => {
+    expect(
+      keys(
+        evaluateProductionGuardrails({
+          ...safeProductionEnv,
+          AUTH_CAPTCHA_PROVIDER: "turnstile",
+        }),
+      ),
+    ).toEqual(["captcha-secret"]);
+
+    expect(
+      keys(
+        evaluateProductionGuardrails({
+          ...safeProductionEnv,
+          AUTH_CAPTCHA_PROVIDER: "recaptcha",
+        }),
+      ),
+    ).toEqual(["captcha-provider"]);
+  });
+
+  it("accepts Turnstile and a disabled CAPTCHA when configured", () => {
+    expect(
+      evaluateProductionGuardrails({
+        ...safeProductionEnv,
+        AUTH_CAPTCHA_PROVIDER: "turnstile",
+        AUTH_CAPTCHA_SECRET_KEY: "turnstile-secret",
+      }),
+    ).toEqual([]);
+    expect(
+      evaluateProductionGuardrails({
+        ...safeProductionEnv,
+        AUTH_CAPTCHA_PROVIDER: "disabled",
+      }),
+    ).toEqual([]);
+  });
+
+  it("refuses an explicitly insecure session cookie", () => {
+    const findings = evaluateProductionGuardrails({
+      ...safeProductionEnv,
+      AUTH_COOKIE_SECURE: "false",
+    });
+
+    expect(keys(findings)).toEqual(["cookie-secure"]);
+    expect(findings[0]?.severity).toBe("fatal");
   });
 
   it("treats a short or missing auth secret as fatal", () => {
