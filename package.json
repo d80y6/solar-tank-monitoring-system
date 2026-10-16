@@ -26,8 +26,9 @@
     "db:migrate:reading-rollup": "node scripts/apply-mysql-schema.mjs database/migrations/007_create_reading_rollup_mysql.sql",
     "db:migrate:auth-telegram": "node scripts/apply-mysql-schema.mjs database/migrations/008_enforce_unique_telegram_binding_mysql.sql",
     "db:migrate:site-taxonomy": "node scripts/apply-mysql-schema.mjs database/migrations/009_extend_site_location_taxonomy_mysql.sql",
+    "db:migrate:ops-alerting": "node scripts/apply-mysql-schema.mjs database/migrations/010_create_ops_alerting_mysql.sql",
     "db:seed:mysql": "node scripts/apply-mysql-schema.mjs database/seeds/001_seed_demo_monitoring_reference_mysql.sql",
-    "db:setup:mysql": "pnpm db:migrate:mysql && pnpm db:migrate:auth && pnpm db:migrate:auth-recovery && pnpm db:migrate:device-provisioning && pnpm db:migrate:device-request-fields && pnpm db:migrate:helpdesk && pnpm db:migrate:reading-rollup && pnpm db:migrate:auth-telegram && pnpm db:migrate:site-taxonomy && pnpm db:seed:mysql",
+    "db:setup:mysql": "pnpm db:migrate:mysql && pnpm db:migrate:auth && pnpm db:migrate:auth-recovery && pnpm db:migrate:device-provisioning && pnpm db:migrate:device-request-fields && pnpm db:migrate:helpdesk && pnpm db:migrate:reading-rollup && pnpm db:migrate:auth-telegram && pnpm db:migrate:site-taxonomy && pnpm db:migrate:ops-alerting && pnpm db:seed:mysql",
     "db:backup:mysql": "node scripts/backup-mysql.mjs",
     "auth:create-admin": "node scripts/create-auth-admin.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"

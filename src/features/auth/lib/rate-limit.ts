@@ -1,6 +1,9 @@
 import type { RowDataPacket } from "mysql2/promise";
 
+import { getMemoryRateLimiter } from "@/lib/memory-rate-limit";
+import { metricNames, metrics } from "@/lib/metrics";
 import { getMysqlPool } from "@/features/monitoring/lib/mysql-connection";
+import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
 import { hmacSha256Hex } from "./auth-crypto";
 
 type RateLimitRow = RowDataPacket & {
@@ -16,7 +19,7 @@ function hashBucketKey(key: string): string {
   return `hmac-sha256:${hmacSha256Hex(key)}`;
 }
 
-export async function checkRateLimit({
+async function checkRateLimitInMysql({
   key,
   limit,
   windowMs,
@@ -66,4 +69,58 @@ export async function checkRateLimit({
       Math.ceil((bucket.window_expires_at.getTime() - Date.now()) / 1000),
     ),
   };
+}
+
+/**
+ * Shared fixed-window rate limiter.
+ *
+ * Uses the durable MySQL bucket when the operational database is active and
+ * falls back to an in-process limiter when it is not (development, preview)
+ * or when the database is temporarily unreachable. Rate limiting therefore
+ * never silently disappears.
+ */
+export async function checkRateLimit({
+  key,
+  limit,
+  windowMs,
+}: {
+  key: string;
+  limit: number;
+  windowMs: number;
+}): Promise<RateLimitResult> {
+  if (getMonitoringStorageDriver() === "mysql") {
+    try {
+      const result = await checkRateLimitInMysql({ key, limit, windowMs });
+
+      metrics.incrementCounter({
+        name: metricNames.rateLimited,
+        help: "Rate-limited requests grouped by limiter backend and outcome.",
+        labels: {
+          backend: "mysql",
+          outcome: result.allowed ? "allowed" : "blocked",
+        },
+      });
+
+      return result;
+    } catch {
+      metrics.incrementCounter({
+        name: metricNames.rateLimited,
+        help: "Rate-limited requests grouped by limiter backend and outcome.",
+        labels: { backend: "memory-fallback", outcome: "degraded" },
+      });
+    }
+  }
+
+  const result = getMemoryRateLimiter().check({ key, limit, windowMs });
+
+  metrics.incrementCounter({
+    name: metricNames.rateLimited,
+    help: "Rate-limited requests grouped by limiter backend and outcome.",
+    labels: {
+      backend: "memory",
+      outcome: result.allowed ? "allowed" : "blocked",
+    },
+  });
+
+  return result;
 }

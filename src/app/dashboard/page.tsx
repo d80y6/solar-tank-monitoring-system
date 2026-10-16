@@ -74,6 +74,10 @@ export default async function SimpleDashboardPage() {
                   href: "/dashboard/admin/users",
                   label: "User Management",
                 },
+                {
+                  href: "/dashboard/admin/alerts",
+                  label: "Alert Centre",
+                },
               ]
             : []),
         ]}

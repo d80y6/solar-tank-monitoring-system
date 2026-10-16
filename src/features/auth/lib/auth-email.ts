@@ -208,6 +208,35 @@ export async function sendAdminLoginOtp({
   });
 }
 
+/**
+ * Operational notification e-mail (device offline, critical fuel level,
+ * backup or job failures). It reuses the same SMTP transport and development
+ * logging behaviour as the auth e-mails so a single configuration covers both.
+ */
+export async function sendOperationalEmail({
+  email,
+  subject,
+  lines,
+  devLogLabel = "DEV-OPS-ALERT",
+}: {
+  email: string;
+  subject: string;
+  lines: string[];
+  devLogLabel?: string;
+}): Promise<EmailDeliveryResult> {
+  return sendAuthEmail({
+    email,
+    subject,
+    htmlIntro:
+      "The monitoring platform reported an operational condition that needs attention.",
+    lines,
+    devLogLabel,
+    kind: "action",
+    warning:
+      "This is an automated operational notification. Follow the incident procedure before acting.",
+  });
+}
+
 export async function sendPasswordResetEmail({
   email,
   resetUrl,

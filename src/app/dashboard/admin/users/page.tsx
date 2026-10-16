@@ -780,6 +780,7 @@ export default async function AdminUsersPage({
             href: "/dashboard/admin/device-requests",
             label: "Review requests",
           },
+          { href: "/dashboard/admin/alerts", label: "Alert Centre" },
           { href: "/dashboard/admin/audit", label: "Security audit" },
         ]}
         user={admin}

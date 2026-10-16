@@ -750,3 +750,65 @@ export async function cleanupMonitoringTanksInMysql({
     connection.release();
   }
 }
+
+export type PruneMonitoringReadingsResult = {
+  cutoff: string;
+  deletedRows: number;
+  dryRun: boolean;
+};
+
+/**
+ * Retention pruning for reading history.
+ *
+ * Disabled by default: operational history is the product's core asset, so
+ * deletion only happens when MONITORING_READING_RETENTION_DAYS is set to a
+ * positive value. The live snapshot table is never touched, so dashboards
+ * keep showing the current level even after old buckets are pruned.
+ */
+export async function pruneMonitoringReadingsOlderThanFromMysql({
+  now = new Date(),
+  olderThanDays,
+  dryRun = false,
+  batchSize = 20_000,
+}: {
+  now?: Date;
+  olderThanDays: number;
+  dryRun?: boolean;
+  batchSize?: number;
+}): Promise<PruneMonitoringReadingsResult> {
+  const safeDays = Math.max(Math.trunc(olderThanDays), 1);
+  const cutoffDate = new Date(now.getTime() - safeDays * 24 * 60 * 60 * 1_000);
+  const cutoff = cutoffDate.toISOString().slice(0, 23).replace("T", " ");
+  const safeBatchSize = Math.min(Math.max(Math.trunc(batchSize), 100), 100_000);
+
+  if (dryRun) {
+    const pool = getMysqlPool();
+    const [rows] = await pool.execute<CountRow[]>(
+      `SELECT COUNT(*) AS count
+         FROM monitoring_readings
+        WHERE received_at < ?`,
+      [cutoff],
+    );
+
+    return {
+      cutoff,
+      deletedRows: Number(rows[0]?.count ?? 0),
+      dryRun: true,
+    };
+  }
+
+  const pool = getMysqlPool();
+  const [result] = await pool.execute<ResultSetHeader>(
+    `DELETE FROM monitoring_readings
+      WHERE received_at < ?
+      ORDER BY received_at
+      LIMIT ${safeBatchSize}`,
+    [cutoff],
+  );
+
+  return {
+    cutoff,
+    deletedRows: result.affectedRows,
+    dryRun: false,
+  };
+}

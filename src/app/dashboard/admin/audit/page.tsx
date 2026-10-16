@@ -42,6 +42,7 @@ export default async function AdminAuditPage() {
         navItems={[
           { href: "/dashboard", label: "Tank Management" },
           { href: "/dashboard/admin/users", label: "User Management" },
+          { href: "/dashboard/admin/alerts", label: "Alert Centre" },
           { current: true, label: "Security Audit" },
         ]}
         user={admin}
