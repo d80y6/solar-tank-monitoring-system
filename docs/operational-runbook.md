@@ -32,7 +32,29 @@ Metric names worth watching:
 - `solar_tank_alerts_total{transition="created"}` — new operational problems;
 - `solar_tank_ops_job_runs_total{outcome="failure"}` — scheduler failures;
 - `solar_tank_errors_total` — application failures;
-- `solar_tank_http_request_duration_seconds` — latency regression.
+- `solar_tank_http_request_duration_seconds` — latency regression;
+- `solar_tank_rate_limited_total` — abuse or a client retry loop;
+- `solar_tank_process_resident_memory_bytes` and
+  `solar_tank_process_heap_used_bytes` — memory growth between deploys;
+- `solar_tank_process_cpu_seconds_total` — CPU consumed since start;
+- `solar_tank_process_event_loop_lag_seconds` — saturation of the Node.js
+  thread; sustained values above one second mean requests are queueing;
+- `solar_tank_build_info` — which version and commit is answering.
+
+Suggested alert thresholds:
+
+| Signal | Warning | Critical |
+|---|---|---|
+| Event loop lag (5-minute mean) | > 0.5 s | > 2 s |
+| Resident memory | > 70 % of the platform limit | > 90 % |
+| Ingest acceptance rate | any drop > 30 % in an hour | ingestion stopped |
+| `/api/ready` | `degraded` for more than 15 minutes | `not_ready` |
+| Error counter rate | > 5 per minute | > 50 per minute |
+
+Disk space, pod restarts, and platform-level CPU throttling are monitored in the
+hosting platform rather than by the application: the process cannot observe the
+host it runs on from inside a serverless runtime. Configure those alerts there
+and keep the quota or plan limit in the deployment record.
 
 ## 3. Alert Playbooks
 

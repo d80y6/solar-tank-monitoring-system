@@ -60,6 +60,49 @@ describe("evaluateProductionGuardrails", () => {
     expect(evaluateProductionGuardrails(safeProductionEnv)).toEqual([]);
   });
 
+  it("treats an unset or unspelled device-key fallback as fatal", () => {
+    // An unset variable means the fallback is ACTIVE at runtime, so this is the
+    // most likely way a deployment ends up accepting the shared dev key.
+    const unset = evaluateProductionGuardrails({
+      ...safeProductionEnv,
+      SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK: undefined,
+    });
+    const misspelled = evaluateProductionGuardrails({
+      ...safeProductionEnv,
+      SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK: "flase",
+    });
+    const disabled = evaluateProductionGuardrails({
+      ...safeProductionEnv,
+      SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK: "false",
+    });
+
+    expect(keys(unset)).toContain("global-device-key-fallback");
+    expect(keys(misspelled)).toContain("global-device-key-fallback");
+    expect(keys(disabled)).not.toContain("global-device-key-fallback");
+  });
+
+  it("warns about unencrypted database traffic when TLS is not required", () => {
+    expect(
+      keys(
+        evaluateProductionGuardrails({
+          ...safeProductionEnv,
+          MYSQL_SSL_MODE: undefined,
+        }),
+      ),
+    ).toContain("mysql-ssl");
+    expect(
+      keys(
+        evaluateProductionGuardrails({
+          ...safeProductionEnv,
+          MYSQL_SSL_MODE: "preferred",
+        }),
+      ),
+    ).toContain("mysql-ssl");
+    expect(keys(evaluateProductionGuardrails(safeProductionEnv))).not.toContain(
+      "mysql-ssl",
+    );
+  });
+
   it("treats memory storage and the shared device key as fatal", () => {
     const findings = evaluateProductionGuardrails({
       ...safeProductionEnv,

@@ -1,3 +1,4 @@
+import { isGlobalDeviceKeyFallbackAllowed } from "@/features/monitoring/lib/device-key";
 import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
 
 import { createLogger } from "./logger";
@@ -96,11 +97,13 @@ export function evaluateProductionGuardrails(
     });
   }
 
-  if (isEnabled(env.SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK)) {
+  // The runtime treats an unset variable as "fallback allowed", so the guardrail
+  // must too: a deployment that simply forgets to set it is the dangerous case.
+  if (isGlobalDeviceKeyFallbackAllowed(env.SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK)) {
     findings.push({
       key: "global-device-key-fallback",
       message:
-        "SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK must be disabled in production, otherwise any device that knows the shared development key can post telemetry as any device id.",
+        "The shared development device key is still accepted because SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK is not set to \"false\". Any device that knows it can post telemetry as any device id.",
       severity: "fatal",
     });
   }
@@ -136,13 +139,16 @@ export function evaluateProductionGuardrails(
     });
   }
 
+  // Same reasoning: the connection code only enables TLS for exactly "required",
+  // so an unset or misspelled value silently downgrades to plaintext.
   const sslMode = env.MYSQL_SSL_MODE?.trim().toLowerCase();
 
-  if (sslMode && sslMode !== "required") {
+  if (sslMode !== "required") {
     findings.push({
       key: "mysql-ssl",
-      message:
-        "MYSQL_SSL_MODE is not \"required\": database traffic is not forced over TLS. Use a TLS-enforcing provider setting in production.",
+      message: sslMode
+        ? `MYSQL_SSL_MODE is "${env.MYSQL_SSL_MODE}": only "required" enables TLS, so database traffic is currently sent unencrypted.`
+        : 'MYSQL_SSL_MODE is not set: database traffic is sent unencrypted. Set it to "required" in production.',
       severity: "warning",
     });
   }
