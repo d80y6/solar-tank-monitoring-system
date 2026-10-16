@@ -52,12 +52,9 @@ jobs:
           --health-timeout=5s
           --health-retries=10
 
-    env:
-      MYSQL_DATABASE_URL: mysql://root@127.0.0.1:3306/solar_tank_ci
-      MYSQL_INTEGRATION_URL: mysql://root@127.0.0.1:3306/solar_tank_ci
-      MYSQL_SSL_MODE: disabled
-      RUN_MYSQL_INTEGRATION_TESTS: "1"
-      SOLAR_TANK_STORAGE_DRIVER: mysql
+    # The database variables are set per step on purpose. Exporting them for the
+    # whole job makes the memory-storage unit tests exercise the MySQL path
+    # instead, which looks like a test failure but is really environment bleed.
 
     steps:
       - name: Checkout repository
@@ -78,24 +75,46 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Apply every migration and the demo seed
+        env:
+          MYSQL_DATABASE_URL: mysql://root@127.0.0.1:3306/solar_tank_ci
+          MYSQL_SSL_MODE: disabled
         run: pnpm db:setup:mysql
 
       - name: Verify the migration ledger
+        env:
+          MYSQL_DATABASE_URL: mysql://root@127.0.0.1:3306/solar_tank_ci
+          MYSQL_SSL_MODE: disabled
         run: pnpm db:migrations:check
 
-      # The JSON report lets the next step publish each failing test as an
-      # annotation, which is far easier to read than the full job log.
-      - name: Run integration tests against MySQL
+      - name: Run the full test suite
         run: >-
           pnpm exec vitest run
           --passWithNoTests
           --reporter=default
           --reporter=json
+          --outputFile=/tmp/vitest-report-full.json
+
+      - name: Run the MySQL integration suite
+        env:
+          MYSQL_DATABASE_URL: mysql://root@127.0.0.1:3306/solar_tank_ci
+          MYSQL_INTEGRATION_URL: mysql://root@127.0.0.1:3306/solar_tank_ci
+          MYSQL_SSL_MODE: disabled
+          RUN_MYSQL_INTEGRATION_TESTS: "1"
+          SOLAR_TANK_STORAGE_DRIVER: mysql
+        run: >-
+          pnpm exec vitest run
+          src/features/monitoring/tests/mysql-integration.test.ts
+          --reporter=default
+          --reporter=json
           --outputFile=/tmp/vitest-report.json
 
+      # The JSON report lets the next step publish each failing test as an
+      # annotation, which is far easier to read than the full job log.
       - name: Annotate failing tests
         if: failure()
-        run: node scripts/report-vitest-failures.mjs /tmp/vitest-report.json
+        run: |
+          node scripts/report-vitest-failures.mjs /tmp/vitest-report.json
+          node scripts/report-vitest-failures.mjs /tmp/vitest-report-full.json
 
       - name: Print the database state on failure
         if: failure()
