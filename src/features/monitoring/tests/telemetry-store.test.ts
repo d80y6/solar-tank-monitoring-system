@@ -324,7 +324,7 @@ describe("telemetry store", () => {
       configuredDriver: "memory",
       activeDriver: "memory",
       isFallback: false,
-      label: "Memory lokal",
+      label: "Local memory",
     });
   });
 });

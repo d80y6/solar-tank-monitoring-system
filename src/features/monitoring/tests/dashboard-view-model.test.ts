@@ -113,7 +113,7 @@ describe("dashboard overview view model", () => {
       status: "offline",
       fillPercent: 0,
       volumeLiter: 0,
-      updateLabel: "belum ada data",
+      updateLabel: "No data yet",
     });
   });
 
@@ -151,9 +151,9 @@ describe("dashboard overview view model", () => {
       status: "warning",
       configStatus: "config_mismatch",
       configNeedsReview: true,
-      configSummary: "Config mismatch perlu review",
+      configSummary: "Config mismatch needs review",
       consumptionLiterPerHour: 25,
     });
-    expect(tph?.note).toContain("Config mismatch perlu review");
+    expect(tph?.note).toContain("Config mismatch needs review");
   });
 });

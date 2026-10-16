@@ -61,7 +61,7 @@ describe("auth telegram private commands", () => {
     const text = mocks.sendTelegramMessage.mock.calls[0]?.[0].text as string;
 
     expect(text).toContain("https://ftm.example/dashboard");
-    expect(text).toContain("Bot tidak menerima password atau token login.");
+    expect(text).toContain("The bot does not accept passwords or login tokens.");
   });
 
   it("reports bound account status without email, phone, chat id, or tokens", async () => {
@@ -87,10 +87,10 @@ describe("auth telegram private commands", () => {
     );
     const text = mocks.sendTelegramMessage.mock.calls[0]?.[0].text as string;
 
-    expect(text).toContain("Telegram ini sudah terhubung.");
-    expect(text).toContain("Akun: Operator STO");
+    expect(text).toContain("This Telegram is connected.");
+    expect(text).toContain("Account: Operator STO");
     expect(text).toContain("Username: operator.sto");
-    expect(text).toContain("Role: Pengguna");
+    expect(text).toContain("Role: User");
     expect(text).not.toContain("operator@example.com");
     expect(text).not.toContain("+6281234567890");
     expect(text).not.toContain("123456789");
@@ -105,7 +105,7 @@ describe("auth telegram private commands", () => {
     expect(handled).toBe(true);
     const text = mocks.sendTelegramMessage.mock.calls[0]?.[0].text as string;
 
-    expect(text).toContain("Telegram ini belum terhubung");
+    expect(text).toContain("This Telegram is not connected to an FTM account.");
     expect(text).toContain("/start TOKEN");
   });
 

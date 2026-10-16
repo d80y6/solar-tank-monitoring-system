@@ -26,19 +26,19 @@ function parsePrivateTelegramCommand(text: string): PrivateTelegramCommand | nul
 }
 
 function formatRole(role: AuthSafeUser["role"]): string {
-  return role === "admin" ? "Administrator" : "Pengguna";
+  return role === "admin" ? "Administrator" : "User";
 }
 
 function formatStatus(status: AuthSafeUser["status"]): string {
   switch (status) {
     case "active":
-      return "Aktif";
+      return "Active";
     case "disabled":
-      return "Dinonaktifkan";
+      return "Disabled";
     case "pending":
-      return "Menunggu persetujuan";
+      return "Pending approval";
     case "suspended":
-      return "Ditangguhkan";
+      return "Suspended";
   }
 }
 
@@ -47,7 +47,7 @@ function formatTelegramDate(value: string | null): string {
     return "-";
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
@@ -67,14 +67,14 @@ function buildDashboardUrl(): string | null {
 
 function buildHelpMessage(): string {
   return [
-    "Bantuan bot FTM",
+    "FTM bot help",
     "",
-    "Command yang tersedia:",
-    "/help - lihat daftar command.",
-    "/status - cek status koneksi Telegram akun FTM.",
-    "/dashboard - buka link dashboard FTM.",
+    "Available commands:",
+    "/help - list commands.",
+    "/status - check the Telegram connection status of the FTM account.",
+    "/dashboard - open the FTM dashboard link.",
     "",
-    "Catatan keamanan: bot tidak akan meminta password, OTP, API key, atau token device.",
+    "Security note: the bot will never ask for your password, OTP, API key, or device token.",
   ].join("\n");
 }
 
@@ -83,25 +83,25 @@ async function buildStatusMessage(chatId: string): Promise<string> {
 
   if (!user) {
     return [
-      "Telegram ini belum terhubung ke akun FTM.",
+      "This Telegram is not connected to an FTM account.",
       "",
-      "Buka dashboard > Keamanan Akun > Hubungkan Telegram, lalu kirim perintah /start TOKEN dari halaman tersebut ke bot ini.",
+      "Open dashboard > Account Security > Connect Telegram, then send the /start TOKEN command from that page to this bot.",
       "",
-      "Gunakan /dashboard untuk membuka link dashboard.",
+      "Use /dashboard to open the dashboard link.",
     ].join("\n");
   }
 
   return [
-    "Status Telegram FTM",
+    "FTM Telegram status",
     "",
-    "Telegram ini sudah terhubung.",
-    `Akun: ${user.fullName || user.username}`,
+    "This Telegram is connected.",
+    `Account: ${user.fullName || user.username}`,
     `Username: ${user.username}`,
     `Role: ${formatRole(user.role)}`,
-    `Status akun: ${formatStatus(user.status)}`,
-    `Terhubung: ${formatTelegramDate(user.telegramVerifiedAt)}`,
+    `Account status: ${formatStatus(user.status)}`,
+    `Connected: ${formatTelegramDate(user.telegramVerifiedAt)}`,
     "",
-    "Data sensitif seperti password, OTP, session, email, nomor telepon, API key, dan token device tidak ditampilkan di Telegram.",
+    "Sensitive data such as password, OTP, session, email, phone number, API key, and device token is not displayed in Telegram.",
   ].join("\n");
 }
 
@@ -110,9 +110,9 @@ function buildDashboardMessage(): string {
 
   if (!dashboardUrl) {
     return [
-      "Link dashboard FTM belum bisa dibuat.",
+      "FTM dashboard link could not be created.",
       "",
-      "Minta admin mengisi APP_BASE_URL pada konfigurasi server.",
+      "Ask an admin to set APP_BASE_URL in the server configuration.",
     ].join("\n");
   }
 
@@ -121,7 +121,7 @@ function buildDashboardMessage(): string {
     "",
     dashboardUrl,
     "",
-    "Login tetap dilakukan melalui browser. Bot tidak menerima password atau token login.",
+    "Sign in still happens via the browser. The bot does not accept passwords or login tokens.",
   ].join("\n");
 }
 

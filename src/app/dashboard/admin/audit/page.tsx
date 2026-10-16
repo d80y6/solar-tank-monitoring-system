@@ -6,15 +6,15 @@ import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
 import { listAuthAuditEvents } from "@/features/auth/lib/mysql-auth-repository";
 
 export const metadata: Metadata = {
-  title: "Audit Keamanan | FTM",
-  description: "Log audit keamanan akun FTM untuk administrator.",
+  title: "Security Audit | FTM",
+  description: "FTM account security audit log for administrators.",
 };
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -40,9 +40,9 @@ export default async function AdminAuditPage() {
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { href: "/dashboard/admin/users", label: "Manajemen Pengguna" },
-          { current: true, label: "Audit Keamanan" },
+          { href: "/dashboard", label: "Tank Management" },
+          { href: "/dashboard/admin/users", label: "User Management" },
+          { current: true, label: "Security Audit" },
         ]}
         user={admin}
       />
@@ -55,14 +55,14 @@ export default async function AdminAuditPage() {
             </span>
             <div>
               <p className="text-sm font-semibold uppercase text-zinc-500">
-                Audit keamanan
+                Security audit
               </p>
               <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">
-                Log aktivitas keamanan
+                Security activity log
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-                Catatan login, OTP, reset password, perubahan role, aktivasi,
-                dan event keamanan akun lain.
+                Records of sign-ins, OTPs, password resets, role changes,
+                activations, and other account security events.
               </p>
             </div>
           </div>
@@ -73,7 +73,7 @@ export default async function AdminAuditPage() {
             <table className="w-full min-w-[980px] border-separate border-spacing-y-2 text-left text-sm">
               <thead className="text-xs uppercase text-zinc-500">
                 <tr>
-                  <th className="px-3 py-2">Waktu</th>
+                  <th className="px-3 py-2">Time</th>
                   <th className="px-3 py-2">Event</th>
                   <th className="px-3 py-2">Actor</th>
                   <th className="px-3 py-2">Target</th>

@@ -37,7 +37,7 @@ type AccessRequestNotificationInput = {
 };
 
 function formatJakartaDate(value: Date): string {
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
@@ -156,19 +156,19 @@ export async function notifyAdminsAccessRequestSubmitted({
     request: accessRequestId,
   });
   const text = [
-    "Pengajuan akses baru FTM",
+    "New FTM access request",
     "",
-    `Nama: ${payload.fullName}`,
+    `Name: ${payload.fullName}`,
     `Username: ${payload.username}`,
     `Email: ${payload.email}`,
-    `Telepon: ${payload.phone}`,
-    `Role diminta: ${payload.requestedRole}`,
+    `Phone: ${payload.phone}`,
+    `Requested role: ${payload.requestedRole}`,
     `User ID: ${userId}`,
-    `Kode pengajuan: ${accessRequestId}`,
-    `Waktu: ${formatJakartaDate(createdAt)}`,
-    `Alasan: ${formatOptionalText(payload.accessReason)}`,
+    `Request code: ${accessRequestId}`,
+    `Time: ${formatJakartaDate(createdAt)}`,
+    `Reason: ${formatOptionalText(payload.accessReason)}`,
     "",
-    "Admin perlu meninjau akses pengguna lewat dashboard.",
+    "Admin needs to review user access via the dashboard.",
     adminUrl,
   ].join("\n");
 

@@ -191,12 +191,12 @@ describe("normalizeCatPayload", () => {
     });
     expect(reading.quality?.configMismatchReasons).toEqual(
       expect.arrayContaining([
-        "Bentuk tangki payload berbeda dari registry resmi.",
-        "Kapasitas tangki payload berbeda 89.2% dari registry.",
+        "Payload tank shape differs from the official registry.",
+        "Tank capacity payload differs by 89.2% from the registry.",
       ]),
     );
     expect(reading.quality?.warnings).toContain(
-      "Nilai tinggi, volume, dan persen dari device diabaikan sampai config payload direview.",
+      "Device height, volume, and percent values are ignored until the payload config is reviewed.",
     );
   });
 
@@ -218,7 +218,7 @@ describe("normalizeCatPayload", () => {
       measuredAtSource: "server",
     });
     expect(reading.quality?.warnings).toContain(
-      "Timestamp device berbeda lebih dari 24 jam dari waktu server; measuredAt memakai waktu server.",
+      "Device timestamp differs from server time by more than 24 hours; measuredAt uses server time.",
     );
   });
 });

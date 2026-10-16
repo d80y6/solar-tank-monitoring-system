@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const code = String(body.code ?? "").trim();
 
     if (!challengeId || !/^\d{6}$/.test(code)) {
-      throw new Error("Kode masuk tidak valid.");
+      throw new Error("Sign-in code is invalid.");
     }
 
     const rateLimit = await checkRateLimit({
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error: "Terlalu banyak percobaan kode. Coba lagi beberapa saat.",
+          error: "Too many code attempts. Try again in a moment.",
         },
         {
           status: 429,
@@ -62,9 +62,9 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         error: getSafeErrorMessage(error, {
-          fallbackMessage: "Kode masuk tidak valid.",
+          fallbackMessage: "Sign-in code is invalid.",
           internalMessage:
-            "Kode masuk belum bisa diverifikasi karena layanan sedang disiapkan. Coba lagi nanti.",
+            "Sign-in code could not be verified because the service is being prepared. Try again later.",
         }),
       },
       { status: getSafeErrorStatus(error, { defaultStatus: 401 }) },

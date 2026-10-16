@@ -147,13 +147,13 @@ export function getDevicePackageEncryptionKey(): Buffer {
     }
 
     throw new Error(
-      "DEVICE_PACKAGE_ENCRYPTION_KEY harus berupa key 32 byte base64/base64url/hex.",
+      "DEVICE_PACKAGE_ENCRYPTION_KEY must be a 32-byte base64/base64url/hex key.",
     );
   }
 
   if (getProductionLikeEnvironment()) {
     throw new Error(
-      "DEVICE_PACKAGE_ENCRYPTION_KEY wajib diisi untuk production.",
+      "DEVICE_PACKAGE_ENCRYPTION_KEY is required for production.",
     );
   }
 
@@ -224,7 +224,7 @@ function assertNoUnresolvedPlaceholders(files: FirmwarePackageFile[]) {
 
   if (unresolved.length > 0) {
     throw new Error(
-      `Template firmware masih memiliki placeholder belum terisi: ${unresolved.join(", ")}`,
+      `Firmware template still has unresolved placeholders: ${unresolved.join(", ")}`,
     );
   }
 }
@@ -425,7 +425,7 @@ function resolveFirmwareTemplatePath(sourcePath: string): string {
     templateSegments.length === 0 ||
     templateSegments.some((segment) => segment === "." || segment === "..")
   ) {
-    throw new Error("Path template firmware tidak valid.");
+    throw new Error("Firmware template path is invalid.");
   }
 
   const resolvedPath = path.join(basePath, ...templateSegments);
@@ -434,7 +434,7 @@ function resolveFirmwareTemplatePath(sourcePath: string): string {
     resolvedPath !== basePath &&
     !resolvedPath.startsWith(`${basePath}${path.sep}`)
   ) {
-    throw new Error("Path template firmware berada di luar folder firmware/templates.");
+    throw new Error("Firmware template path is outside the firmware/templates folder.");
   }
 
   return resolvedPath;
@@ -454,8 +454,8 @@ export function renderDeviceConfigHeader({
 }: Pick<FirmwarePackageContext, "appBaseUrl" | "deviceKey" | "request">): string {
   return `#pragma once
 
-// File ini dibuat otomatis oleh FTM.
-// Jangan membagikan isi file ini karena berisi device key.
+// This file is generated automatically by FTM.
+// Do not share its contents because it contains the device key.
 
 #define SOLARTANK_API_BASE_URL ${toCppString(appBaseUrl)}
 #define SOLARTANK_DEVICE_CODE ${toCppString(request.deviceCode)}
@@ -492,7 +492,7 @@ export function renderHardwareProfileHeader({
 }: Pick<FirmwarePackageContext, "hardwareProfile">): string {
   return `#pragma once
 
-// Hardware profile resmi yang dipilih saat pengajuan device.
+// Official hardware profile selected when the device was requested.
 
 #define SOLARTANK_HARDWARE_PROFILE_CODE ${toCppString(hardwareProfile.code)}
 #define SOLARTANK_BOARD_FAMILY ${toCppString(hardwareProfile.boardFamily)}
@@ -508,47 +508,47 @@ export function renderFirmwareReadme({
   hardwareProfile,
   request,
 }: Pick<FirmwarePackageContext, "hardwareProfile" | "request">): string {
-  return `# Langkah Upload Firmware FTM
+  return `# FTM Firmware Upload Steps
 
-Paket ini dibuat untuk:
+This package was created for:
 
 - STO: ${request.siteName} (${request.siteCode})
 - Regional: ${request.regionalLabel}
-- Wilayah: ${request.wilayahLabel}
+- Territory: ${request.wilayahLabel}
 - Area: ${request.areaLabel}
 - Device: ${request.deviceCode}
-- Mode sensor: ${request.deviceSensorType}
+- Sensor mode: ${request.deviceSensorType}
 - Hardware: ${hardwareProfile.name}
-- Tangki: ${request.tankShape === "rectangular" ? "balok" : "silinder horizontal"}
-- Kapasitas: ${request.capacityLiter} liter
-- Beban lokasi: ${request.loadValue} ${request.loadUnit.toUpperCase()}
+- Tank: ${request.tankShape === "rectangular" ? "rectangular" : "horizontal cylinder"}
+- Capacity: ${request.capacityLiter} liters
+- Location load: ${request.loadValue} ${request.loadUnit.toUpperCase()}
 - Diesel engine: ${request.dieselEngineCapacityKva} kVA
 - Cos phi: ${request.cosPhi}
-- Estimasi konsumsi: ${request.consumptionLiterPerHour} liter/jam
+- Estimated consumption: ${request.consumptionLiterPerHour} liters/hour
 
-## Isi Paket
+## Package Contents
 
 1. solar_tank_firmware.ino
 2. device_config.h
 3. hardware_profile.h
-4. README_LANGKAH_UPLOAD.md
+4. README_UPLOAD_STEPS.md
 5. manifest.json
 
-## Cara Upload
+## Upload Instructions
 
-1. Ekstrak ZIP ini ke folder lokal.
-2. Buka Arduino IDE.
-3. Buka file solar_tank_firmware.ino.
-4. Isi SOLARTANK_WIFI_SSID dan SOLARTANK_WIFI_PASSWORD di bagian atas file firmware, atau gunakan command serial WIFI/PASS untuk uji sementara.
-5. Pilih board sesuai hardware profile: ${hardwareProfile.boardLabel}.
-6. Pilih port board.
-7. Klik Upload.
-8. Setelah upload selesai, buka Serial Monitor untuk mengecek koneksi, sensor, dan status POST.
-9. Jangan membagikan file device_config.h karena file itu berisi device key.
+1. Extract this ZIP to a local folder.
+2. Open Arduino IDE.
+3. Open the solar_tank_firmware.ino file.
+4. Fill in SOLARTANK_WIFI_SSID and SOLARTANK_WIFI_PASSWORD at the top of the firmware file, or use the WIFI/PASS serial commands for temporary testing.
+5. Select the board that matches the hardware profile: ${hardwareProfile.boardLabel}.
+6. Select the board port.
+7. Click Upload.
+8. After the upload finishes, open the Serial Monitor to check the connection, sensor, and POST status.
+9. Do not share the device_config.h file because it contains the device key.
 
-## Catatan Keamanan
+## Security Notes
 
-Device key hanya boleh dipakai untuk device ini. Jika file ini salah kirim atau hilang, hubungi admin agar key dicabut dan paket baru dibuat.
+The device key may only be used for this device. If this file is sent to the wrong recipient or lost, contact an admin so the key can be revoked and a new package created.
 `;
 }
 
@@ -626,7 +626,7 @@ export async function createFirmwarePackageBundle({
       content: Buffer.from(renderHardwareProfileHeader({ hardwareProfile }), "utf8"),
     },
     {
-      path: "README_LANGKAH_UPLOAD.md",
+      path: "README_UPLOAD_STEPS.md",
       content: Buffer.from(
         renderFirmwareReadme({ hardwareProfile, request }),
         "utf8",

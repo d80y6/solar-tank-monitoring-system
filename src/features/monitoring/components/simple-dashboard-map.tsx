@@ -50,7 +50,7 @@ const MAX_ZOOM = 16;
 const DEFAULT_ZOOM = 12;
 
 function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID", {
+  return new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 0,
   }).format(value);
 }
@@ -211,12 +211,12 @@ function MapEmptyState({ hasSites }: { hasSites: boolean }) {
       <div className="max-w-sm">
         <MapPin className="mx-auto size-9 text-zinc-400" aria-hidden="true" />
         <h3 className="mt-4 text-base font-semibold text-zinc-950">
-          {hasSites ? "Koordinat belum tersedia" : "Tidak ada STO di peta"}
+          {hasSites ? "Coordinates unavailable" : "No STOs on the map"}
         </h3>
         <p className="mt-2 text-sm leading-6 text-zinc-500">
           {hasSites
-            ? "Isi latitude dan longitude di data lokasi agar titik STO muncul."
-            : "Coba ubah pencarian, status, area, atau STO yang sedang dipilih."}
+            ? "Fill in latitude and longitude in the location data so the STO pin appears."
+            : "Try changing the search, status, area, or selected STO."}
         </p>
       </div>
     </div>
@@ -305,7 +305,7 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
     <div className="grid min-w-0 items-start gap-3 xl:grid-cols-[minmax(0,1fr)_22rem]">
       <div className="overflow-hidden rounded-lg border border-zinc-200 bg-[#dceee8] shadow-sm">
         <div
-          aria-label="Peta STO"
+          aria-label="STO map"
           className="relative h-[28rem] touch-none overflow-hidden bg-[#dceee8] md:h-[32rem]"
           onPointerCancel={handlePointerEnd}
           onPointerDown={handlePointerDown}
@@ -350,7 +350,7 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
 
               return (
                 <button
-                  aria-label={`${site.name}, ${formatLiter(site.volumeLiter)} dari ${formatLiter(site.capacityLiter)} liter, ${getStatusLabel(site)}`}
+                  aria-label={`${site.name}, ${formatLiter(site.volumeLiter)} of ${formatLiter(site.capacityLiter)} liters, ${getStatusLabel(site)}`}
                   className="group absolute z-20 -translate-x-1/2 -translate-y-full text-left outline-none"
                   key={site.tankId}
                   onClick={(event) => {
@@ -406,7 +406,7 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
             onPointerDown={(event) => event.stopPropagation()}
           >
             <button
-              aria-label="Perbesar peta"
+              aria-label="Zoom in"
               className="grid size-10 place-items-center rounded-lg border border-zinc-200 bg-white/95 text-zinc-800 shadow-sm backdrop-blur transition hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15 disabled:cursor-not-allowed disabled:opacity-45"
               disabled={zoom >= MAX_ZOOM}
               onClick={() => changeZoom(zoom + 1)}
@@ -415,7 +415,7 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
               <Plus className="size-4" aria-hidden="true" />
             </button>
             <button
-              aria-label="Perkecil peta"
+              aria-label="Zoom out"
               className="grid size-10 place-items-center rounded-lg border border-zinc-200 bg-white/95 text-zinc-800 shadow-sm backdrop-blur transition hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15 disabled:cursor-not-allowed disabled:opacity-45"
               disabled={zoom <= MIN_ZOOM}
               onClick={() => changeZoom(zoom - 1)}
@@ -424,7 +424,7 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
               <Minus className="size-4" aria-hidden="true" />
             </button>
             <button
-              aria-label="Pusatkan ulang peta"
+              aria-label="Recenter map"
               className="grid size-10 place-items-center rounded-lg border border-zinc-200 bg-white/95 text-zinc-800 shadow-sm backdrop-blur transition hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
               onClick={resetMap}
               type="button"
@@ -468,31 +468,31 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
             </div>
 
             <div className="mt-5 rounded-lg border border-zinc-100 bg-zinc-50 p-4">
-              <p className="text-sm font-medium text-zinc-500">Isi tangki</p>
+              <p className="text-sm font-medium text-zinc-500">Tank level</p>
               <p className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
                 {formatLiter(activeSite.volumeLiter)} /{" "}
                 {formatLiter(activeSite.capacityLiter)} L
               </p>
               <p className="mt-1 text-sm text-zinc-500">
-                saat ini / kapasitas maksimal
+                current / maximum capacity
               </p>
             </div>
 
             <dl className="mt-4 grid gap-3 text-sm">
               <div className="flex items-center justify-between gap-3 border-b border-zinc-100 pb-3">
-                <dt className="text-zinc-500">Update terakhir</dt>
+                <dt className="text-zinc-500">Last update</dt>
                 <dd className="font-semibold text-zinc-950">
                   {activeSite.updateLabel}
                 </dd>
               </div>
               <div className="flex items-center justify-between gap-3 border-b border-zinc-100 pb-3">
-                <dt className="text-zinc-500">Perangkat</dt>
+                <dt className="text-zinc-500">Device</dt>
                 <dd className="font-semibold text-zinc-950">
                   {activeSite.deviceId}
                 </dd>
               </div>
               <div className="flex items-center justify-between gap-3">
-                <dt className="text-zinc-500">Koordinat</dt>
+                <dt className="text-zinc-500">Coordinates</dt>
                 <dd className="font-semibold text-zinc-950">
                   {isValidCoordinate(activeSite)
                     ? formatCoordinatePair(
@@ -506,15 +506,15 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
 
             <Link
               className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
-              href={`/dashboard/ringkas/tanks/${activeSite.tankId}`}
+              href={`/dashboard/operations/tanks/${activeSite.tankId}`}
             >
-              Detail
+              Details
               <MapPin className="size-4" aria-hidden="true" />
             </Link>
 
           </div>
         ) : (
-          <p className="text-sm text-zinc-500">Belum ada STO yang dipilih.</p>
+          <p className="text-sm text-zinc-500">No STO selected yet.</p>
         )}
       </aside>
     </div>

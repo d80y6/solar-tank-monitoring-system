@@ -1,20 +1,20 @@
 /*
   SolarTank ESP8266 Ultrasonic Firmware Template
 
-  File ini dipakai sebagai template paket firmware saat pengajuan device
-  disetujui. Nilai device, endpoint, lokasi, tangki, dan pin hardware dibaca
-  dari device_config.h dan hardware_profile.h yang dibuat otomatis oleh server.
+  This file is used as the firmware package template when a device request
+  is approved. Device, endpoint, location, tank, and hardware pin values are read
+  from device_config.h and hardware_profile.h, which the server generates automatically.
 
-  Sebelum upload, isi WiFi lewat definisi SOLARTANK_WIFI_SSID dan
-  SOLARTANK_WIFI_PASSWORD di bawah ini, atau kirim command serial WIFI/PASS
-  untuk uji sementara selama board belum restart.
+  Before uploading, fill in WiFi via the SOLARTANK_WIFI_SSID and
+  SOLARTANK_WIFI_PASSWORD definitions below, or send the serial WIFI/PASS
+  commands for a temporary test while the board has not restarted.
 */
 
 #include "device_config.h"
 #include "hardware_profile.h"
 
 #if !defined(ESP8266)
-  #error "Template ini ditujukan untuk board ESP8266 sesuai hardware profile."
+  #error "This template targets the ESP8266 board per the hardware profile."
 #endif
 
 #include <Arduino.h>
@@ -163,7 +163,7 @@ String maskSecret(String value) {
 void printConfig() {
   Serial.println("Current config:");
   Serial.print("  WiFi SSID: ");
-  Serial.println(wifiSsid.length() > 0 ? wifiSsid : "(belum diisi)");
+  Serial.println(wifiSsid.length() > 0 ? wifiSsid : "(not set)");
   Serial.print("  WiFi password: ");
   Serial.println(maskSecret(wifiPass));
   Serial.print("  API URL: ");
@@ -239,7 +239,7 @@ void ensureWifi() {
   if (WiFi.status() == WL_CONNECTED) return;
 
   if (wifiSsid.length() == 0) {
-    Serial.println("WiFi SSID belum diisi. Edit SOLARTANK_WIFI_SSID atau kirim command WIFI <ssid>.");
+    Serial.println("WiFi SSID is not set. Edit SOLARTANK_WIFI_SSID or send the WIFI <ssid> command.");
     return;
   }
 
@@ -578,7 +578,7 @@ footer{margin-top:10px;color:#888;font-size:12px}
 <div class="card"><h1>SolarTank Device</h1><div class="grid">
 <div class="tile"><div class="val" id="device">-</div><div class="label">Device</div></div>
 <div class="tile"><div class="val" id="H">-</div><div class="label">Fuel height cm</div></div>
-<div class="tile"><div class="val" id="dist">-</div><div class="label">Ruang kosong cm</div></div>
+<div class="tile"><div class="val" id="dist">-</div><div class="label">Empty space cm</div></div>
 <div class="tile"><div class="val" id="vol">-</div><div class="label">Volume L</div></div>
 <div class="tile"><div class="val" id="pct">-</div><div class="label">Fill percent</div></div>
 <div class="tile"><div class="val" id="ip">-</div><div class="label">IP</div></div>

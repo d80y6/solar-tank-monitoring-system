@@ -75,7 +75,7 @@ function createRawReading(index: number, volumeLiter: number): Reading {
 }
 
 describe("simple tank detail model", () => {
-  it("membuat detail ringkas dari detail tangki tanpa field teknis payload", () => {
+  it("builds compact detail from tank detail without payload technical fields", () => {
     const detail = buildTankDetail("tank-tph-main", {
       now: new Date("2026-06-25T07:45:00.000Z"),
     });
@@ -98,7 +98,7 @@ describe("simple tank detail model", () => {
     });
   });
 
-  it("memakai raw history tank untuk grafik, bukan seri detail yang sudah dipotong", () => {
+  it("uses raw tank history for the chart, not the trimmed detail series", () => {
     const detail = buildTankDetail("tank-tph-main", {
       now: new Date("2026-06-25T07:45:00.000Z"),
     });
@@ -117,7 +117,7 @@ describe("simple tank detail model", () => {
     expect(simpleDetail.chartPoints.at(-1)?.volumeLiter).toBe(335);
   });
 
-  it("mengambil titik grafik minimal per lima menit dan tetap menjaga titik terbaru", () => {
+  it("samples chart points at least five minutes apart and keeps the latest point", () => {
     const points = sampleSimpleTankDetailChartPoints(
       [
         createReadingPoint(0, 100),
@@ -134,7 +134,7 @@ describe("simple tank detail model", () => {
     expect(points.map((point) => point.volumeLiter)).toEqual([100, 140]);
   });
 
-  it("membatasi jumlah titik grafik dari sisi data terbaru", () => {
+  it("limits chart point count from the newest data side", () => {
     const points = sampleSimpleTankDetailChartPoints(
       [
         createReadingPoint(0, 100),
@@ -150,7 +150,7 @@ describe("simple tank detail model", () => {
     expect(points.map((point) => point.volumeLiter)).toEqual([150, 200]);
   });
 
-  it("membuat tren harian dari 00:00 sampai 23:59 dengan bucket lima menit", () => {
+  it("builds daily trend from 00:00 to 23:59 with five-minute buckets", () => {
     const trend = buildSimpleTankTrend(
       [
         createChartPoint({
@@ -166,7 +166,7 @@ describe("simple tank detail model", () => {
     expect(trend.totalSlots).toBe(288);
     expect(trend.domainStart).toBe("2026-07-01T17:00:00.000Z");
     expect(trend.domainEnd).toBe("2026-07-02T17:00:00.000Z");
-    expect(trend.range.bucketLabel).toBe("Bucket 5 menit");
+    expect(trend.range.bucketLabel).toBe("5-minute buckets");
     expect(trend.xTicks.map((tick) => tick.label)).toEqual([
       "00:00",
       "06:00",
@@ -183,7 +183,7 @@ describe("simple tank detail model", () => {
     expect(trend.points[0].xRatio).toBeLessThan(0.44);
   });
 
-  it("menghitung tren lanjutan memakai bobot jumlah sampel rollup", () => {
+  it("computes advanced trend using rollup sample count weights", () => {
     const trend = buildSimpleTankTrend(
       [
         {
@@ -214,7 +214,7 @@ describe("simple tank detail model", () => {
     });
   });
 
-  it("memutus segmen tren jika ada jeda data melebihi batas offline", () => {
+  it("breaks trend segments when a data gap exceeds the offline threshold", () => {
     const trend = buildSimpleTankTrend(
       [
         createChartPoint({
@@ -247,12 +247,12 @@ describe("simple tank detail model", () => {
     ]);
     expect(trend.gaps).toHaveLength(1);
     expect(trend.gaps[0]).toMatchObject({
-      durationLabel: "25 menit",
+      durationLabel: "25m",
       thresholdMinutes: 15,
     });
   });
 
-  it("membuat tren bulanan sebagai rata-rata per tanggal", () => {
+  it("builds monthly trend as a per-date average", () => {
     const trend = buildSimpleTankTrend(
       [
         createChartPoint({
@@ -272,7 +272,7 @@ describe("simple tank detail model", () => {
     );
 
     expect(trend.totalSlots).toBe(30);
-    expect(trend.range.bucketLabel).toBe("Rata-rata per tanggal");
+    expect(trend.range.bucketLabel).toBe("Daily averages");
     expect(trend.points).toHaveLength(1);
     expect(trend.points[0]).toMatchObject({
       sampleCount: 2,

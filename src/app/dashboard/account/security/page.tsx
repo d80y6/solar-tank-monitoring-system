@@ -7,9 +7,9 @@ import { listCurrentUserSessions } from "@/features/auth/lib/auth-service";
 import AccountSecurityPanel from "./security-panel";
 
 export const metadata: Metadata = {
-  title: "Keamanan Akun | FTM",
+  title: "Account Security | FTM",
   description:
-    "Pengaturan keamanan akun FTM: password, sesi aktif, dan Telegram.",
+    "FTM account security settings: password, active sessions, and Telegram.",
 };
 
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ export default async function AccountSecurityPage() {
   return (
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
-        navItems={[{ href: "/dashboard", label: "Manajemen Tangki" }]}
+        navItems={[{ href: "/dashboard", label: "Tank Management" }]}
         user={user}
       />
 
@@ -34,14 +34,14 @@ export default async function AccountSecurityPage() {
             </span>
             <div>
               <p className="text-sm font-semibold uppercase text-zinc-500">
-                Keamanan akun
+                Account security
               </p>
               <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">
-                Password, sesi, dan Telegram
+                Password, sessions, and Telegram
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-                Kelola akses akun sendiri. Perubahan password akan mencabut
-                sesi lain, dan sesi mencurigakan bisa dicabut dari daftar ini.
+                Manage your own account access. Password changes revoke other
+                sessions, and suspicious sessions can be revoked from this list.
               </p>
             </div>
           </div>

@@ -26,6 +26,6 @@ describe("monitoring reading rollup", () => {
         deviceId: "device-tph-main",
         receivedAt: "invalid",
       }),
-    ).toThrow("Timestamp reading tidak valid untuk bucket agregasi.");
+    ).toThrow("Reading timestamp is invalid for the aggregation bucket.");
   });
 });

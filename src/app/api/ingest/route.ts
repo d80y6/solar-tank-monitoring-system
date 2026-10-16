@@ -43,7 +43,7 @@ async function checkIngestRateLimit(request: Request): Promise<Response | null> 
   return Response.json(
     {
       ok: false,
-      error: "Terlalu banyak request device. Coba lagi sebentar.",
+      error: "Too many device requests. Try again shortly.",
     },
     {
       headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     return Response.json(
       {
         ok: false,
-        error: "Body request harus JSON valid.",
+        error: "Request body must be valid JSON.",
       },
       { status: 400 },
     );

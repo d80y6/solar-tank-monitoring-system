@@ -138,7 +138,7 @@ export async function createLegacyPbkdf2PasswordHashForTest(
   password: string,
 ): Promise<string> {
   if (process.env.NODE_ENV !== "test") {
-    throw new Error("Legacy password hash helper hanya boleh dipakai di test.");
+    throw new Error("Legacy password hash helper is for tests only.");
   }
 
   const salt = randomBytes(16);

@@ -19,7 +19,7 @@ function requiredEnv(name) {
   const value = process.env[name]?.trim();
 
   if (!value) {
-    console.error(`${name} wajib diisi.`);
+    console.error(`${name} is required.`);
     process.exit(1);
   }
 
@@ -67,7 +67,7 @@ try {
   );
 
   if (rows.length > 0) {
-    console.log("Admin bootstrap dilewati karena email/username sudah ada.");
+    console.log("Admin bootstrap skipped because the email/username already exists.");
   } else {
     const userId = createId("usr");
     await connection.execute(
@@ -77,7 +77,7 @@ try {
       [userId, email, username, fullName, await hashPassword(password)],
     );
 
-    console.log(`Admin bootstrap berhasil dibuat untuk ${email}.`);
+    console.log(`Admin bootstrap created for ${email}.`);
   }
 } finally {
   await connection.end();

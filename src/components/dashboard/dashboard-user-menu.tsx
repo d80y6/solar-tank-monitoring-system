@@ -30,7 +30,7 @@ function getAvatarLabel(user: DashboardUserMenuProps["user"]) {
 }
 
 function getRoleLabel(role: AuthSafeUser["role"]) {
-  return role === "admin" ? "Administrator" : "Pengguna";
+  return role === "admin" ? "Administrator" : "User";
 }
 
 export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
@@ -94,8 +94,8 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
         aria-haspopup="menu"
         aria-label={
           needsTelegramBinding
-            ? "Buka menu akun, Telegram belum terhubung"
-            : "Buka menu akun"
+            ? "Open account menu, Telegram not connected"
+            : "Open account menu"
         }
         className="relative grid size-10 place-items-center rounded-full bg-zinc-950 text-sm font-semibold text-white shadow-sm ring-1 ring-zinc-950/10 transition hover:scale-[1.03] hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
         onClick={() => setIsOpen((current) => !current)}
@@ -105,7 +105,7 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
         {needsTelegramBinding ? (
           <span className="absolute -right-0.5 -top-0.5 grid size-5 place-items-center rounded-full bg-red-600 text-[0.7rem] font-black leading-none text-white ring-2 ring-white">
             !
-            <span className="sr-only">Telegram belum terhubung</span>
+            <span className="sr-only">Telegram not connected</span>
           </span>
         ) : null}
       </button>
@@ -153,17 +153,17 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
                   </span>
                   <span className="min-w-0">
                     <span className="block font-semibold">
-                      Telegram belum terhubung
+                      Telegram not connected
                     </span>
                     <span className="mt-1 block text-xs leading-5 text-amber-800">
-                      Hubungkan akun agar notifikasi dan fitur Telegram siap
-                      dipakai.
+                      Connect your account so Telegram notifications and
+                      features are ready to use.
                     </span>
                   </span>
                 </span>
                 <span className="inline-flex items-center gap-2 text-xs font-semibold text-amber-800">
                   <Send className="size-3.5" aria-hidden="true" />
-                  Hubungkan Telegram
+                  Connect Telegram
                 </span>
               </Link>
             ) : null}
@@ -184,7 +184,7 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
               role="menuitem"
             >
               <KeyRound className="size-4" aria-hidden="true" />
-              Keamanan Akun
+              Account security
             </Link>
             <button
               className="flex items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-red-700 transition hover:bg-red-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/15 disabled:cursor-not-allowed disabled:opacity-60"
@@ -194,7 +194,7 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
               type="button"
             >
               <LogOut className="size-4" aria-hidden="true" />
-              {isLoggingOut ? "Logout..." : "Logout"}
+              {isLoggingOut ? "Signing out..." : "Sign out"}
             </button>
           </div>
         </div>

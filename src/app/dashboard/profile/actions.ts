@@ -36,7 +36,7 @@ function parseProfilePayload(formData: FormData) {
   const phone = phoneInput ? normalizeIndonesianMobilePhone(phoneInput) : null;
 
   if (fullName.length < 2) {
-    throw new Error("Nama lengkap wajib diisi minimal 2 karakter.");
+    throw new Error("Full name must be at least 2 characters.");
   }
 
   return { fullName, phone };
@@ -69,15 +69,15 @@ export async function updateCurrentUserProfileAction(
 
     return {
       status: "success",
-      message: "Profil berhasil diperbarui.",
+      message: "Profile updated successfully.",
     };
   } catch (error) {
     return {
       status: "error",
       message: getSafeErrorMessage(error, {
-        fallbackMessage: "Profil belum bisa diperbarui.",
+        fallbackMessage: "Profile could not be updated yet.",
         internalMessage:
-          "Profil belum bisa diperbarui karena layanan auth belum siap.",
+          "Profile could not be updated because the auth service is not ready.",
       }),
     };
   }

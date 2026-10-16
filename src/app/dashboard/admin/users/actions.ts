@@ -32,7 +32,7 @@ function getRequiredFormValue(formData: FormData, key: string): string {
   const value = String(formData.get(key) ?? "").trim();
 
   if (!value) {
-    throw new Error("Data aksi admin tidak lengkap.");
+    throw new Error("Admin action data is incomplete.");
   }
 
   return value;
@@ -42,9 +42,9 @@ function getAdminActionError(error: unknown): AdminActionState {
   return {
     status: "error",
     message: getSafeErrorMessage(error, {
-      fallbackMessage: "Aksi admin belum bisa diproses.",
+      fallbackMessage: "Admin action could not be processed yet.",
       internalMessage:
-        "Aksi admin belum bisa diproses karena layanan sedang disiapkan. Periksa koneksi database dan konfigurasi email.",
+        "Admin action could not be processed because the service is being prepared. Check the database connection and email configuration.",
     }),
   };
 }
@@ -71,7 +71,7 @@ function assertValidAdminActionCsrf({
       token: csrfToken,
     })
   ) {
-    throw new Error("Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.");
+    throw new Error("Admin session is invalid. Reload the page and try again.");
   }
 }
 
@@ -97,7 +97,7 @@ export async function approveAccessRequestAction(
 
     revalidatePath(ADMIN_USERS_PATH);
 
-    return getAdminActionSuccess("Pengajuan akses berhasil disetujui.");
+    return getAdminActionSuccess("Access request approved successfully.");
   } catch (error) {
     return getAdminActionError(error);
   }
@@ -125,7 +125,7 @@ export async function rejectAccessRequestAction(
 
     revalidatePath(ADMIN_USERS_PATH);
 
-    return getAdminActionSuccess("Pengajuan akses berhasil ditolak.");
+    return getAdminActionSuccess("Access request rejected successfully.");
   } catch (error) {
     return getAdminActionError(error);
   }
@@ -143,11 +143,11 @@ export async function changeAuthUserRoleAction(
     const roleValue = getRequiredFormValue(formData, "role");
 
     if (!isAuthRole(roleValue)) {
-      throw new Error("Role pengguna tidak valid.");
+      throw new Error("User role is invalid.");
     }
 
     if (targetUserId === admin.id && roleValue !== "admin") {
-      throw new Error("Admin tidak bisa menurunkan role akun sendiri.");
+      throw new Error("Admin cannot downgrade their own account role.");
     }
 
     await updateAuthUserRole({
@@ -163,7 +163,7 @@ export async function changeAuthUserRoleAction(
 
     revalidatePath(ADMIN_USERS_PATH);
 
-    return getAdminActionSuccess("Role pengguna berhasil diperbarui.");
+    return getAdminActionSuccess("User role updated successfully.");
   } catch (error) {
     return getAdminActionError(error);
   }
@@ -191,7 +191,7 @@ export async function activateAuthUserAction(
 
     revalidatePath(ADMIN_USERS_PATH);
 
-    return getAdminActionSuccess("Pengguna berhasil diaktifkan.");
+    return getAdminActionSuccess("User activated successfully.");
   } catch (error) {
     return getAdminActionError(error);
   }
@@ -208,7 +208,7 @@ export async function disableAuthUserAction(
     const targetUserId = getRequiredFormValue(formData, "targetUserId");
 
     if (targetUserId === admin.id) {
-      throw new Error("Admin tidak bisa menonaktifkan akun sendiri.");
+      throw new Error("Admin cannot disable their own account.");
     }
 
     await setAuthUserStatus({
@@ -223,7 +223,7 @@ export async function disableAuthUserAction(
 
     revalidatePath(ADMIN_USERS_PATH);
 
-    return getAdminActionSuccess("Pengguna berhasil dinonaktifkan.");
+    return getAdminActionSuccess("User disabled successfully.");
   } catch (error) {
     return getAdminActionError(error);
   }
@@ -240,7 +240,7 @@ export async function revokeAuthUserSessionsAction(
     const targetUserId = getRequiredFormValue(formData, "targetUserId");
 
     if (targetUserId === admin.id) {
-      throw new Error("Cabut sesi akun sendiri dilakukan lewat tombol keluar.");
+      throw new Error("Revoke your own account sessions via the sign-out button.");
     }
 
     await revokeAllUserSessions(targetUserId);
@@ -252,7 +252,7 @@ export async function revokeAuthUserSessionsAction(
 
     revalidatePath(ADMIN_USERS_PATH);
 
-    return getAdminActionSuccess("Semua sesi pengguna berhasil dicabut.");
+    return getAdminActionSuccess("All user sessions revoked successfully.");
   } catch (error) {
     return getAdminActionError(error);
   }
@@ -280,7 +280,7 @@ export async function resendUserVerificationEmailAction(
 
     revalidatePath(ADMIN_USERS_PATH);
 
-    return getAdminActionSuccess("Email verifikasi berhasil dikirim.");
+    return getAdminActionSuccess("Verification email sent successfully.");
   } catch (error) {
     return getAdminActionError(error);
   }
@@ -297,7 +297,7 @@ export async function sendUserPasswordResetAction(
     const targetUserId = getRequiredFormValue(formData, "targetUserId");
 
     if (targetUserId === admin.id) {
-      throw new Error("Reset password akun sendiri dilakukan dari keamanan akun.");
+      throw new Error("Reset your own account password from account security.");
     }
 
     await sendPasswordResetForUserId({
@@ -312,7 +312,7 @@ export async function sendUserPasswordResetAction(
 
     revalidatePath(ADMIN_USERS_PATH);
 
-    return getAdminActionSuccess("Link reset password berhasil dikirim.");
+    return getAdminActionSuccess("Password reset link sent successfully.");
   } catch (error) {
     return getAdminActionError(error);
   }
@@ -329,7 +329,7 @@ export async function deleteAuthUserAction(
     const targetUserId = getRequiredFormValue(formData, "targetUserId");
 
     if (targetUserId === admin.id) {
-      throw new Error("Admin tidak bisa menghapus akun sendiri.");
+      throw new Error("Admin cannot delete their own account.");
     }
 
     const deletedUser = await deleteAuthUser({ targetUserId });
@@ -348,7 +348,7 @@ export async function deleteAuthUserAction(
 
     revalidatePath(ADMIN_USERS_PATH);
 
-    return getAdminActionSuccess("Pengguna berhasil dihapus.");
+    return getAdminActionSuccess("User deleted successfully.");
   } catch (error) {
     return getAdminActionError(error);
   }

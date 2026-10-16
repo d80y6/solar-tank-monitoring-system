@@ -4,33 +4,33 @@ import { BrandLogo } from "@/components/brand-logo";
 import { getCurrentSessionUser } from "@/features/auth/lib/auth-session";
 
 const navItems = [
-  { label: "Fitur", href: "#fitur" },
-  { label: "Alur Data", href: "#alur-data" },
-  { label: "Operasional", href: "#operasional" },
-  { label: "Cara Kerja", href: "#cara-kerja" },
-  { label: "Akses", href: "#daftar" },
+  { label: "Features", href: "#features" },
+  { label: "Data Flow", href: "#data-flow" },
+  { label: "Operations", href: "#operations" },
+  { label: "How It Works", href: "#how-it-works" },
+  { label: "Access", href: "#access" },
   { label: "Dashboard", href: "/dashboard" },
 ];
 
 const tankStatus = [
   {
-    name: "STO Utama",
+    name: "Main STO",
     level: "78%",
-    runtime: "18 jam",
+    runtime: "18 hrs",
     bar: "w-[78%] bg-cyan-500",
   },
   {
-    name: "STO Timur",
+    name: "East STO",
     level: "42%",
-    runtime: "13 jam",
+    runtime: "13 hrs",
     bar: "w-[42%] bg-amber-500",
   },
 ];
 
 const siteStats = [
-  ["3", "site terdaftar"],
-  ["20 dtk", "refresh dashboard"],
-  ["5 mnt", "resolusi riwayat"],
+  ["3", "registered sites"],
+  ["20 sec", "dashboard refresh"],
+  ["5 min", "history resolution"],
 ];
 
 const monitoredSites = [
@@ -39,45 +39,45 @@ const monitoredSites = [
     name: "STO TPH",
     status: "Online",
     level: "78%",
-    runtime: "18 jam",
+    runtime: "18 hrs",
     tone: "bg-emerald-500",
   },
   {
     code: "NJA",
     name: "STO NJA",
-    status: "Waspada",
+    status: "Warning",
     level: "42%",
-    runtime: "13 jam",
+    runtime: "13 hrs",
     tone: "bg-amber-500",
   },
   {
     code: "JTO",
     name: "STO JTO",
-    status: "Perlu cek",
+    status: "Needs check",
     level: "19%",
-    runtime: "7 jam",
+    runtime: "7 hrs",
     tone: "bg-red-500",
   },
 ];
 
 const readingRows = [
-  ["Volume", "3.900 L"],
-  ["Persen isi", "78%"],
+  ["Volume", "3,900 L"],
+  ["Fill level", "78%"],
   ["RSSI", "-61 dBm"],
-  ["Update", "10 detik lalu"],
+  ["Updated", "10 seconds ago"],
 ];
 
 const runtimeBands = [
-  { label: "Kritis", range: "< 13 jam", width: "w-[24%]", tone: "bg-red-500" },
+  { label: "Critical", range: "< 13 hrs", width: "w-[24%]", tone: "bg-red-500" },
   {
-    label: "Waspada",
-    range: "13 - 16 jam",
+    label: "Warning",
+    range: "13 - 16 hrs",
     width: "w-[32%]",
     tone: "bg-amber-500",
   },
   {
-    label: "Aman",
-    range: "> 16 jam",
+    label: "Safe",
+    range: "> 16 hrs",
     width: "w-[44%]",
     tone: "bg-emerald-500",
   },
@@ -86,23 +86,23 @@ const runtimeBands = [
 const workflowSteps = [
   {
     number: "1",
-    title: "Perangkat mengirim pembacaan",
+    title: "Device sends readings",
     description:
-      "Sensor atau simulator membaca kondisi tangki, lalu mengirim data ke endpoint API dengan identitas perangkat.",
-    badge: "Kirim data",
+      "A sensor or simulator reads tank conditions and sends the data to the API endpoint with the device identity.",
+    badge: "Send data",
   },
   {
     number: "2",
-    title: "API menyimpan pembacaan",
+    title: "API stores readings",
     description:
-      "Server menerima data perangkat, menyimpan riwayat, dan menyiapkan data terbaru agar dashboard tidak membaca sensor secara langsung.",
+      "The server receives device data, stores the history, and prepares the latest readings so the dashboard never reads sensors directly.",
     badge: "/ingest",
   },
   {
     number: "3",
-    title: "Dashboard membantu tindak lanjut",
+    title: "Dashboard drives follow-up",
     description:
-      "Operator melihat volume, estimasi runtime, status risiko, dan prioritas lokasi yang perlu dicek di lapangan.",
+      "Operators see volume, runtime estimates, risk status, and prioritized locations that need field checks.",
     badge: "Dashboard",
   },
 ];
@@ -116,13 +116,13 @@ export default async function Home() {
 
   return (
     <main
-      id="beranda"
+      id="home"
       className="min-h-screen w-full max-w-full overflow-x-hidden bg-white text-zinc-950"
     >
       {/* Header */}
       <header className="sticky top-0 z-50 mx-auto flex h-20 max-w-[1480px] items-center justify-between border-b border-zinc-100 bg-white/85 px-5 backdrop-blur-xl sm:px-8 lg:px-12">
         <a
-          href="#beranda"
+          href="#home"
           className="flex items-center gap-3"
           aria-label="FTM"
         >
@@ -150,13 +150,13 @@ export default async function Home() {
             href="/login"
             className="hidden text-zinc-800 transition hover:text-red-600 sm:inline"
           >
-            Masuk
+            Sign in
           </a>
           <a
             href="/register"
             className="rounded-lg border border-zinc-300 px-5 py-3 text-zinc-900 transition hover:border-red-500 hover:text-red-600"
           >
-            Daftar
+            Sign up
           </a>
         </div>
       </header>
@@ -186,7 +186,7 @@ export default async function Home() {
         >
           <div className="relative h-40 w-56 bg-[#fff18a] px-7 py-6 text-lg font-medium leading-7 shadow-xl shadow-zinc-300/40">
             <span className="absolute -top-2 left-1/2 size-4 -translate-x-1/2 rounded-full bg-red-500 shadow" />
-            Catat stok bahan bakar, cek runtime genset, dan pantau status STO.
+            Record fuel stock, check generator runtime, and monitor STO status.
           </div>
         </div>
 
@@ -205,14 +205,14 @@ export default async function Home() {
           className="animate-soft-float absolute right-20 top-28 hidden w-64 rounded-lg border border-zinc-200 bg-white p-5 shadow-2xl shadow-zinc-300/50 lg:block"
           style={{ "--float-rotate": "6deg" } as React.CSSProperties}
         >
-          <p className="text-lg font-semibold">Pengingat operasional</p>
+          <p className="text-lg font-semibold">Operational reminders</p>
           <div className="mt-5 rounded-full bg-zinc-100 px-4 py-2 text-right text-xs text-zinc-400">
-            Jadwal pengecekan
+            Check schedule
           </div>
           <div className="mt-4 border-t border-zinc-100 pt-4">
-            <p className="text-sm font-semibold">Validasi sensor hari ini</p>
+            <p className="text-sm font-semibold">Today&apos;s sensor validation</p>
             <p className="mt-1 text-xs leading-5 text-zinc-500">
-              Cocokkan pembacaan dashboard dengan kondisi lapangan.
+              Match dashboard readings with field conditions.
             </p>
             <div className="mt-4 rounded-lg bg-cyan-50 px-3 py-2 text-center text-xs font-medium text-cyan-700">
               13:00 - 13:45
@@ -232,7 +232,7 @@ export default async function Home() {
         </div>
 
         <div className="absolute bottom-10 left-12 hidden w-[25rem] rounded-lg border border-zinc-200 bg-white/95 p-6 shadow-2xl shadow-zinc-300/50 xl:block">
-          <p className="text-lg font-semibold">Ilustrasi status tangki</p>
+          <p className="text-lg font-semibold">Tank status illustration</p>
           <div className="mt-5 space-y-4">
             {tankStatus.map((tank) => (
               <div
@@ -243,7 +243,7 @@ export default async function Home() {
                   <div>
                     <p className="text-sm font-semibold">{tank.name}</p>
                     <p className="mt-1 text-xs text-zinc-500">
-                      Estimasi {tank.runtime}
+                      Est. {tank.runtime}
                     </p>
                   </div>
                   <span className="text-sm font-semibold text-zinc-700">
@@ -259,7 +259,7 @@ export default async function Home() {
         </div>
 
         <div className="absolute bottom-10 right-14 hidden w-[25rem] rounded-lg border border-zinc-200 bg-white/95 p-6 shadow-2xl shadow-zinc-300/50 xl:block">
-          <p className="text-lg font-semibold">Pilot operasional aktif</p>
+          <p className="text-lg font-semibold">Live operational pilot</p>
           <div className="mt-7 grid grid-cols-3 gap-3">
             {siteStats.map(([value, label]) => (
               <div
@@ -297,16 +297,16 @@ export default async function Home() {
           </div>
 
           <h1 className="w-full max-w-[22rem] text-[clamp(2.1rem,9vw,5.8rem)] font-medium leading-[1.08] tracking-normal sm:max-w-5xl sm:text-[clamp(3rem,6.4vw,5.8rem)]">
-            <span className="block sm:inline">Pantau tangki</span>{" "}
-            <span className="block sm:inline">solar</span>
+            <span className="block sm:inline">Monitor diesel</span>{" "}
+            <span className="block sm:inline">tanks</span>
             <span className="block pt-3 text-zinc-400">
-              dalam satu dashboard
+              in a single dashboard
             </span>
           </h1>
 
           <p className="mt-8 w-full max-w-[18rem] text-sm leading-8 text-zinc-700 sm:max-w-2xl sm:text-lg">
-            Baca volume, estimasi durasi operasional genset, dan status risiko
-            setiap STO dengan tampilan yang rapi dan mudah dipahami.
+            Read volume, estimate generator runtime, and see the risk status
+            of every STO in a clean, easy-to-understand display.
           </p>
 
           <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
@@ -314,33 +314,33 @@ export default async function Home() {
               href="/register"
               className="w-full sm:w-auto rounded-lg bg-blue-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
             >
-              Daftar sekarang
+              Sign up now
             </a>
             <a
               href="/login"
               className="w-full sm:w-auto rounded-lg border border-zinc-300 bg-white px-8 py-4 text-base font-semibold text-zinc-900 transition hover:border-red-500 hover:text-red-600"
             >
-              Masuk
+              Sign in
             </a>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="fitur" className="bg-zinc-50 px-5 py-24 sm:px-8 lg:px-12">
+      <section id="features" className="bg-zinc-50 px-5 py-24 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-[1480px]">
           <div className="animate-soft-fade reveal-on-scroll mx-auto max-w-4xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-xl shadow-red-600/30">
               <span className="size-2 rounded-full bg-white/50" />
-              Fitur
+              Features
             </span>
             <h2 className="mt-10 text-[clamp(1.75rem,4.2vw,3.75rem)] font-medium leading-[1.08] tracking-normal text-zinc-950">
-              Manajemen tangki dalam satu tempat
+              Tank management in one place
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-zinc-600 sm:text-lg">
-              Dashboard disiapkan untuk membaca data perangkat, melihat kondisi
-              terbaru, menelusuri riwayat volume, dan membantu menentukan
-              prioritas pengecekan operasional.
+              The dashboard is built to read device data, show the latest
+              conditions, explore volume history, and help prioritize
+              operational checks.
             </p>
           </div>
 
@@ -350,7 +350,7 @@ export default async function Home() {
                 <div className="absolute left-0 top-8 w-[62%] rotate-[-5deg] rounded-lg border border-zinc-200 bg-white p-5 shadow-xl shadow-zinc-200/80">
                   <div className="mb-5 flex items-center justify-between">
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
-                      Daftar STO
+                      STO list
                     </p>
                     <span className="grid size-7 place-items-center rounded-lg border border-zinc-200 text-sm font-semibold text-red-500">
                       +
@@ -380,7 +380,7 @@ export default async function Home() {
 
                 <div className="absolute right-0 top-20 w-[74%] rounded-lg border border-zinc-200 bg-white p-5 shadow-2xl shadow-zinc-200/90 sm:w-[68%]">
                   <p className="text-sm font-semibold text-zinc-500">
-                    Prioritas hari ini
+                    Today&apos;s priorities
                   </p>
                   <div className="mt-4 space-y-3">
                     {monitoredSites.map((site) => (
@@ -391,7 +391,7 @@ export default async function Home() {
                               {site.name}
                             </p>
                             <p className="mt-1 text-xs text-zinc-500">
-                              Estimasi {site.runtime}
+                              Est. {site.runtime}
                             </p>
                           </div>
                           <span className="whitespace-nowrap rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600">
@@ -412,24 +412,24 @@ export default async function Home() {
 
               <div className="mx-auto max-w-md text-center">
                 <h3 className="text-2xl font-semibold text-zinc-950">
-                  Manajemen multi-STO
+                  Multi-STO management
                 </h3>
                 <p className="mt-4 text-base leading-7 text-zinc-600">
-                  Setiap lokasi bisa dipantau dari satu daftar ringkas, sehingga
-                  STO yang aman, waspada, dan perlu dicek dapat dibedakan tanpa
-                  membuka banyak halaman.
+                  Every location can be monitored from one compact list, so
+                  safe, warning, and check-needed STOs are distinguishable
+                  without opening multiple pages.
                 </p>
               </div>
             </article>
 
             <article
-              id="alur-data"
+              id="data-flow"
               className="animate-soft-fade reveal-on-scroll overflow-hidden rounded-lg border border-zinc-200 bg-white p-6 shadow-sm scroll-mt-24"
             >
               <div className="grid min-h-[22rem] gap-4 md:grid-cols-[0.88fr_1.12fr_0.78fr]">
                 <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
                   <p className="text-sm font-semibold text-zinc-500">
-                    Riwayat volume
+                    Volume history
                   </p>
                   <div className="mt-8 flex h-44 items-end gap-3">
                     {[48, 62, 58, 71, 64, 78].map((height, index) => (
@@ -457,7 +457,7 @@ export default async function Home() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="text-sm font-semibold text-zinc-500">
-                        Pembacaan terbaru
+                        Latest reading
                       </p>
                       <h3 className="mt-2 text-2xl font-semibold text-zinc-950">
                         STO TPH
@@ -484,7 +484,7 @@ export default async function Home() {
 
                 <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
                   <p className="text-sm font-semibold text-zinc-500">
-                    Kesehatan data
+                    Data health
                   </p>
                   <div
                     className="mx-auto mt-8 grid size-36 place-items-center rounded-full p-4"
@@ -517,12 +517,12 @@ export default async function Home() {
 
               <div className="mx-auto mt-8 max-w-2xl text-center">
                 <h3 className="text-2xl font-semibold text-zinc-950">
-                  Latest, history, dan status data
+                  Latest, history, and data status
                 </h3>
                 <p className="mt-4 text-base leading-7 text-zinc-600">
-                  Alur data dibuat jelas: perangkat mengirim pembacaan ke API,
-                  dashboard mengambil data terbaru, lalu riwayat dipakai untuk
-                  melihat perubahan volume dari waktu ke waktu.
+                  The data flow is kept clear: devices send readings to the
+                  API, the dashboard fetches the latest data, and history is
+                  used to track volume changes over time.
                 </p>
               </div>
             </article>
@@ -530,18 +530,17 @@ export default async function Home() {
 
           <div className="mt-6 grid gap-6 lg:grid-cols-[1.55fr_0.85fr]">
             <article
-              id="operasional"
+              id="operations"
               className="animate-soft-fade reveal-on-scroll overflow-hidden rounded-lg border border-zinc-200 bg-white p-6 shadow-sm scroll-mt-24"
             >
               <div className="grid min-h-[24rem] gap-6 lg:grid-cols-[0.72fr_1.28fr]">
                 <div className="flex flex-col justify-center">
                   <h3 className="mt-8 text-3xl font-semibold leading-tight text-zinc-950">
-                    Runtime genset dan prioritas risiko
+                    Generator runtime and risk priority
                   </h3>
                   <p className="mt-5 text-base leading-8 text-zinc-600">
-                    Volume bahan bakar diterjemahkan menjadi estimasi durasi
-                    operasional, supaya keputusan lapangan tidak berhenti di
-                    angka liter saja.
+                    Fuel volume is translated into an estimated operational
+                    duration so field decisions don&apos;t stop at liter numbers.
                   </p>
                 </div>
 
@@ -550,14 +549,14 @@ export default async function Home() {
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold text-zinc-500">
-                          Simulasi runtime
+                          Runtime simulation
                         </p>
                         <p className="mt-1 text-2xl font-semibold text-zinc-950">
-                          18 jam 20 menit
+                          18 hrs 20 min
                         </p>
                       </div>
                       <span className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
-                        Aman
+                        Safe
                       </span>
                     </div>
 
@@ -596,10 +595,10 @@ export default async function Home() {
 
                   <div className="mt-5 grid gap-3 md:grid-cols-2">
                     {[
-                      ["Konsumsi acuan", "25 L/jam"],
-                      ["Kapasitas contoh", "5.000 L"],
-                      ["Sumber data", "sensor + API"],
-                      ["Tindak lanjut", "cek lapangan"],
+                      ["Reference consumption", "25 L/h"],
+                      ["Sample capacity", "5,000 L"],
+                      ["Data source", "sensor + API"],
+                      ["Follow-up", "field check"],
                     ].map(([label, value]) => (
                       <div
                         key={label}
@@ -639,7 +638,7 @@ export default async function Home() {
                     <p className="mt-3 text-3xl font-semibold">API</p>
                   </div>
                   <div className="absolute right-0 top-8 w-32 rotate-6 rounded-lg border border-zinc-200 bg-zinc-50 p-4 shadow-lg shadow-zinc-200/70">
-                    <p className="text-sm font-semibold">Perangkat</p>
+                    <p className="text-sm font-semibold">Device</p>
                     <div className="mt-4 grid grid-cols-2 gap-2">
                       <span className="h-9 rounded-lg bg-cyan-400" />
                       <span className="h-9 rounded-lg bg-emerald-500" />
@@ -650,12 +649,12 @@ export default async function Home() {
                 </div>
 
                 <h3 className="mt-8 text-2xl font-semibold text-zinc-950">
-                  Siap simulator dan perangkat
+                  Simulator and device ready
                 </h3>
                 <p className="mt-4 text-base leading-7 text-zinc-600">
-                  Pengembangan tetap bisa berjalan dari data contoh dan
-                  simulator, lalu disambungkan bertahap ke pembacaan perangkat
-                  yang mengirim data ke endpoint API.
+                  Development can run on sample data and a simulator, then
+                  gradually connect to real device readings sent to the API
+                  endpoint.
                 </p>
               </div>
             </article>
@@ -665,24 +664,24 @@ export default async function Home() {
 
       {/* How It Works Section */}
       <section
-        id="cara-kerja"
+        id="how-it-works"
         className="scroll-mt-24 bg-white px-5 py-24 sm:px-8 lg:px-12"
       >
         <div className="mx-auto max-w-[1480px]">
           <div className="animate-soft-fade reveal-on-scroll mx-auto max-w-4xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-xl shadow-red-600/30">
               <span className="size-2 rounded-full bg-white/50" />
-              Cara Kerja
+              How It Works
             </span>
             <h2 className="mt-10 text-[clamp(1.75rem,4.2vw,3.75rem)] font-medium leading-[1.08] tracking-normal text-zinc-950">
-              Alur kerja dalam{" "}
-              <span className="font-serif italic text-red-600">tiga</span>{" "}
-              langkah
+              Workflow in{" "}
+              <span className="font-serif italic text-red-600">three</span>{" "}
+              steps
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-zinc-600 sm:text-lg">
-              Sistem dirancang mengikuti pola existing yang sudah terbukti:
-              perangkat mengirim data, server menyiapkan informasi, lalu
-              dashboard membantu keputusan operasional.
+              The system follows a proven existing pattern: devices send
+              data, the server prepares information, and the dashboard
+              supports operational decisions.
             </p>
           </div>
 
@@ -735,7 +734,7 @@ export default async function Home() {
                     style={{ "--float-rotate": "-6deg" } as React.CSSProperties}
                   >
                     <p className="text-sm font-semibold text-zinc-500">
-                      Perangkat
+                      Device
                     </p>
                     <div className="mt-5 grid grid-cols-2 gap-2">
                       <span className="h-10 rounded-lg bg-cyan-400" />
@@ -744,7 +743,7 @@ export default async function Home() {
                       <span className="h-10 rounded-lg bg-amber-400" />
                     </div>
                     <p className="mt-4 text-xs leading-5 text-zinc-500">
-                      Sensor membaca level tangki.
+                      The sensor reads the tank level.
                     </p>
                   </div>
 
@@ -754,7 +753,7 @@ export default async function Home() {
                     </p>
                     <p className="mt-4 text-4xl font-semibold">/ingest</p>
                     <div className="mt-5 rounded-lg bg-white/15 px-4 py-3 text-sm">
-                      validasi device id dan API key
+                      validates device id and API key
                     </div>
                   </div>
 
@@ -784,21 +783,21 @@ export default async function Home() {
                     <div className="flex flex-wrap items-center justify-between gap-4">
                       <div>
                         <p className="text-sm font-semibold text-zinc-500">
-                          Hasil operasional
+                          Operational outcome
                         </p>
                         <p className="mt-2 text-2xl font-semibold text-zinc-950">
-                          STO prioritas terlihat lebih cepat
+                          Priority STOs become visible faster
                         </p>
                       </div>
                       <span className="rounded-full bg-red-50 px-4 py-2 text-sm font-semibold text-red-600">
-                        siap tindak lanjut
+                        ready for follow-up
                       </span>
                     </div>
                     <div className="mt-6 grid gap-3 sm:grid-cols-3">
                       {[
-                        ["Volume", "3.900 L"],
-                        ["Runtime", "18 jam"],
-                        ["Status", "Aman"],
+                        ["Volume", "3,900 L"],
+                        ["Runtime", "18 hrs"],
+                        ["Status", "Safe"],
                       ].map(([label, value]) => (
                         <div
                           key={label}
@@ -823,22 +822,22 @@ export default async function Home() {
 
       {/* Closing CTA Section */}
       <section
-        id="daftar"
+        id="access"
         className="bg-white px-5 pb-24 pt-10 sm:px-8 lg:px-12"
       >
         <div className="mx-auto flex max-w-4xl flex-col items-center rounded-2xl border border-zinc-100 bg-zinc-50 px-6 py-14 text-center shadow-sm sm:px-12 sm:py-20">
           <h2 className="text-2xl font-semibold text-zinc-950 sm:text-3xl">
-            Siap memantau operasional tangki STO?
+            Ready to monitor STO tank operations?
           </h2>
           <p className="mx-auto mt-4 mb-8 max-w-xl text-base text-zinc-600">
-            Dapatkan visibilitas penuh terhadap volume bahan bakar dan pantau
-            estimasi runtime genset dalam satu dashboard terpusat.
+            Get full visibility into fuel volume and track generator runtime
+            estimates in one centralized dashboard.
           </p>
           <a
             href="/login"
             className="w-full rounded-lg bg-blue-600 px-8 py-4 text-center text-base font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 sm:w-auto"
           >
-            Masuk ke dashboard sekarang
+            Go to the dashboard now
           </a>
         </div>
       </section>
@@ -852,7 +851,7 @@ export default async function Home() {
               markClassName="size-7"
               textClassName="font-semibold text-zinc-900"
             />
-            <span>&copy; 2026 Hak Cipta Dilindungi.</span>
+            <span>&copy; 2026 All rights reserved.</span>
           </div>
           <p>FTM Fuel Tank Management Service.</p>
         </div>

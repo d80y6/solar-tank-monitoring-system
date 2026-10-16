@@ -59,7 +59,7 @@ function toRequiredIso(value: Date | string): string {
   const isoValue = toIso(value);
 
   if (!isoValue) {
-    throw new Error("Timestamp helpdesk dari MySQL tidak valid.");
+    throw new Error("Helpdesk timestamp from MySQL is invalid.");
   }
 
   return isoValue;
@@ -120,7 +120,7 @@ export function normalizeHelpdeskMessage(value: unknown): string {
     .replace(/\n{4,}/g, "\n\n\n");
 
   if (!text) {
-    throw new Error("Pesan helpdesk tidak boleh kosong.");
+    throw new Error("Helpdesk message must not be empty.");
   }
 
   return text.slice(0, MAX_MESSAGE_LENGTH);
@@ -255,11 +255,11 @@ export async function getOrCreateHelpdeskSession({
   const session = await findSessionByTokenHash(tokenHash);
 
   if (!session) {
-    throw new Error("Sesi helpdesk gagal dibuat.");
+    throw new Error("Helpdesk session could not be created.");
   }
 
   await addHelpdeskMessage({
-    body: "Sesi helpdesk dibuat. Admin akan membalas melalui chat ini.",
+    body: "Helpdesk session created. An admin will reply in this chat.",
     senderLabel: "FTM",
     senderType: "system",
     sessionId,
@@ -319,7 +319,7 @@ export async function addHelpdeskMessage({
   const row = rows[0];
 
   if (!row) {
-    throw new Error("Pesan helpdesk gagal disimpan.");
+    throw new Error("Helpdesk message could not be saved.");
   }
 
   return rowToMessage(row);
@@ -343,7 +343,7 @@ export async function addUserHelpdeskMessage({
   });
 
   if (bundle.session.status === "closed") {
-    throw new Error("Sesi helpdesk sudah ditutup.");
+    throw new Error("Helpdesk session is closed.");
   }
 
   const requester = buildRequester(user);
@@ -417,11 +417,11 @@ export function summarizeHelpdeskSession(session: HelpdeskSession): string {
   const requester =
     session.requesterName && session.requesterEmail
       ? `${session.requesterName} <${session.requesterEmail}>`
-      : (session.requesterName ?? session.requesterEmail ?? "Visitor web");
+      : (session.requesterName ?? session.requesterEmail ?? "Web visitor");
 
   return [
     `Session: ${session.sessionCode}`,
     `User: ${requester}`,
-    `Halaman: ${session.sourcePath || "-"}`,
+    `Page: ${session.sourcePath || "-"}`,
   ].join("\n");
 }

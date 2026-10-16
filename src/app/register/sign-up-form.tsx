@@ -19,7 +19,7 @@ const inputClassName =
 const labelClassName =
   "mb-1.5 block text-[0.82rem] font-semibold text-zinc-800";
 const captchaRequiredMessage =
-  "Selesaikan verifikasi keamanan terlebih dahulu.";
+  "Please complete the security verification first.";
 const isCaptchaEnabled = Boolean(
   process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim(),
 );
@@ -54,7 +54,7 @@ function PasswordField({
         />
         <button
           aria-label={
-            showPassword ? `Sembunyikan ${label}` : `Tampilkan ${label}`
+            showPassword ? `Hide ${label}` : `Show ${label}`
           }
           className="absolute inset-y-0 right-0 grid w-11 place-items-center text-zinc-400 transition hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600"
           onClick={() => setShowPassword((visible) => !visible)}
@@ -75,7 +75,7 @@ function buildAccessReason(formData: FormData): string {
   const position = String(formData.get("position") ?? "").trim();
   const note = String(formData.get("accessReason") ?? "").trim();
 
-  return [`Peran kerja: ${position || "-"}`, note]
+  return [`Work role: ${position || "-"}`, note]
     .filter(Boolean)
     .join("\n\n");
 }
@@ -126,7 +126,7 @@ export default function SignUpForm() {
 
       if (!response.ok || !result?.ok) {
         throw new Error(
-          result?.error ?? "Pengajuan akses belum bisa diproses.",
+          result?.error ?? "The access request could not be processed yet.",
         );
       }
 
@@ -136,7 +136,7 @@ export default function SignUpForm() {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Pengajuan akses belum bisa diproses.",
+          : "The access request could not be processed yet.",
       );
     } finally {
       if (isCaptchaEnabled) {
@@ -151,7 +151,7 @@ export default function SignUpForm() {
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <label className={labelClassName} htmlFor="fullName">
-            Nama lengkap
+            Full name
           </label>
           <div className="relative">
             <UserRound
@@ -164,7 +164,7 @@ export default function SignUpForm() {
               className={`${inputClassName} pl-10`}
               id="fullName"
               name="fullName"
-              placeholder="Nama sesuai identitas"
+              placeholder="Name as shown on your ID"
               required
               type="text"
             />
@@ -172,14 +172,14 @@ export default function SignUpForm() {
         </div>
         <div>
           <label className={labelClassName} htmlFor="username">
-            Nama pengguna
+            Username
           </label>
           <input
             autoComplete="username"
             className={inputClassName}
             id="username"
             name="username"
-            placeholder="Contoh: operator.pasuruan"
+            placeholder="Example: operator.pasuruan"
             required
             type="text"
           />
@@ -188,7 +188,7 @@ export default function SignUpForm() {
 
       <div>
         <label className={labelClassName} htmlFor="email">
-          Email kerja
+          Work email
         </label>
         <div className="relative">
           <Mail
@@ -201,20 +201,20 @@ export default function SignUpForm() {
             id="email"
             inputMode="email"
             name="email"
-            placeholder="nama@perusahaan.co.id"
+            placeholder="name@company.co.id"
             required
             type="email"
           />
         </div>
         <p className="mt-1 text-[0.72rem] leading-5 text-zinc-500">
-          Email ini dipakai admin untuk meninjau dan mengaktifkan akses.
+          Admins use this email to review and activate access.
         </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <label className={labelClassName} htmlFor="phone">
-            Nomor telepon
+            Phone number
           </label>
           <div className="relative">
             <Phone
@@ -228,19 +228,19 @@ export default function SignUpForm() {
               inputMode="tel"
               pattern="(?:[+]?62|0|8)[0-9 .()-]{7,16}"
               name="phone"
-              placeholder="08xxxxxxxxxx atau +628xxxxxxxxxx"
+              placeholder="08xxxxxxxxxx or +628xxxxxxxxxx"
               required
-              title="Gunakan nomor seluler Indonesia, contoh 081234567890 atau +6281234567890."
+              title="Use an Indonesian mobile number, e.g. 081234567890 or +6281234567890."
               type="tel"
             />
           </div>
           <p className="mt-1 text-[0.72rem] leading-5 text-zinc-500">
-            Nomor akan disimpan konsisten dalam format +62.
+            The number is stored consistently in +62 format.
           </p>
         </div>
         <div>
           <label className={labelClassName} htmlFor="position">
-            Peran kerja
+            Work role
           </label>
           <div className="relative">
             <BriefcaseBusiness
@@ -255,11 +255,11 @@ export default function SignUpForm() {
               required
             >
               <option disabled value="">
-                Pilih peran
+                Select a role
               </option>
-              <option>Operator operasional</option>
-              <option>Teknisi lapangan</option>
-              <option>Reviewer operasional</option>
+              <option>Operations operator</option>
+              <option>Field technician</option>
+              <option>Operations reviewer</option>
             </select>
           </div>
         </div>
@@ -268,27 +268,27 @@ export default function SignUpForm() {
       <div className="grid gap-3 sm:grid-cols-2">
         <PasswordField
           id="password"
-          label="Kata sandi"
+          label="Password"
           name="password"
-          placeholder="Minimal 10 karakter"
+          placeholder="Minimum 10 characters"
         />
         <PasswordField
           id="confirmPassword"
-          label="Konfirmasi sandi"
+          label="Confirm password"
           name="confirmPassword"
-          placeholder="Ulangi kata sandi"
+          placeholder="Repeat your password"
         />
       </div>
 
       <div>
         <label className={labelClassName} htmlFor="accessReason">
-          Catatan akses
+          Access note
         </label>
         <textarea
           className="min-h-24 w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-3 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
           id="accessReason"
           name="accessReason"
-          placeholder="Contoh: perlu memantau status tangki STO area Pasuruan."
+          placeholder="Example: need to monitor tank status for the Pasuruan STO area."
         />
       </div>
 
@@ -296,8 +296,9 @@ export default function SignUpForm() {
 
       {submitted ? (
         <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-          Pengajuan akses diterima. Cek email kerja untuk verifikasi, lalu
-          administrator akan meninjau sebelum akun aktif.
+          Access request received. Check your work email for verification,
+          then an administrator will review it before the account becomes
+          active.
         </div>
       ) : null}
 
@@ -312,7 +313,7 @@ export default function SignUpForm() {
         disabled={pending}
         type="submit"
       >
-        {pending ? "Mengirim..." : "Ajukan akses"}
+        {pending ? "Submitting..." : "Request access"}
         <ArrowRight
           aria-hidden="true"
           className="size-4 transition group-hover:translate-x-0.5"

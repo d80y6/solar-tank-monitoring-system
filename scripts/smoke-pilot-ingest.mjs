@@ -51,15 +51,15 @@ const VALUE_FLAGS = new Map([
 
 function printHelp() {
   globalThis.console.log(`
-Smoke test ingest pilot dengan payload real-format.
+Smoke test pilot ingest with real-format payloads.
 
 Pemakaian:
   PILOT_DEVICE_KEY="key-real" pnpm pilot:smoke
   pnpm pilot:smoke -- --base-url https://solar-tank-monitoring-system.vercel.app --device pilot-tph-01
 
 Opsi penting:
-  --base-url <url>                    Default: PILOT_API_BASE_URL atau http://localhost:3000
-  --device <id>                       Default: PILOT_DEVICE_ID atau pilot-tph-01
+  --base-url <url>                    Default: PILOT_API_BASE_URL or http://localhost:3000
+  --device <id>                       Default: PILOT_DEVICE_ID or pilot-tph-01
   --key <key>                         Default: PILOT_DEVICE_KEY
   --distance-cm <angka>               Default: 10.2
   --capacity-liter <angka>            Default: 540
@@ -67,10 +67,10 @@ Opsi penting:
   --width-cm <angka>                  Default: 60
   --height-cm <angka>                 Default: 60
   --sensor-mount-height-cm <angka>    Default: 60
-  --lat <angka> --lng <angka>         Opsional, hanya jika koordinat sudah boleh dikirim
-  --device-ip <ip>                    Opsional, jangan pakai IP internal kalau tidak boleh dibagikan
-  --dry-run                           Tampilkan payload tanpa mengirim
-  --allow-config-review               Jangan gagal jika response needsReview=true
+  --lat <number> --lng <number>     Optional, only when coordinates may be sent
+  --device-ip <ip>                    Optional, do not use an internal IP if it must not be shared
+  --dry-run                           Show the payload without sending
+  --allow-config-review               Do not fail when response needsReview=true
   --help                              Tampilkan bantuan
 `);
 }
@@ -79,7 +79,7 @@ function normalizeBaseUrl(value) {
   const cleanValue = String(value).trim();
 
   if (!cleanValue) {
-    throw new Error("Base URL tidak boleh kosong.");
+    throw new Error("Base URL must not be empty.");
   }
 
   return cleanValue.replace(/\/+$/, "");
@@ -89,7 +89,7 @@ function normalizeEndpointPath(value) {
   const cleanValue = String(value).trim();
 
   if (!cleanValue) {
-    throw new Error("Endpoint tidak boleh kosong.");
+    throw new Error("Endpoint must not be empty.");
   }
 
   return cleanValue.startsWith("/") ? cleanValue : `/${cleanValue}`;
@@ -99,11 +99,11 @@ function toNumber(value, label, { min = -Infinity, max = Infinity } = {}) {
   const number = Number(value);
 
   if (!Number.isFinite(number)) {
-    throw new Error(`${label} harus berupa angka.`);
+    throw new Error(`${label} must be a number.`);
   }
 
   if (number < min || number > max) {
-    throw new Error(`${label} harus berada di rentang ${min} sampai ${max}.`);
+    throw new Error(`${label} must be in the range ${min} to ${max}.`);
   }
 
   return number;
@@ -147,13 +147,13 @@ function parseArgs(argv) {
     const optionKey = VALUE_FLAGS.get(arg);
 
     if (!optionKey) {
-      throw new Error(`Argumen tidak dikenal: ${arg}`);
+      throw new Error(`Unknown argument: ${arg}`);
     }
 
     const value = argv[index + 1];
 
     if (!value || value.startsWith("--")) {
-      throw new Error(`${arg} membutuhkan nilai.`);
+      throw new Error(`${arg} requires a value.`);
     }
 
     options[optionKey] = value;
@@ -167,7 +167,7 @@ function normalizeOptions(options) {
   const tankShape = String(options.tankShape).trim();
 
   if (tankShape !== "rectangular") {
-    throw new Error("Smoke pilot saat ini hanya mendukung tankShape rectangular.");
+    throw new Error("Smoke pilot currently only supports tankShape rectangular.");
   }
 
   const normalized = {
@@ -216,19 +216,19 @@ function normalizeOptions(options) {
   };
 
   if (!normalized.deviceId) {
-    throw new Error("Device ID wajib diisi.");
+    throw new Error("Device ID is required.");
   }
 
   if (!normalized.deviceKey && !normalized.dryRun) {
-    throw new Error("PILOT_DEVICE_KEY atau --key wajib diisi untuk mengirim.");
+    throw new Error("PILOT_DEVICE_KEY or --key is required to send.");
   }
 
   if (normalized.criticalLevelPercent >= normalized.lowLevelPercent) {
-    throw new Error("criticalLevelPercent harus lebih kecil dari lowLevelPercent.");
+    throw new Error("criticalLevelPercent must be smaller than lowLevelPercent.");
   }
 
   if (normalized.distanceCm > normalized.sensorMountHeightCm) {
-    throw new Error("distanceCm tidak boleh lebih besar dari sensorMountHeightCm.");
+    throw new Error("distanceCm must not be greater than sensorMountHeightCm.");
   }
 
   return normalized;
@@ -326,24 +326,24 @@ async function postPayload(options, payload) {
 
 function validateResult(options, result) {
   if (!result.ok) {
-    throw new Error(`Ingest gagal dengan HTTP ${result.status}.`);
+    throw new Error(`Ingest failed with HTTP ${result.status}.`);
   }
 
   if (!result.body?.ok) {
-    throw new Error("Response ingest tidak membawa ok=true.");
+    throw new Error("Ingest response does not carry ok=true.");
   }
 
   const data = result.body.data;
 
   if (options.expectStorage && data?.storage !== options.expectStorage) {
     throw new Error(
-      `Storage response ${data?.storage ?? "-"} tidak sesuai ekspektasi ${options.expectStorage}.`,
+      `Storage response ${data?.storage ?? "-"} does not match the expectation ${options.expectStorage}.`,
     );
   }
 
   if (data?.needsReview && !options.allowConfigReview) {
     throw new Error(
-      "Ingest sukses tetapi config perlu review. Jalankan dengan --allow-config-review hanya untuk test mismatch yang disengaja.",
+      "Ingest succeeded but the config needs review. Run with --allow-config-review only for intentional mismatch tests.",
     );
   }
 
@@ -381,7 +381,7 @@ async function main() {
   }
 
   if (typeof globalThis.fetch !== "function") {
-    throw new Error("Fetch tidak tersedia. Gunakan Node.js 18 atau lebih baru.");
+    throw new Error("Fetch is unavailable. Use Node.js 18 or newer.");
   }
 
   const result = await postPayload(options, payload);

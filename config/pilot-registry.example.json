@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "name": "Contoh registry pilot 5 STO",
-  "description": "Salin file ini menjadi config/pilot-registry.local.json, lalu ganti koordinat, kode device, dan hash key memakai data yang sudah disetujui. File .local.json tidak boleh di-commit.",
+  "description": "Copy this file to config/pilot-registry.local.json, then replace the coordinates, device code, and key hash with approved data. The .local.json file must not be committed.",
   "sites": [
     {
       "id": "site-tph",

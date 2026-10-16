@@ -140,7 +140,7 @@ export function AdminConfirmationDialog(
           ref={cancelButtonRef}
           type="button"
         >
-          Batal
+          Cancel
         </button>
         <button
           className={`inline-flex h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold shadow-lg transition focus-visible:outline-none focus-visible:ring-4 disabled:cursor-wait ${classes.button}`}
@@ -149,7 +149,7 @@ export function AdminConfirmationDialog(
           type={"formAction" in props ? "submit" : "button"}
         >
           {confirmIcon}
-          {pending ? "Memproses..." : confirmation.confirmLabel}
+          {pending ? "Processing..." : confirmation.confirmLabel}
         </button>
       </div>
     </>
@@ -201,7 +201,7 @@ export function AdminConfirmationDialog(
             </div>
           </div>
           <button
-            aria-label="Tutup dialog konfirmasi"
+            aria-label="Close confirmation dialog"
             className="grid size-9 shrink-0 place-items-center rounded-lg text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 disabled:cursor-not-allowed disabled:opacity-50"
             disabled={pending}
             onClick={onClose}

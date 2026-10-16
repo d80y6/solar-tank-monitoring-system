@@ -3,9 +3,9 @@ import { DashboardRouteLoading } from "@/components/dashboard/dashboard-route-lo
 export default function UsersLoading() {
   return (
     <DashboardRouteLoading
-      label="Memuat pengguna"
-      title="Menyiapkan manajemen pengguna"
-      description="Sistem sedang membaca akun, status akses, dan antrean persetujuan."
+      label="Loading users"
+      title="Preparing user management"
+      description="The system is reading accounts, access status, and the approval queue."
     />
   );
 }

@@ -1,184 +1,182 @@
 # Roadmap
 
-Roadmap ini menjelaskan rencana pengembangan bertahap.
+This roadmap explains the phased development plan.
 
-## Fase 1 - Fondasi Repositori
+## Phase 1 - Repository Foundation
 
-Status: selesai.
+Status: done.
 
-Isi:
+Contents:
 
 - Next.js project;
 - TypeScript;
 - Tailwind CSS;
-- struktur dokumentasi;
-- aturan keamanan publik;
-- CI dasar.
+- documentation structure;
+- public security rules;
+- basic CI.
 
-## Fase 2 - Landing Page
+## Phase 2 - Landing Page
 
-Status: selesai untuk versi awal.
+Status: done for the initial version.
 
-Isi:
+Contents:
 
-- landing page Bahasa Indonesia;
-- gaya visual bersih;
-- konteks monitoring tangki;
-- tombol masuk dashboard.
+- landing page;
+- clean visual style;
+- tank monitoring context;
+- dashboard entry button.
 
-## Fase 3 - Dashboard dan Detail Awal
+## Phase 3 - Initial Dashboard and Detail
 
-Status: selesai untuk versi awal.
+Status: done for the initial version.
 
-Isi:
+Contents:
 
-- halaman dashboard;
-- halaman detail tangki;
-- peta ilustratif;
-- kartu status;
-- tabel monitoring;
-- visual tangki.
+- dashboard page;
+- tank detail page;
+- illustrative map;
+- status cards;
+- monitoring table;
+- tank visual.
 
-Catatan:
+Note:
 
 ```text
-UI monitoring dan detail sudah membaca storage aktif yang sama dengan endpoint API. Registry MySQL, alat bantu pilot, dan fondasi auth database sudah tersedia, tetapi hardening production masih perlu dimatangkan.
+The monitoring and detail UI already reads the same active storage as the API endpoints. MySQL registry, pilot tooling, and the database auth foundation are available, but production hardening still needs refinement.
 ```
 
-## Fase 4 - Domain Logic dan Test
+## Phase 4 - Domain Logic and Tests
 
-Status: selesai untuk versi awal.
+Status: done for the initial version.
 
-Isi:
+Contents:
 
-- model data monitoring;
-- perhitungan volume;
+- monitoring data model;
+- volume calculation;
 - runtime;
 - status;
-- normalisasi payload;
-- unit test.
+- payload normalization;
+- unit tests.
 
-## Fase 5 - API dan Simulator Lokal
+## Phase 5 - API and Local Simulator
 
-Status: selesai untuk versi awal.
+Status: done for the initial version.
 
-Isi:
+Contents:
 
-- API read-only;
-- API ingest;
+- read-only API;
+- ingest API;
 - memory store;
-- simulator terminal;
-- verifikasi payload masuk;
-- history bertambah.
+- terminal simulator;
+- payload arrival verification;
+- growing history.
 
-## Fase 6 - Sambungkan UI ke Storage Aktif/API Lokal
+## Phase 6 - Connect UI to Active Storage/Local API
 
-Status: selesai untuk versi awal.
+Status: done for the initial version.
 
-Isi:
+Contents:
 
-- dashboard membaca data terbaru dari storage aktif;
-- detail membaca data terbaru dari storage aktif;
-- grafik memakai riwayat yang sama dengan endpoint readings;
-- UI berubah saat simulator mengirim data lalu halaman dirender ulang;
-- endpoint API tetap tersedia untuk kontrak integrasi.
+- dashboard reads the latest data from active storage;
+- detail reads the latest data from active storage;
+- charts use the same history as the readings endpoint;
+- the UI changes when the simulator sends data and the page re-renders;
+- API endpoints remain available for integration contracts.
 
-## Fase 7 - Storage Permanen dan Registry
+## Phase 7 - Persistent Storage and Registry
 
-Status: dipakai pada pilot operasional, hardening production belum selesai.
+Status: used in the operational pilot; production hardening not finished.
 
-Sudah ada:
+Available:
 
-- migration MySQL;
-- seed demo MySQL;
-- repository reading MySQL;
-- repository registry MySQL untuk site, tangki, device, dan hash key;
-- storage facade `memory` atau `mysql`;
-- query mengambil data terbaru terlebih dahulu;
-- script apply registry pilot dari file lokal.
+- MySQL migrations;
+- MySQL demo seed;
+- MySQL reading repository;
+- MySQL registry repository for sites, tanks, devices, and key hashes;
+- `memory` or `mysql` storage facade;
+- queries fetch the latest data first;
+- pilot registry apply script from a local file.
 
-Yang belum selesai:
+Not finished:
 
-- rotasi key device;
-- backup terenkripsi dan restore drill;
-- test integrasi database nyata;
-- audit berkala agar data contoh tetap hanya aktif di mode development lokal.
+- device key rotation;
+- encrypted backup and restore drills;
+- real database integration tests;
+- periodic audits so sample data stays active only in local development mode.
 
-## Fase 8 - Auth dan Role
+## Phase 8 - Auth and Roles
 
-Status: fondasi utama tersedia, production hardening berlanjut.
+Status: main foundation available, production hardening continues.
 
-Yang sudah tersedia:
+Available:
 
-- login;
-- role `admin` dan `user`;
-- proteksi dashboard dan halaman admin;
-- pengajuan akses pending review admin;
-- OTP admin, reset password, verifikasi email, session management, dan audit log auth.
+- sign-in;
+- `admin` and `user` roles;
+- dashboard and admin page protection;
+- access requests pending admin review;
+- admin OTP, password reset, email verification, session management, and auth audit log.
 
-Yang masih perlu dimatangkan:
+Still to refine:
 
-- SMTP production;
-- Turnstile production;
-- role operasional lebih rinci jika memang diperlukan;
-- prosedur recovery akun;
-- audit review berkala.
+- production SMTP;
+- production Turnstile;
+- more detailed operational roles if truly needed;
+- account recovery procedures;
+- periodic audit review.
 
-## Fase 9 - Integrasi Device Fisik
+## Phase 9 - Physical Device Integration
 
-Status: perangkat fisik sudah mengirim data pada pilot; kalibrasi dan hardening
-lapangan tetap perlu validasi.
+Status: physical devices already send data in the pilot; calibration and field hardening still need validation.
 
-Sudah ada:
+Available:
 
-- perangkat fisik yang terhubung ke deployment pilot;
-- normalisasi payload real-format;
-- review config payload vs registry;
-- script smoke test ingest;
-- panduan firmware payload minimal;
-- alur pengajuan perangkat oleh user;
-- review admin untuk approve/reject pengajuan;
-- pembuatan device key dan paket firmware ZIP;
-- link download firmware dengan masa berlaku dan batas download;
-- aktivasi device setelah first valid ping.
+- physical devices connected to the pilot deployment;
+- real-format payload normalization;
+- payload config vs registry review;
+- ingest smoke test script;
+- minimal firmware payload guidance;
+- device request flow by users;
+- admin review to approve/reject requests;
+- device key and firmware ZIP package generation;
+- firmware download links with expiry and download limits;
+- device activation after first valid ping.
 
-Target berikutnya:
+Next targets:
 
-- validasi firmware final bersama tim lapangan;
-- validasi pin dan hardware profile final;
-- uji di lingkungan aman;
-- validasi akurasi sensor;
-- dokumentasi operasional provisioning device setelah flow final disetujui.
+- final firmware validation with the field team;
+- final pin and hardware profile validation;
+- testing in a safe environment;
+- sensor accuracy validation;
+- operational device provisioning documentation once the final flow is approved.
 
-Catatan:
+Note:
 
-Endpoint ingest dan key per device sudah disiapkan untuk latihan dan pilot awal. Perangkat fisik tetap harus mengikuti validasi payload, jaringan, keamanan, dan safety lapangan.
+The ingest endpoint and per-device keys are prepared for practice and the early pilot. Physical devices must still follow payload, network, security, and field safety validation.
 
-## Fase 10 - Deployment Pilot
+## Phase 10 - Pilot Deployment
 
-Status: Vercel + Aiven MySQL aktif untuk pilot terbatas. Kesiapan produksi final,
-kapasitas target ekspansi, dan SOP jangka panjang belum disetujui.
+Status: Vercel + Aiven MySQL active for a limited pilot. Final production readiness, expansion target capacity, and long-term SOPs are not yet approved.
 
-Sudah ada:
+Available:
 
 - health check;
 - readiness check;
-- panduan MySQL cloud;
-- alat registry pilot;
-- smoke ingest ke URL lokal atau Vercel;
-- dokumen kebenaran operasional terkini.
-- registry 3 site, 3 tangki, dan 3 device pada verifikasi 14 Juli 2026.
+- cloud MySQL guide;
+- pilot registry tooling;
+- smoke ingest to local or Vercel URL;
+- current operational truth document.
+- registry of 3 sites, 3 tanks, and 3 devices as of the 14 July 2026 verification.
 
-Target berikutnya:
+Next targets:
 
-- uji backup dan restore MySQL ke database staging/lokal;
-- prosedur update aplikasi tanpa menghapus data;
-- monitoring dasar untuk health, readiness, disk, CPU, RAM, dan log error;
-- checklist go-live 5 device/STO.
+- test MySQL backup and restore to a staging/local database;
+- application update procedure that does not delete data;
+- basic monitoring for health, readiness, disk, CPU, RAM, and error logs;
+- go-live checklist for 5 devices/STOs.
 
-## Prinsip Roadmap
+## Roadmap Principles
 
-- Jangan menambah fitur besar sebelum alur data inti stabil.
-- Jangan memakai data real sebelum keamanan siap.
-- Jangan mengklaim production-ready sebelum validasi lapangan.
-- Setiap fase harus bisa diuji dari terminal.
+- Do not add big features before the core data flow is stable.
+- Do not use real data before security is ready.
+- Do not claim production-ready before field validation.
+- Every phase must be testable from the terminal.

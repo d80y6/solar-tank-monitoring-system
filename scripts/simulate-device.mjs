@@ -53,7 +53,7 @@ Opsi:
   --base-url <url>             Default: http://localhost:3000
   --endpoint <path>            Default: /api/ingest
   --device <id>                Default: demo-tph-01
-  --key <key>                  Default: env SOLAR_TANK_DEVICE_KEY, key demo device, atau fallback lokal
+  --key <key>                  Default: env SOLAR_TANK_DEVICE_KEY, demo device key, or local fallback
   --interval-ms <angka>        Default: 5000
   --start-percent <angka>      Default: 84
   --step-percent <angka>       Default: 1.5
@@ -63,7 +63,7 @@ Opsi:
   --battery <angka>            Default: 3.86
   --rssi <angka>               Default: -55
   --once                       Kirim sekali lalu berhenti
-  --critical                   Mulai dari 9 persen dengan step 0
+  --critical                   Start from 9 percent with step 0
   --help                       Tampilkan bantuan
 `);
 }
@@ -72,7 +72,7 @@ function normalizeBaseUrl(value) {
   const cleanValue = String(value).trim();
 
   if (!cleanValue) {
-    throw new Error("Base URL tidak boleh kosong.");
+    throw new Error("Base URL must not be empty.");
   }
 
   return cleanValue.replace(/\/+$/, "");
@@ -82,7 +82,7 @@ function normalizeEndpointPath(value) {
   const cleanValue = String(value).trim();
 
   if (!cleanValue) {
-    throw new Error("Endpoint tidak boleh kosong.");
+    throw new Error("Endpoint must not be empty.");
   }
 
   return cleanValue.startsWith("/") ? cleanValue : `/${cleanValue}`;
@@ -92,11 +92,11 @@ function toNumber(value, label, { min = -Infinity, max = Infinity } = {}) {
   const number = Number(value);
 
   if (!Number.isFinite(number)) {
-    throw new Error(`${label} harus berupa angka.`);
+    throw new Error(`${label} must be a number.`);
   }
 
   if (number < min || number > max) {
-    throw new Error(`${label} harus berada di rentang ${min} sampai ${max}.`);
+    throw new Error(`${label} must be in the range ${min} to ${max}.`);
   }
 
   return number;
@@ -138,13 +138,13 @@ function parseArgs(argv) {
     const optionKey = VALUE_FLAGS.get(arg);
 
     if (!optionKey) {
-      throw new Error(`Argumen tidak dikenal: ${arg}`);
+      throw new Error(`Unknown argument: ${arg}`);
     }
 
     const value = argv[index + 1];
 
     if (!value || value.startsWith("--")) {
-      throw new Error(`${arg} membutuhkan nilai.`);
+      throw new Error(`${arg} requires a value.`);
     }
 
     options[optionKey] = value;
@@ -191,15 +191,15 @@ function normalizeOptions(options) {
   };
 
   if (!normalized.device) {
-    throw new Error("--device tidak boleh kosong.");
+    throw new Error("--device must not be empty.");
   }
 
   if (!normalized.deviceKey) {
-    throw new Error("--key tidak boleh kosong.");
+    throw new Error("--key must not be empty.");
   }
 
   if (normalized.minPercent > normalized.startPercent) {
-    throw new Error("--min-percent tidak boleh lebih besar dari --start-percent.");
+    throw new Error("--min-percent must not be greater than --start-percent.");
   }
 
   return normalized;
@@ -264,7 +264,7 @@ async function postPayload(options, payload) {
 }
 
 function printResult(payload, result) {
-  const statusText = result.ok ? "terkirim" : "gagal";
+  const statusText = result.ok ? "delivered" : "failed";
 
   globalThis.console.log(
     `[simulator] ${statusText} ${payload.device} | ${payload.raw.percent}% | ${payload.raw.volume} L | jarak ${payload.distance} cm | HTTP ${result.status}`,
@@ -286,7 +286,7 @@ function nextPercent(currentPercent, options) {
 
 async function run(options) {
   if (typeof globalThis.fetch !== "function") {
-    throw new Error("Fetch tidak tersedia. Gunakan Node.js 18 atau lebih baru.");
+    throw new Error("Fetch is unavailable. Use Node.js 18 or newer.");
   }
 
   let currentPercent = options.startPercent;

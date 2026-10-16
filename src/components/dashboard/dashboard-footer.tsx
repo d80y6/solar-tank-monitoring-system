@@ -22,13 +22,13 @@ export function DashboardFooter() {
             className="transition hover:text-blue-700"
             href="/dashboard/contact"
           >
-            Kontak
+            Contact
           </Link>
           <Link
             className="transition hover:text-blue-700"
             href="/dashboard/account/security"
           >
-            Keamanan akun
+            Account security
           </Link>
         </div>
       </div>

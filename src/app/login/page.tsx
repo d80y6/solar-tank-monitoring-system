@@ -16,9 +16,9 @@ type LoginSearchParams = {
 };
 
 export const metadata: Metadata = {
-  title: "Masuk | FTM",
+  title: "Sign in | FTM",
   description:
-    "Masuk ke dashboard FTM untuk memantau volume tangki, runtime genset, dan kondisi perangkat.",
+    "Sign in to the FTM dashboard to monitor tank volume, generator runtime, and device conditions.",
 };
 
 export default async function LoginPage({
@@ -58,20 +58,20 @@ export default async function LoginPage({
 
   return (
     <AuthShell
-      description="Masuk dengan akun yang sudah disetujui administrator untuk membuka dashboard FTM sesuai peran akses."
+      description="Sign in with an administrator-approved account to open the FTM dashboard for your access role."
       footerPrompt={
         <>
-          Belum memiliki akses?{" "}
+          Don&apos;t have access?{" "}
           <Link
             className="font-semibold text-blue-600 transition hover:text-blue-700"
             href="/register"
           >
-            Ajukan akses
+            Request access
           </Link>
           .
         </>
       }
-      heading="Masuk ke FTM"
+      heading="Sign in to FTM"
     >
       <SignInForm
         redirectTo={nextPath}

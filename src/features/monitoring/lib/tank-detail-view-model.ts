@@ -141,15 +141,15 @@ const DEFAULT_NOW = new Date("2026-06-25T07:45:00.000Z");
 
 const statusLabels: Record<TankDetailStatus, string> = {
   online: "Online",
-  warning: "Waspada",
-  critical: "Kritis",
+  warning: "Warning",
+  critical: "Critical",
   offline: "Offline",
 };
 
 function getTankShapeLabel(shape: Tank["shape"]): string {
   return shape === "rectangular"
-    ? "Tangki balok"
-    : "Tangki silinder horizontal";
+    ? "Rectangular tank"
+    : "Horizontal cylinder tank";
 }
 
 function getLatestReading(readings: Reading[], tankId: string): Reading | null {
@@ -198,27 +198,27 @@ function formatAgeLabel(receivedAt: string, now: Date): string {
   const receivedTime = new Date(receivedAt).getTime();
 
   if (!Number.isFinite(receivedTime)) {
-    return "waktu tidak valid";
+    return "invalid time";
   }
 
   const ageSec = Math.max(0, Math.floor((now.getTime() - receivedTime) / 1000));
 
   if (ageSec < 60) {
-    return `${ageSec} dtk lalu`;
+    return `${ageSec} sec ago`;
   }
 
   const ageMin = Math.floor(ageSec / 60);
 
   if (ageMin < 60) {
-    return `${ageMin} mnt lalu`;
+    return `${ageMin} min ago`;
   }
 
   const ageHour = Math.floor(ageMin / 60);
   const restMin = ageMin % 60;
 
   return restMin > 0
-    ? `${ageHour} jam ${restMin} mnt lalu`
-    : `${ageHour} jam lalu`;
+    ? `${ageHour} hrs ${restMin} min ago`
+    : `${ageHour} hrs ago`;
 }
 
 function formatTimeLabel(value: string): string {
@@ -228,7 +228,7 @@ function formatTimeLabel(value: string): string {
     return "-";
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -240,10 +240,10 @@ function formatDateTimeLabel(value: string): string {
   const date = new Date(value);
 
   if (!Number.isFinite(date.getTime())) {
-    return "waktu tidak valid";
+    return "invalid time";
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -369,22 +369,22 @@ function buildStatusNote({
   deviceStatus: DeviceStatus;
 }): string {
   if (!hasReading) {
-    return "Belum ada pembacaan dari perangkat. Detail tetap ditampilkan agar lokasi bisa dicek dan disiapkan sebelum data pertama masuk.";
+    return "No reading from the device yet. Details remain visible so the location can be checked and prepared before the first data arrives.";
   }
 
   if (status === "offline") {
-    return "Perangkat belum mengirim data dalam rentang yang diharapkan.";
+    return "The device has not sent data within the expected window.";
   }
 
   if (status === "critical") {
-    return `Tangki masuk prioritas karena level atau runtime rendah. Runtime estimasi ${runtimeHour} jam.`;
+    return `Tank is a priority because level or runtime is low. Estimated runtime ${runtimeHour} hrs.`;
   }
 
   if (status === "warning") {
-    return `Perlu dipantau berkala. Isi ${fillPercent}% dan status perangkat ${deviceStatus}.`;
+    return `Needs periodic monitoring. Level ${fillPercent}% and device status ${deviceStatus}.`;
   }
 
-  return "Pembacaan terbaru masih segar dan level bahan bakar berada di zona aman.";
+  return "The latest reading is still fresh and the fuel level is in the safe zone.";
 }
 
 function getReadingPointStatus(
@@ -417,10 +417,10 @@ function toReadingPoint(reading: Reading): TankReadingPoint {
 
 function getCoordinateLabel(site: Site): string {
   if (typeof site.latitude === "number" && typeof site.longitude === "number") {
-    return `${formatCoordinatePair(site.latitude, site.longitude)} (koordinat manual)`;
+    return `${formatCoordinatePair(site.latitude, site.longitude)} (manual coordinates)`;
   }
 
-  return "koordinat manual belum diisi";
+  return "manual coordinates not filled in";
 }
 
 function buildReadingSeries(
@@ -502,7 +502,7 @@ function buildNearbySites(
           fillPercent,
           updateLabel: latestReading
             ? formatAgeLabel(latestReading.receivedAt, input.now)
-            : "belum ada data",
+            : "No data yet",
         },
       ];
     })
@@ -623,15 +623,15 @@ export function buildTankDetail(
     expectedIntervalMin: roundTo(device.expectedReportIntervalSec / 60, 2),
     lastUpdateLabel: latestReading
       ? formatAgeLabel(latestReading.receivedAt, now)
-      : "belum ada data",
+      : "No data yet",
     measuredAt: latestReading?.measuredAt ?? "",
     measuredAtLabel: latestReading
       ? formatDateTimeLabel(latestReading.measuredAt)
-      : "belum ada data",
+      : "No data yet",
     receivedAt: latestReading?.receivedAt ?? "",
     receivedAtLabel: latestReading
       ? formatDateTimeLabel(latestReading.receivedAt)
-      : "belum ada data",
+      : "No data yet",
     rssiDbm: latestReading?.rssiDbm ?? null,
     batteryVolt: latestReading?.batteryVolt ?? null,
     coordinate: {

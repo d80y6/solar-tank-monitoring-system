@@ -79,7 +79,7 @@ export function formatMysqlUtcDateTime(value: string): string {
   const time = date.getTime();
 
   if (!Number.isFinite(time)) {
-    throw new Error("Timestamp reading tidak valid.");
+    throw new Error("Reading timestamp is invalid.");
   }
 
   return date.toISOString().slice(0, 23).replace("T", " ");
@@ -101,7 +101,7 @@ export function parseMysqlDateTimeAsUtc(value: Date | string): string {
   const parsedTime = new Date(isoCandidate).getTime();
 
   if (!Number.isFinite(parsedTime)) {
-    throw new Error("Timestamp reading dari MySQL tidak valid.");
+    throw new Error("Reading timestamp from MySQL is invalid.");
   }
 
   return new Date(parsedTime).toISOString();

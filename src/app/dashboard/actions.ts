@@ -11,9 +11,9 @@ import {
 import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
-const DELETE_TANK_CONFIRMATION = "HAPUS DATA STO";
-const RESET_TANK_READINGS_CONFIRMATION = "RESET READING STO";
-const RESET_ALL_READINGS_CONFIRMATION = "RESET SEMUA READING";
+const DELETE_TANK_CONFIRMATION = "DELETE STO DATA";
+const RESET_TANK_READINGS_CONFIRMATION = "RESET STO READINGS";
+const RESET_ALL_READINGS_CONFIRMATION = "RESET ALL READINGS";
 
 export type DashboardAdminActionState = {
   status: "idle" | "success" | "error";
@@ -24,7 +24,7 @@ function getRequiredFormValue(formData: FormData, key: string): string {
   const value = String(formData.get(key) ?? "").trim();
 
   if (!value) {
-    throw new Error("Data aksi admin belum lengkap.");
+    throw new Error("Admin action data is incomplete.");
   }
 
   return value;
@@ -45,13 +45,15 @@ function assertValidAdminActionCsrf({
       token: csrfToken,
     })
   ) {
-    throw new Error("Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.");
+    throw new Error(
+      "Admin session is invalid. Reload the page and try again.",
+    );
   }
 }
 
 function assertMysqlStorageIsReady() {
   if (getMonitoringStorageDriver() !== "mysql") {
-    throw new Error("Pembersihan data STO memerlukan storage MySQL.");
+    throw new Error("STO data cleanup requires MySQL storage.");
   }
 }
 
@@ -59,9 +61,9 @@ function revalidateDashboardMonitoringPages(tankId?: string) {
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/detail");
   if (tankId) {
-    revalidatePath(`/dashboard/ringkas/tanks/${tankId}`);
+    revalidatePath(`/dashboard/operations/tanks/${tankId}`);
   }
-  revalidatePath("/dashboard/ringkas/tanks/[tankId]", "page");
+  revalidatePath("/dashboard/operations/tanks/[tankId]", "page");
   revalidatePath("/dashboard/tanks/[tankId]", "page");
   revalidatePath("/dashboard/admin/device-requests");
   revalidatePath("/dashboard/devices/request");
@@ -82,7 +84,7 @@ export async function cleanupDashboardTankAction(
     const confirmation = getRequiredFormValue(formData, "confirmation");
 
     if (confirmation !== DELETE_TANK_CONFIRMATION) {
-      throw new Error("Konfirmasi hapus data STO tidak valid.");
+      throw new Error("STO data deletion confirmation is invalid.");
     }
 
     const result = await cleanupMonitoringTanksInMysql({ tankIds: [tankId] });
@@ -92,21 +94,22 @@ export async function cleanupDashboardTankAction(
     if (result.matchedTankCount === 0) {
       return {
         status: "success",
-        message: "Data STO sudah tidak ditemukan atau sudah dibersihkan.",
+        message:
+          "STO data is already missing or has already been cleaned up.",
       };
     }
 
     return {
       status: "success",
-      message: `${siteLabel} berhasil dibersihkan dari dashboard FTM.`,
+      message: `${siteLabel} was cleaned from the FTM dashboard.`,
     };
   } catch (error) {
     return {
       status: "error",
       message: getSafeErrorMessage(error, {
-        fallbackMessage: "Data STO belum bisa dibersihkan.",
+        fallbackMessage: "STO data could not be cleaned yet.",
         internalMessage:
-          "Data STO belum bisa dibersihkan karena layanan database belum siap.",
+          "STO data could not be cleaned because the database service is not ready yet.",
       }),
     };
   }
@@ -127,7 +130,7 @@ export async function resetDashboardTankReadingsAction(
     const confirmation = getRequiredFormValue(formData, "confirmation");
 
     if (confirmation !== RESET_TANK_READINGS_CONFIRMATION) {
-      throw new Error("Konfirmasi reset reading STO tidak valid.");
+      throw new Error("STO reading reset confirmation is invalid.");
     }
 
     const result = await resetMonitoringReadingsInMysql({ tankIds: [tankId] });
@@ -137,7 +140,8 @@ export async function resetDashboardTankReadingsAction(
     if (result.matchedTankCount === 0) {
       return {
         status: "success",
-        message: "Tangki sudah tidak ditemukan atau belum punya data reading.",
+        message:
+          "Tank is already missing or has no reading data yet.",
       };
     }
 
@@ -145,16 +149,16 @@ export async function resetDashboardTankReadingsAction(
       status: "success",
       message:
         result.readingRows > 0
-          ? `${siteLabel} berhasil direset. ${result.readingRows} reading dihapus.`
-          : `${siteLabel} belum memiliki reading yang perlu direset.`,
+          ? `${siteLabel} was reset. ${result.readingRows} readings deleted.`
+          : `${siteLabel} has no readings that need resetting.`,
     };
   } catch (error) {
     return {
       status: "error",
       message: getSafeErrorMessage(error, {
-        fallbackMessage: "Reading STO belum bisa direset.",
+        fallbackMessage: "STO readings could not be reset yet.",
         internalMessage:
-          "Reading STO belum bisa direset karena layanan database belum siap.",
+          "STO readings could not be reset because the database service is not ready yet.",
       }),
     };
   }
@@ -173,7 +177,7 @@ export async function resetAllDashboardReadingsAction(
     const confirmation = getRequiredFormValue(formData, "confirmation");
 
     if (confirmation !== RESET_ALL_READINGS_CONFIRMATION) {
-      throw new Error("Konfirmasi reset semua reading tidak valid.");
+      throw new Error("Reset-all-readings confirmation is invalid.");
     }
 
     const result = await resetMonitoringReadingsInMysql();
@@ -184,16 +188,16 @@ export async function resetAllDashboardReadingsAction(
       status: "success",
       message:
         result.readingRows > 0
-          ? `${result.readingRows} reading dari ${result.matchedTankCount} tangki berhasil direset.`
-          : "Belum ada reading yang perlu direset.",
+          ? `${result.readingRows} readings from ${result.matchedTankCount} tanks were reset.`
+          : "No readings need resetting yet.",
     };
   } catch (error) {
     return {
       status: "error",
       message: getSafeErrorMessage(error, {
-        fallbackMessage: "Semua reading belum bisa direset.",
+        fallbackMessage: "All readings could not be reset yet.",
         internalMessage:
-          "Semua reading belum bisa direset karena layanan database belum siap.",
+          "All readings could not be reset because the database service is not ready yet.",
       }),
     };
   }

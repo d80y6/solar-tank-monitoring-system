@@ -5,16 +5,16 @@ import process from "node:process";
 
 function printHelp() {
   globalThis.console.log(`
-Generate key dan hash device pilot.
+Generate pilot device key and hash.
 
 Pemakaian:
   pnpm pilot:hash-key
-  DEVICE_KEY="key-yang-sudah-ada" pnpm pilot:hash-key
+  DEVICE_KEY="existing-key" pnpm pilot:hash-key
 
 Catatan:
   - Simpan device key asli di tempat aman.
   - Jangan commit device key asli.
-  - Database hanya perlu nilai hash sha256:...
+  - The database only needs the sha256 hash value:...
 `);
 }
 
@@ -34,8 +34,8 @@ const generatedKey = providedKey || randomBytes(32).toString("hex");
 const hash = `sha256:${sha256(generatedKey)}`;
 
 if (providedKey) {
-  globalThis.console.log("Mode: hash dari DEVICE_KEY environment");
-  globalThis.console.log("Device key asli tidak ditampilkan ulang oleh script.");
+  globalThis.console.log("Mode: hash from DEVICE_KEY environment");
+  globalThis.console.log("The raw device key is not printed again by the script.");
 } else {
   globalThis.console.log("Mode: generate key baru");
   globalThis.console.log("");
@@ -48,5 +48,5 @@ globalThis.console.log("API_KEY_HASH_UNTUK_DATABASE:");
 globalThis.console.log(hash);
 globalThis.console.log("");
 globalThis.console.log(
-  "Peringatan: jangan commit key asli, file .env.local, atau file registry lokal.",
+  "Warning: do not commit the raw key, the .env.local file, or the local registry file.",
 );

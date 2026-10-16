@@ -4,28 +4,28 @@ import Link from "next/link";
 import ForgotPasswordForm from "./forgot-password-form";
 
 export const metadata: Metadata = {
-  title: "Lupa Password | FTM",
+  title: "Forgot Password | FTM",
   description:
-    "Permintaan reset kata sandi akun FTM melalui email terdaftar.",
+    "FTM account password reset request via your registered email.",
 };
 
 export default function ForgotPasswordPage() {
   return (
     <AuthShell
-      description="Masukkan email atau nama pengguna. Jika akun ditemukan, link reset akan dikirim ke email terdaftar."
+      description="Enter your email or username. If the account is found, a reset link will be sent to the registered email."
       footerPrompt={
         <>
-          Sudah ingat akses?{" "}
+          Remember your access?{" "}
           <Link
             className="font-semibold text-blue-600 transition hover:text-blue-700"
             href="/login"
           >
-            Masuk kembali
+            Sign back in
           </Link>
           .
         </>
       }
-      heading="Reset kata sandi"
+      heading="Reset password"
     >
       <ForgotPasswordForm />
     </AuthShell>

@@ -235,9 +235,9 @@ export function isTankShapeSupportedByHardwareProfile({
 export function getDeviceSensorTypeLabel(sensorType: DeviceSensorType): string {
   switch (sensorType) {
     case "energy":
-      return "Sensor energy";
+      return "Energy sensor";
     case "fuel":
-      return "Sensor fuel";
+      return "Fuel sensor";
   }
 }
 
@@ -388,24 +388,24 @@ export function validateDeviceRequestDraft(
   });
 
   if (!siteName) {
-    errors.push(createIssue("siteName", "Nama STO wajib diisi."));
+    errors.push(createIssue("siteName", "STO name is required."));
   }
 
   if (!areaLabel) {
-    errors.push(createIssue("areaLabel", "Area STO wajib diisi."));
+    errors.push(createIssue("areaLabel", "STO area is required."));
   }
 
   if (!regionalLabel) {
-    errors.push(createIssue("regionalLabel", "Regional wajib dipilih."));
+    errors.push(createIssue("regionalLabel", "Regional must be selected."));
   }
 
   if (!wilayahLabel) {
-    errors.push(createIssue("wilayahLabel", "Wilayah wajib dipilih."));
+    errors.push(createIssue("wilayahLabel", "Territory must be selected."));
   }
 
   if (deviceCode && deviceCode.length < 4) {
     errors.push(
-      createIssue("deviceCode", "Kode perangkat minimal 4 karakter."),
+      createIssue("deviceCode", "Device code must be at least 4 characters."),
     );
   }
 
@@ -413,14 +413,14 @@ export function validateDeviceRequestDraft(
     errors.push(
       createIssue(
         "deviceSensorType",
-        "Mode sensor energy belum aktif di paket firmware saat ini. Gunakan Sensor fuel dulu.",
+        "Energy sensor mode is not active in the current firmware package. Use the fuel sensor first.",
       ),
     );
   }
 
   if (!isValidCoordinate(draft.latitude ?? undefined, -90, 90)) {
     errors.push(
-      createIssue("latitude", "Latitude harus berada di rentang -90 sampai 90."),
+      createIssue("latitude", "Latitude must be between -90 and 90."),
     );
   }
 
@@ -428,44 +428,44 @@ export function validateDeviceRequestDraft(
     errors.push(
       createIssue(
         "longitude",
-        "Longitude harus berada di rentang -180 sampai 180.",
+        "Longitude must be between -180 and 180.",
       ),
     );
   }
 
   if (draft.tankShape === "rectangular") {
     if (!lengthCm) {
-      errors.push(createIssue("lengthCm", "Tangki balok wajib memiliki panjang."));
+      errors.push(createIssue("lengthCm", "Rectangular tanks must have a length."));
     }
 
     if (!widthCm) {
-      errors.push(createIssue("widthCm", "Tangki balok wajib memiliki lebar."));
+      errors.push(createIssue("widthCm", "Rectangular tanks must have a width."));
     }
 
     if (!heightCm) {
-      errors.push(createIssue("heightCm", "Tangki balok wajib memiliki tinggi."));
+      errors.push(createIssue("heightCm", "Rectangular tanks must have a height."));
     }
   } else if (draft.tankShape === "horizontal-cylinder") {
     if (!lengthCm) {
       errors.push(
-        createIssue("lengthCm", "Tangki silinder wajib memiliki panjang."),
+        createIssue("lengthCm", "Cylinder tanks must have a length."),
       );
     }
 
     if (!diameterCm) {
       errors.push(
-        createIssue("diameterCm", "Tangki silinder wajib memiliki diameter."),
+        createIssue("diameterCm", "Cylinder tanks must have a diameter."),
       );
     }
   } else {
-    errors.push(createIssue("tankShape", "Tipe tangki tidak dikenal."));
+    errors.push(createIssue("tankShape", "Unknown tank type."));
   }
 
   if (!capacityLiter) {
     errors.push(
       createIssue(
         "capacityLiter",
-        "Kapasitas tangki belum bisa dihitung. Lengkapi dimensi tangki.",
+        "Tank capacity cannot be calculated yet. Complete the tank dimensions.",
       ),
     );
   }
@@ -478,7 +478,7 @@ export function validateDeviceRequestDraft(
     errors.push(
       createIssue(
         "sensorMountHeightCm",
-        "Tinggi acuan sensor wajib tersedia dari input atau dimensi tangki.",
+        "Sensor reference height must be available from input or tank dimensions.",
       ),
     );
   }
@@ -487,7 +487,7 @@ export function validateDeviceRequestDraft(
     errors.push(
       createIssue(
         "loadValue",
-        "Beban lokasi wajib diisi lebih dari 0 agar konsumsi bahan bakar per jam bisa dihitung.",
+        "Location load must be greater than 0 so hourly fuel consumption can be calculated.",
       ),
     );
   }
@@ -496,14 +496,14 @@ export function validateDeviceRequestDraft(
     errors.push(
       createIssue(
         "dieselEngineCapacityKva",
-        "Kapasitas diesel engine wajib diisi lebih dari 0 kVA.",
+        "Diesel engine capacity must be greater than 0 kVA.",
       ),
     );
   }
 
   if (!cosPhi) {
     errors.push(
-      createIssue("cosPhi", "Cos phi wajib diisi dengan angka lebih dari 0 sampai 1."),
+      createIssue("cosPhi", "Cos phi must be a number greater than 0 and up to 1."),
     );
   }
 
@@ -519,7 +519,7 @@ export function validateDeviceRequestDraft(
       warnings.push(
         createIssue(
           "loadValue",
-          "Beban lokasi terlihat lebih besar dari kapasitas diesel engine. Admin perlu konfirmasi sebelum approve.",
+          "Location load appears larger than the diesel engine capacity. Admin confirmation is needed before approval.",
           "warning",
         ),
       );
@@ -534,7 +534,7 @@ export function validateDeviceRequestDraft(
     errors.push(
       createIssue(
         "hardwareProfileId",
-        "Profil hardware tidak ditemukan atau belum tersedia.",
+        "Hardware profile not found or unavailable.",
       ),
     );
   }
@@ -544,7 +544,7 @@ export function validateDeviceRequestDraft(
       errors.push(
         createIssue(
           "hardwareProfileId",
-          "Profil hardware belum aktif untuk pengajuan perangkat.",
+          "Hardware profile is not active for device requests.",
         ),
       );
     }
@@ -558,7 +558,7 @@ export function validateDeviceRequestDraft(
       errors.push(
         createIssue(
           "hardwareProfileId",
-          "Profil hardware tidak sesuai dengan tipe tangki yang dipilih.",
+          "Hardware profile does not match the selected tank type.",
         ),
       );
     }
@@ -571,7 +571,7 @@ export function validateDeviceRequestDraft(
       errors.push(
         createIssue(
           "firmwareTemplateId",
-          "Template firmware untuk hardware profile belum ditemukan.",
+          "Firmware template for the hardware profile was not found.",
         ),
       );
     }
@@ -580,7 +580,7 @@ export function validateDeviceRequestDraft(
       errors.push(
         createIssue(
           "firmwareTemplateId",
-          "Template firmware belum aktif untuk membuat paket perangkat.",
+          "Firmware template is not active for creating device packages.",
         ),
       );
     }
@@ -675,11 +675,11 @@ export function buildPendingDeviceRequest({
   const normalizedRequesterEmail = requesterEmail.trim().toLowerCase();
 
   if (!normalizedRequesterUserId) {
-    errors.push(createIssue("requesterUserId", "User pengaju wajib tersedia."));
+    errors.push(createIssue("requesterUserId", "Requesting user is required."));
   }
 
   if (!normalizedRequesterEmail) {
-    errors.push(createIssue("requesterEmail", "Email user pengaju wajib tersedia."));
+    errors.push(createIssue("requesterEmail", "Requesting user email is required."));
   }
 
   if (!validation.ok || !validation.normalized || errors.length > 0) {
@@ -707,7 +707,7 @@ export function buildPendingDeviceRequest({
           ...validation.errors,
           createIssue(
             "hardwareProfileId",
-            "Profil hardware wajib tersedia sebelum request dibuat.",
+            "Hardware profile must be available before creating the request.",
           ),
         ],
         ok: false,
@@ -746,24 +746,24 @@ export function buildPendingDeviceRequest({
 export function getDeviceRequestStatusLabel(status: DeviceRequestStatus): string {
   switch (status) {
     case "pending_admin_review":
-      return "Menunggu admin";
+      return "Waiting for admin";
     case "rejected":
-      return "Ditolak";
+      return "Rejected";
     case "approved_waiting_package":
-      return "Disetujui, menunggu paket firmware";
+      return "Approved, waiting for firmware package";
     case "approved_package_ready":
-      return "Paket firmware siap";
+      return "Firmware package ready";
     case "waiting_firmware_download":
-      return "Menunggu download firmware";
+      return "Waiting for firmware download";
     case "waiting_first_valid_ping":
-      return "Menunggu perangkat online";
+      return "Waiting for device online";
     case "active":
-      return "Perangkat aktif";
+      return "Device active";
     case "expired":
-      return "Kedaluwarsa";
+      return "Expired";
     case "revoked":
-      return "Dicabut";
+      return "Revoked";
     case "package_generation_failed":
-      return "Pembuatan paket gagal";
+      return "Package generation failed";
   }
 }

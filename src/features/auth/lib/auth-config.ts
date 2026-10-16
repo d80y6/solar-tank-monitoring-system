@@ -162,7 +162,7 @@ export function getRequiredAuthSecret(): string {
     return "development-auth-secret-change-before-production";
   }
 
-  throw new Error("AUTH_SECRET minimal 32 karakter wajib diisi.");
+  throw new Error("AUTH_SECRET with at least 32 characters is required.");
 }
 
 export function getAppBaseUrl(): string {
@@ -173,7 +173,7 @@ export function getAppBaseUrl(): string {
   }
 
   if (isProductionLikeEnvironment()) {
-    throw new Error("APP_BASE_URL wajib diisi untuk production.");
+    throw new Error("APP_BASE_URL is required for production.");
   }
 
   return "http://localhost:3000";

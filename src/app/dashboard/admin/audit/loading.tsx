@@ -3,9 +3,9 @@ import { DashboardRouteLoading } from "@/components/dashboard/dashboard-route-lo
 export default function AuditLoading() {
   return (
     <DashboardRouteLoading
-      label="Memuat audit"
-      title="Menyiapkan catatan keamanan"
-      description="Sistem sedang membaca riwayat audit dan aktivitas keamanan terbaru."
+      label="Loading audit"
+      title="Preparing security records"
+      description="The system is reading the audit trail and recent security activity."
     />
   );
 }

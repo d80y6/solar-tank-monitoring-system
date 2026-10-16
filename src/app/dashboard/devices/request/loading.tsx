@@ -3,9 +3,9 @@ import { DashboardRouteLoading } from "@/components/dashboard/dashboard-route-lo
 export default function DeviceRequestLoading() {
   return (
     <DashboardRouteLoading
-      label="Memuat form"
-      title="Menyiapkan pengajuan perangkat"
-      description="Sistem sedang menyiapkan profil sensor, tipe tangki, dan validasi pengajuan."
+      label="Loading form"
+      title="Preparing the device request"
+      description="The system is preparing the sensor profile, tank type, and request validation."
     />
   );
 }

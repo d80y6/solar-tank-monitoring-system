@@ -33,12 +33,12 @@ const statusMeta: Record<
     badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
   },
   warning: {
-    label: "Waspada",
+    label: "Warning",
     dot: "bg-amber-500",
     badge: "bg-amber-50 text-amber-700 ring-amber-100",
   },
   critical: {
-    label: "Kritis",
+    label: "Critical",
     dot: "bg-red-600",
     badge: "bg-red-50 text-red-700 ring-red-100",
   },
@@ -50,7 +50,7 @@ const statusMeta: Record<
 };
 
 function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID").format(value);
+  return new Intl.NumberFormat("en-US").format(value);
 }
 
 function StatusBadge({ status }: { status: DashboardSiteStatus }) {
@@ -110,14 +110,14 @@ export function DashboardMapOverview({
     <>
       {/* Map Monitoring Section */}
       <section
-        id="peta"
+        id="map"
         className="animate-soft-fade overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm"
       >
         <div className="flex flex-col gap-4 border-b border-zinc-200 p-5 lg:flex-row lg:items-center lg:justify-between">
           <SectionHeader
-            label="Peta monitoring"
-            title="Lokasi STO berdasarkan input manual"
-            description="Titik peta diproyeksikan dari latitude dan longitude manual karena perangkat tidak memakai modul GPS."
+            label="Monitoring map"
+            title="STO locations from manual input"
+            description="Map pins are projected from manual latitude and longitude because devices do not use a GPS module."
           />
 
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-zinc-600">
@@ -155,7 +155,7 @@ export function DashboardMapOverview({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold text-zinc-500">
-                  Detail overview
+                  Overview detail
                 </p>
                 <h2
                   data-site-detail-title
@@ -186,10 +186,10 @@ export function DashboardMapOverview({
                   </span>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  {formatLiter(selectedSite.volumeLiter)} liter tersedia.
-                  Runtime estimasi {selectedSite.runtimeHour} jam dengan asumsi
-                  konsumsi konfigurasi {selectedSite.consumptionLiterPerHour}{" "}
-                  L/jam.
+                  {formatLiter(selectedSite.volumeLiter)} liters available.
+                  Estimated runtime {selectedSite.runtimeHour} hrs assuming
+                  configured consumption of {selectedSite.consumptionLiterPerHour}{" "}
+                  L/h.
                 </p>
               </div>
             </div>
@@ -204,7 +204,7 @@ export function DashboardMapOverview({
             <div className="mt-6 grid grid-cols-3 gap-3">
               {[
                 ["Volume", `${formatLiter(selectedSite.volumeLiter)} L`],
-                ["Runtime", `${selectedSite.runtimeHour} jam`],
+                ["Runtime", `${selectedSite.runtimeHour} hrs`],
                 ["RSSI", selectedSite.signal],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-lg bg-zinc-50 p-3">
@@ -220,12 +220,12 @@ export function DashboardMapOverview({
               href={`/dashboard/tanks/${selectedSite.tankId}`}
               className="mt-6 block w-full rounded-lg bg-zinc-100 px-4 py-3 text-center text-sm font-semibold text-zinc-700 transition hover:bg-zinc-200"
             >
-              Buka detail tangki
+              Open tank details
             </Link>
           </>
         ) : (
           <p className="text-sm leading-6 text-zinc-500">
-            Belum ada STO yang bisa ditampilkan.
+            No STO available to display.
           </p>
         )}
       </section>

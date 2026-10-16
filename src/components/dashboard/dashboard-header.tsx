@@ -23,7 +23,7 @@ type DashboardHeaderProps = {
 
 const dashboardContactItem: DashboardNavItem = {
   href: "/dashboard/contact",
-  label: "Kontak",
+  label: "Contact",
 };
 
 function withDashboardContact(navItems: DashboardNavItem[]) {
@@ -77,7 +77,7 @@ export function DashboardHeader({
         {/* Brand */}
         <div className="flex min-w-0 items-center gap-3">
           <Link
-            aria-label="Kembali ke dashboard FTM"
+            aria-label="Back to the FTM dashboard"
             className="min-w-0"
             href="/dashboard"
           >

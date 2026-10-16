@@ -34,9 +34,9 @@ import {
 import { AdminActionForm, AdminRoleForm } from "./admin-action-controls";
 
 export const metadata: Metadata = {
-  title: "Manajemen Pengguna | FTM",
+  title: "User Management | FTM",
   description:
-    "Manajemen akses pengguna FTM untuk admin manajemen tangki bahan bakar.",
+    "FTM user access management for fuel tank management admins.",
 };
 
 export const dynamic = "force-dynamic";
@@ -46,29 +46,29 @@ const USER_STATUS_OPTIONS: Array<{
   label: string;
   value: AuthUserStatus | "all";
 }> = [
-  { label: "Semua status", value: "all" },
-  { label: "Aktif", value: "active" },
+  { label: "All statuses", value: "all" },
+  { label: "Active", value: "active" },
   { label: "Pending", value: "pending" },
-  { label: "Ditahan", value: "suspended" },
-  { label: "Nonaktif", value: "disabled" },
+  { label: "Suspended", value: "suspended" },
+  { label: "Disabled", value: "disabled" },
 ];
 
 const ROLE_OPTIONS: Array<{ label: string; value: AuthRole | "all" }> = [
-  { label: "Semua role", value: "all" },
+  { label: "All roles", value: "all" },
   { label: "Admin", value: "admin" },
   { label: "User", value: "user" },
 ];
 
 const VERIFICATION_OPTIONS = [
-  { label: "Semua email", value: "all" },
-  { label: "Terverifikasi", value: "verified" },
-  { label: "Belum verifikasi", value: "unverified" },
+  { label: "All emails", value: "all" },
+  { label: "Verified", value: "verified" },
+  { label: "Unverified", value: "unverified" },
 ] as const;
 
 const SORT_OPTIONS = [
-  { label: "Terbaru dibuat", value: "created_desc" },
-  { label: "Login terakhir", value: "last_login_desc" },
-  { label: "Nama A-Z", value: "name_asc" },
+  { label: "Newest created", value: "created_desc" },
+  { label: "Last sign-in", value: "last_login_desc" },
+  { label: "Name A-Z", value: "name_asc" },
 ] as const;
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const;
@@ -150,7 +150,7 @@ function formatDate(value: string | null) {
     return "-";
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
@@ -163,11 +163,11 @@ function formatDate(value: string | null) {
 function getStatusLabel(status: AuthUserStatus) {
   switch (status) {
     case "active":
-      return "Aktif";
+      return "Active";
     case "disabled":
-      return "Nonaktif";
+      return "Disabled";
     case "suspended":
-      return "Ditahan";
+      return "Suspended";
     case "pending":
       return "Pending";
   }
@@ -270,7 +270,7 @@ function EmailVerificationBadge({ verified }: { verified: boolean }) {
           : "bg-amber-50 text-amber-700 ring-amber-100"
       }`}
     >
-      {verified ? "Terverifikasi" : "Belum verifikasi"}
+      {verified ? "Verified" : "Unverified"}
     </span>
   );
 }
@@ -294,7 +294,7 @@ function UserIdentity({
           </p>
           {isCurrentUser ? (
             <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 ring-1 ring-blue-100">
-              akun Anda
+              your account
             </span>
           ) : null}
         </div>
@@ -328,7 +328,7 @@ function UserActionStack({
   if (isCurrentUser) {
     return (
       <p className="rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-500">
-        Akun sendiri dikunci dari aksi admin.
+        Your own account is locked from admin actions.
       </p>
     );
   }
@@ -340,10 +340,10 @@ function UserActionStack({
           action={disableAuthUserAction}
           compact
           confirmation={{
-            confirmLabel: "Ya, nonaktifkan",
-            description: `${user.fullName} tidak dapat menggunakan akun ini sampai admin mengaktifkannya kembali.`,
-            eyebrow: "Nonaktifkan akses pengguna",
-            title: `Nonaktifkan akun ${user.fullName}?`,
+            confirmLabel: "Yes, disable",
+            description: `${user.fullName} cannot use this account until an admin reactivates it.`,
+            eyebrow: "Disable user access",
+            title: `Disable ${user.fullName}'s account?`,
             tone: "danger",
           }}
           csrfToken={csrfToken}
@@ -352,7 +352,7 @@ function UserActionStack({
           icon="ban"
           variant="dangerOutline"
         >
-          Nonaktifkan
+          Disable
         </AdminActionForm>
       ) : null}
 
@@ -361,10 +361,10 @@ function UserActionStack({
           action={activateAuthUserAction}
           compact
           confirmation={{
-            confirmLabel: "Ya, aktifkan",
-            description: `${user.fullName} akan kembali dapat masuk dan menggunakan fitur sesuai role yang dimilikinya.`,
-            eyebrow: "Aktifkan akses pengguna",
-            title: `Aktifkan kembali ${user.fullName}?`,
+            confirmLabel: "Yes, activate",
+            description: `${user.fullName} will be able to sign in and use features according to their role again.`,
+            eyebrow: "Enable user access",
+            title: `Reactivate ${user.fullName}?`,
             tone: "primary",
           }}
           csrfToken={csrfToken}
@@ -373,7 +373,7 @@ function UserActionStack({
           icon="refresh"
           variant="success"
         >
-          Aktifkan
+          Activate
         </AdminActionForm>
       ) : null}
 
@@ -382,10 +382,10 @@ function UserActionStack({
           action={revokeAuthUserSessionsAction}
           compact
           confirmation={{
-            confirmLabel: "Ya, cabut semua sesi",
-            description: `${user.fullName} akan dikeluarkan dari seluruh perangkat dan harus login kembali.`,
-            eyebrow: "Keamanan sesi pengguna",
-            title: `Cabut semua sesi ${user.fullName}?`,
+            confirmLabel: "Yes, revoke all sessions",
+            description: `${user.fullName} will be signed out of all devices and must sign in again.`,
+            eyebrow: "User session security",
+            title: `Revoke all sessions for ${user.fullName}?`,
             tone: "warning",
           }}
           csrfToken={csrfToken}
@@ -394,7 +394,7 @@ function UserActionStack({
           icon="logout"
           variant="neutralOutline"
         >
-          Cabut sesi
+          Revoke sessions
         </AdminActionForm>
       ) : null}
 
@@ -403,10 +403,10 @@ function UserActionStack({
           action={resendUserVerificationEmailAction}
           compact
           confirmation={{
-            confirmLabel: "Ya, kirim email",
-            description: `Sistem akan mengirim tautan verifikasi baru ke ${user.email}.`,
-            eyebrow: "Kirim email verifikasi",
-            title: `Kirim verifikasi untuk ${user.fullName}?`,
+            confirmLabel: "Yes, send email",
+            description: `The system will send a new verification link to ${user.email}.`,
+            eyebrow: "Send verification email",
+            title: `Send verification to ${user.fullName}?`,
             tone: "primary",
           }}
           csrfToken={csrfToken}
@@ -415,7 +415,7 @@ function UserActionStack({
           icon="send"
           variant="neutralOutline"
         >
-          Kirim verifikasi
+          Send verification
         </AdminActionForm>
       ) : null}
 
@@ -424,10 +424,10 @@ function UserActionStack({
           action={sendUserPasswordResetAction}
           compact
           confirmation={{
-            confirmLabel: "Ya, kirim tautan",
-            description: `Tautan reset password akan dikirim ke ${user.email}. Password tidak berubah sampai pengguna menyelesaikan proses tersebut.`,
-            eyebrow: "Pemulihan akun pengguna",
-            title: `Kirim reset password untuk ${user.fullName}?`,
+            confirmLabel: "Yes, send link",
+            description: `A password reset link will be sent to ${user.email}. The password does not change until the user completes the process.`,
+            eyebrow: "User account recovery",
+            title: `Send password reset for ${user.fullName}?`,
             tone: "warning",
           }}
           csrfToken={csrfToken}
@@ -445,10 +445,10 @@ function UserActionStack({
           action={deleteAuthUserAction}
           compact
           confirmation={{
-            confirmLabel: "Ya, hapus akun",
-            description: `Akun ${user.fullName} akan dihapus permanen. Aksi ini hanya dapat dilakukan jika akun tidak memiliki jejak pengajuan perangkat.`,
-            eyebrow: "Hapus akun pengguna",
-            title: `Hapus ${user.fullName}?`,
+            confirmLabel: "Yes, delete account",
+            description: `The ${user.fullName} account will be permanently deleted. This action can only be done if the account has no device request trail.`,
+            eyebrow: "Delete user account",
+            title: `Delete ${user.fullName}?`,
             tone: "danger",
           }}
           csrfToken={csrfToken}
@@ -457,7 +457,7 @@ function UserActionStack({
           icon="trash"
           variant="dangerOutline"
         >
-          Hapus
+          Delete
         </AdminActionForm>
       ) : null}
     </div>
@@ -467,7 +467,7 @@ function UserActionStack({
 function SearchField({ query }: { query: string }) {
   return (
     <label className="block">
-      <span className="sr-only">Cari pengguna</span>
+      <span className="sr-only">Search users</span>
       <span className="relative block">
         <Search
           aria-hidden="true"
@@ -477,7 +477,7 @@ function SearchField({ query }: { query: string }) {
           className="h-9 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm font-medium text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
           defaultValue={query}
           name="q"
-          placeholder="Cari nama, email, username"
+          placeholder="Search name, email, username"
           type="search"
         />
       </span>
@@ -531,7 +531,7 @@ function UserFilterControls({
       </label>
 
       <label className="block">
-        <span className="sr-only">Verifikasi</span>
+        <span className="sr-only">Verification</span>
         <select
           className={FILTER_CONTROL_CLASS}
           defaultValue={verificationFilter}
@@ -546,7 +546,7 @@ function UserFilterControls({
       </label>
 
       <label className="block">
-        <span className="sr-only">Urutkan</span>
+        <span className="sr-only">Sort</span>
         <select
           className={FILTER_CONTROL_CLASS}
           defaultValue={sortFilter}
@@ -561,7 +561,7 @@ function UserFilterControls({
       </label>
 
       <label className="block">
-        <span className="sr-only">Per halaman</span>
+        <span className="sr-only">Per page</span>
         <select
           className={FILTER_CONTROL_CLASS}
           defaultValue={pageSize}
@@ -590,10 +590,10 @@ function PendingAccessRequests({
       <div className="flex flex-col gap-2 border-b border-zinc-200 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600">
-            Perlu review
+            Needs review
           </p>
           <h2 className="mt-0.5 text-base font-semibold">
-            Pengajuan akses pending
+            Pending access requests
           </h2>
         </div>
         <span className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-100">
@@ -605,7 +605,7 @@ function PendingAccessRequests({
       <div className="max-h-64 overflow-y-auto p-2">
         {accessRequests.length === 0 ? (
           <div className="rounded-lg border border-dashed border-zinc-300 p-4 text-sm text-zinc-500">
-            Belum ada pengajuan akses baru.
+            No new access requests yet.
           </div>
         ) : (
           <div className="grid gap-2">
@@ -635,18 +635,18 @@ function PendingAccessRequests({
                         {getRoleLabel(request.requestedRole)}
                       </span>
                     </p>
-                    <p>Diajukan: {formatDate(request.createdAt)}</p>
+                    <p>Submitted: {formatDate(request.createdAt)}</p>
                     <p>
                       Email:{" "}
                       {request.user.emailVerifiedAt
-                        ? "terverifikasi"
-                        : "belum verifikasi"}
+                        ? "verified"
+                        : "unverified"}
                     </p>
                   </div>
                   {request.accessReason ? (
                     <p className="mt-2 truncate text-sm text-zinc-600">
                       <span className="font-semibold text-zinc-950">
-                        Alasan:
+                        Reason:
                       </span>{" "}
                       {request.accessReason}
                     </p>
@@ -658,10 +658,10 @@ function PendingAccessRequests({
                     action={approveAccessRequestAction}
                     className="min-w-0"
                     confirmation={{
-                      confirmLabel: "Ya, setujui akses",
-                      description: `${request.user.fullName} akan memperoleh akses sebagai ${getRoleLabel(request.requestedRole)} dan dapat masuk ke sistem setelah persyaratan akun terpenuhi.`,
-                      eyebrow: "Persetujuan akses pengguna",
-                      title: `Setujui pengajuan ${request.user.fullName}?`,
+                      confirmLabel: "Yes, approve access",
+                      description: `${request.user.fullName} will gain access as ${getRoleLabel(request.requestedRole)} and can sign in to the system once the account requirements are met.`,
+                      eyebrow: "User access approval",
+                      title: `Approve ${request.user.fullName}'s request?`,
                       tone: "primary",
                     }}
                     csrfToken={csrfToken}
@@ -669,16 +669,16 @@ function PendingAccessRequests({
                     icon="check"
                     variant="primary"
                   >
-                    Setujui
+                    Approve
                   </AdminActionForm>
                   <AdminActionForm
                     action={rejectAccessRequestAction}
                     className="min-w-0"
                     confirmation={{
-                      confirmLabel: "Ya, tolak pengajuan",
-                      description: `Pengajuan akses ${request.user.fullName} akan ditolak dan tidak dapat diproses sebagai pengajuan aktif.`,
-                      eyebrow: "Tolak akses pengguna",
-                      title: `Tolak pengajuan ${request.user.fullName}?`,
+                      confirmLabel: "Yes, reject request",
+                      description: `The access request from ${request.user.fullName} will be rejected and cannot be processed as an active request.`,
+                      eyebrow: "Reject user access",
+                      title: `Reject ${request.user.fullName}'s request?`,
                       tone: "danger",
                     }}
                     csrfToken={csrfToken}
@@ -686,17 +686,17 @@ function PendingAccessRequests({
                     icon="x"
                     variant="dangerOutline"
                   >
-                    Tolak
+                    Reject
                   </AdminActionForm>
                   {!request.user.emailVerifiedAt ? (
                     <AdminActionForm
                       action={resendUserVerificationEmailAction}
                       className="col-span-2 min-w-0 sm:col-span-1"
                       confirmation={{
-                        confirmLabel: "Ya, kirim email",
-                        description: `Sistem akan mengirim tautan verifikasi baru ke ${request.user.email}.`,
-                        eyebrow: "Kirim email verifikasi",
-                        title: `Kirim verifikasi untuk ${request.user.fullName}?`,
+                        confirmLabel: "Yes, send email",
+                        description: `The system will send a new verification link to ${request.user.email}.`,
+                        eyebrow: "Send verification email",
+                        title: `Send verification to ${request.user.fullName}?`,
                         tone: "primary",
                       }}
                       csrfToken={csrfToken}
@@ -704,7 +704,7 @@ function PendingAccessRequests({
                       icon="send"
                       variant="neutralOutline"
                     >
-                      Verifikasi
+                      Verify
                     </AdminActionForm>
                   ) : null}
                 </div>
@@ -774,13 +774,13 @@ export default async function AdminUsersPage({
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
+          { href: "/dashboard", label: "Tank Management" },
           { current: true, label: "Manajemen Pengguna" },
           {
             href: "/dashboard/admin/device-requests",
-            label: "Tinjau Pengajuan",
+            label: "Review requests",
           },
-          { href: "/dashboard/admin/audit", label: "Audit Keamanan" },
+          { href: "/dashboard/admin/audit", label: "Security audit" },
         ]}
         user={admin}
       />
@@ -793,7 +793,7 @@ export default async function AdminUsersPage({
                 User management
               </p>
               <h1 className="mt-1 text-xl font-semibold sm:text-2xl">
-                Pengguna dan akses admin
+                Users and admin access
               </h1>
             </div>
 
@@ -866,12 +866,12 @@ export default async function AdminUsersPage({
               <summary className="flex h-9 cursor-pointer list-none items-center justify-between gap-3 px-3 text-sm font-semibold text-zinc-800 [&::-webkit-details-marker]:hidden">
                 <span className="inline-flex items-center gap-2">
                   <Filter className="size-4 text-blue-700" aria-hidden="true" />
-                  Filter dan urutan
+                  Filters and sorting
                 </span>
                 <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-zinc-500 ring-1 ring-zinc-200">
                   {activeFilterCount > 0
-                    ? `${activeFilterCount} aktif`
-                    : "Buka"}
+                    ? `${activeFilterCount} active`
+                    : "Open"}
                 </span>
               </summary>
               <div className="grid gap-2 border-t border-zinc-200 p-2">
@@ -888,7 +888,7 @@ export default async function AdminUsersPage({
             <div className="grid grid-cols-[1fr_auto] gap-2">
               <button className={FILTER_BUTTON_CLASS} type="submit">
                 <Filter className="size-4" aria-hidden="true" />
-                Terapkan
+                Apply
               </button>
               <Link className={FILTER_RESET_CLASS} href="/dashboard/admin/users">
                 Reset
@@ -912,7 +912,7 @@ export default async function AdminUsersPage({
             />
             <button className={FILTER_BUTTON_CLASS} type="submit">
               <Filter className="size-4" aria-hidden="true" />
-              Terapkan
+              Apply
             </button>
             <Link className={FILTER_RESET_CLASS} href="/dashboard/admin/users">
               Reset
@@ -924,14 +924,14 @@ export default async function AdminUsersPage({
           <div className="flex flex-col gap-2 border-b border-zinc-200 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-red-600">
-                Daftar pengguna
+                User list
               </p>
               <h2 className="mt-0.5 text-base font-semibold">
-                {showingStart}-{showingEnd} dari {directory.filteredCount} akun
+                {showingStart}-{showingEnd} of {directory.filteredCount} accounts
               </h2>
             </div>
             <span className="w-fit rounded-full bg-zinc-50 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-              Halaman {directory.page} dari {directory.pageCount}
+              Page {directory.page} of {directory.pageCount}
             </span>
           </div>
 
@@ -939,10 +939,10 @@ export default async function AdminUsersPage({
             <div className="grid min-h-64 place-items-center p-6 text-center">
               <div>
                 <p className="text-sm font-semibold text-zinc-950">
-                  Tidak ada pengguna yang cocok.
+                  No users match.
                 </p>
                 <p className="mt-1 text-sm text-zinc-500">
-                  Ubah kata kunci atau reset filter untuk melihat semua akun.
+                  Change the keyword or reset filters to see all accounts.
                 </p>
               </div>
             </div>
@@ -956,10 +956,10 @@ export default async function AdminUsersPage({
                       <th className="w-[22%] px-4 py-2.5">Email</th>
                       <th className="w-[13rem] px-4 py-2.5">Role</th>
                       <th className="w-[7rem] px-4 py-2.5">Status</th>
-                      <th className="w-[9rem] px-4 py-2.5">Login</th>
-                      <th className="w-[9rem] px-4 py-2.5">Dibuat</th>
+                      <th className="w-[9rem] px-4 py-2.5">Sign in</th>
+                      <th className="w-[9rem] px-4 py-2.5">Created</th>
                       <th className="w-[14rem] min-w-[14rem] px-4 py-2.5">
-                        Aksi
+                        Actions
                       </th>
                     </tr>
                   </thead>
@@ -1091,7 +1091,7 @@ export default async function AdminUsersPage({
 
                       <div className="mt-3 border-t border-zinc-200 pt-3">
                         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
-                          Aksi
+                          Actions
                         </p>
                         <div className="mt-2">
                           <UserActionStack
@@ -1110,11 +1110,11 @@ export default async function AdminUsersPage({
 
           <div className="grid gap-3 border-t border-zinc-200 px-4 pb-8 pt-3 text-center sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:pb-5 sm:text-left lg:pb-4">
             <p className="text-sm text-zinc-500 sm:justify-self-start">
-              Menampilkan {showingStart}-{showingEnd} dari{" "}
-              {directory.filteredCount} hasil.
+              Showing {showingStart}-{showingEnd} of{" "}
+              {directory.filteredCount} results.
             </p>
             <nav
-              aria-label="Pagination pengguna"
+              aria-label="User pagination"
               className="flex max-w-full flex-wrap items-center justify-center gap-2 sm:justify-self-center"
             >
               <Link

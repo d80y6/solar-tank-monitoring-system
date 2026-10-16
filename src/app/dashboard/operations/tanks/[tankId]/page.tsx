@@ -37,9 +37,9 @@ import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-re
 import type { DeviceStatus } from "@/features/monitoring/types/monitoring";
 
 export const metadata: Metadata = {
-  title: "Detail Operasional Tangki | FTM",
+  title: "Tank Operational Detail | FTM",
   description:
-    "Detail operasional tangki bahan bakar untuk membaca volume, status perangkat, update terakhir, dan tren volume terbaru.",
+    "Operational fuel tank detail for reading volume, device status, last update, and the latest volume trends.",
 };
 
 export const runtime = "nodejs";
@@ -89,65 +89,65 @@ const deviceStatusTone: Record<
 
 const runtimeLevelParameters: RuntimeLevelParameter[] = [
   {
-    label: "Kritis",
-    range: "< 13 jam",
-    description: "Sisa runtime sudah masuk prioritas tindakan cepat.",
+    label: "Critical",
+    range: "< 13 hrs",
+    description: "Remaining runtime has reached the fast-action priority zone.",
     badge: "bg-red-50 text-red-700 ring-red-100",
     card: "border-red-200 bg-red-50",
   },
   {
     label: "Threshold Under",
-    range: "13 - <14 jam",
-    description: "Mendekati batas bawah dan perlu dipantau lebih rapat.",
+    range: "13 - <14 hrs",
+    description: "Approaching the lower bound and needs closer monitoring.",
     badge: "bg-orange-50 text-orange-700 ring-orange-100",
     card: "border-orange-200 bg-orange-50",
   },
   {
     label: "Under",
-    range: "14 - <16 jam",
-    description: "Masih di bawah zona ideal operasional.",
+    range: "14 - <16 hrs",
+    description: "Still below the ideal operational zone.",
     badge: "bg-amber-50 text-amber-700 ring-amber-100",
     card: "border-amber-200 bg-amber-50",
   },
   {
     label: "Threshold Upper",
-    range: "16 - <19 jam",
-    description: "Sudah melewati batas bawah dan menuju zona atas.",
+    range: "16 - <19 hrs",
+    description: "Past the lower bound and moving toward the upper zone.",
     badge: "bg-cyan-50 text-cyan-700 ring-cyan-100",
     card: "border-cyan-200 bg-cyan-50",
   },
   {
     label: "Upper",
-    range: "19 - <24 jam",
-    description: "Runtime berada di zona atas yang masih normal.",
+    range: "19 - <24 hrs",
+    description: "Runtime is in the upper zone, which is still normal.",
     badge: "bg-blue-50 text-blue-700 ring-blue-100",
     card: "border-blue-200 bg-blue-50",
   },
   {
     label: "Overstock",
-    range: ">= 24 jam",
-    description: "Cadangan runtime sangat panjang dibanding batas parameter.",
+    range: ">= 24 hrs",
+    description: "Runtime reserve is very long compared to the parameter bound.",
     badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
     card: "border-emerald-200 bg-emerald-50",
   },
 ];
 
 const unknownRuntimeLevel: RuntimeLevelParameter = {
-  label: "Belum terbaca",
+  label: "No data",
   range: "-",
-  description: "Parameter sisa jam menunggu data volume valid.",
+  description: "Remaining-hours parameter is waiting for valid volume data.",
   badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
   card: "border-zinc-200 bg-zinc-50",
 };
 
 function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID", {
+  return new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 0,
   }).format(value);
 }
 
 function formatNumber(value: number, maximumFractionDigits = 2) {
-  return new Intl.NumberFormat("id-ID", {
+  return new Intl.NumberFormat("en-US", {
     maximumFractionDigits,
   }).format(value);
 }
@@ -157,7 +157,7 @@ function formatRuntimeHour(value: number | null) {
     return "-";
   }
 
-  return `${formatNumber(value, 2)} jam`;
+  return `${formatNumber(value, 2)} hrs`;
 }
 
 function formatMeasurement(value: number | null, unit: string) {
@@ -285,14 +285,14 @@ function RuntimeParameterPanel({ tank }: { tank: SimpleTankDetail }) {
         </span>
         <div>
           <p className="text-sm font-semibold uppercase text-zinc-500">
-            Sisa jam
+            Remaining hours
           </p>
           <h2 className="mt-1 text-xl font-semibold tracking-normal text-zinc-950">
-            Level parameter runtime
+            Runtime parameter level
           </h2>
           <p className="mt-1 text-sm leading-6 text-zinc-500">
-            Kategori ini membaca sisa runtime genset agar operator tahu posisi
-            tangki terhadap batas operasional.
+            This category reads generator runtime remaining so operators
+            know the tank position against operational bounds.
           </p>
         </div>
       </div>
@@ -301,7 +301,7 @@ function RuntimeParameterPanel({ tank }: { tank: SimpleTankDetail }) {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase text-zinc-500">
-              Parameter aktif
+              Active parameter
             </p>
             <p className="mt-2 text-2xl font-semibold text-zinc-950">
               {activeParameter.label}
@@ -349,12 +349,12 @@ function TankDimensionPanel({ tank }: { tank: SimpleTankDetail }) {
   const dimensionItems: InfoItem[] =
     tank.shape === "rectangular"
       ? [
-          { label: "Panjang", value: formatMeasurement(tank.lengthCm, "cm") },
-          { label: "Lebar", value: formatMeasurement(tank.widthCm, "cm") },
-          { label: "Tinggi", value: formatMeasurement(tank.heightCm, "cm") },
+          { label: "Length", value: formatMeasurement(tank.lengthCm, "cm") },
+          { label: "Width", value: formatMeasurement(tank.widthCm, "cm") },
+          { label: "Height", value: formatMeasurement(tank.heightCm, "cm") },
         ]
       : [
-          { label: "Panjang", value: formatMeasurement(tank.lengthCm, "cm") },
+          { label: "Length", value: formatMeasurement(tank.lengthCm, "cm") },
           {
             label: "Diameter",
             value: formatMeasurement(tank.diameterCm, "cm"),
@@ -369,14 +369,14 @@ function TankDimensionPanel({ tank }: { tank: SimpleTankDetail }) {
         </span>
         <div>
           <p className="text-sm font-semibold uppercase text-zinc-500">
-            Bentuk tangki
+            Tank shape
           </p>
           <h2 className="mt-1 text-xl font-semibold tracking-normal text-zinc-950">
             {tank.shapeLabel}
           </h2>
           <p className="mt-1 text-sm leading-6 text-zinc-500">
-            Ukuran fisik utama yang membantu operator mengenali konfigurasi
-            tangki.
+            Key physical dimensions that help operators recognize the tank
+            configuration.
           </p>
         </div>
       </div>
@@ -385,12 +385,12 @@ function TankDimensionPanel({ tank }: { tank: SimpleTankDetail }) {
         items={[
           ...dimensionItems,
           {
-            label: "Kapasitas",
+            label: "Capacity",
             value: `${formatLiter(tank.capacityLiter)} L`,
           },
           {
-            label: "Konsumsi/jam",
-            value: `${formatNumber(tank.consumptionLiterPerHour, 2)} L/jam`,
+            label: "Consumption/hour",
+            value: `${formatNumber(tank.consumptionLiterPerHour, 2)} L/h`,
           },
         ]}
       />
@@ -454,26 +454,26 @@ export default async function SimpleTankDetailPage({
   const statusTone = deviceStatusTone[tank.deviceStatus];
   const infoItems: InfoItem[] = [
     { label: "Regional", value: tank.regionalLabel ?? "-" },
-    { label: "Wilayah", value: tank.wilayahLabel ?? "-" },
+    { label: "Territory", value: tank.wilayahLabel ?? "-" },
     { label: "Area", value: tank.areaLabel },
-    { label: "Perangkat", value: tank.deviceCode },
-    { label: "Jenis tangki", value: tank.shapeLabel },
-    { label: "Kapasitas", value: `${formatLiter(tank.capacityLiter)} L` },
+    { label: "Device", value: tank.deviceCode },
+    { label: "Tank type", value: tank.shapeLabel },
+    { label: "Capacity", value: `${formatLiter(tank.capacityLiter)} L` },
     {
-      label: "Sisa jam",
+      label: "Remaining hours",
       value: tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-",
     },
-    { label: "Pembacaan", value: tank.measuredAtLabel },
+    { label: "Reading", value: tank.measuredAtLabel },
   ];
 
   return (
     <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { current: true, label: "Detail Operasional" },
+          { href: "/dashboard", label: "Tank Management" },
+          { current: true, label: "Operational Detail" },
           ...(isAdmin
-            ? [{ href: "/dashboard/detail", label: "Analisis Teknis" }]
+            ? [{ href: "/dashboard/detail", label: "Technical Analysis" }]
             : []),
         ]}
         user={user}
@@ -486,15 +486,15 @@ export default async function SimpleTankDetailPage({
             className="inline-flex w-fit items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
-            Kembali ke dashboard
+            Back to dashboard
           </Link>
           <p className="text-sm font-medium text-zinc-500">
-            Detail operasional untuk pemantauan harian
+            Operational detail for daily monitoring
           </p>
           <LiveRefreshControl
             className="flex"
             intervalMs={refreshIntervalMs}
-            lastSyncedLabel={`Update ${tank.lastUpdateLabel}`}
+            lastSyncedLabel={`Updated ${tank.lastUpdateLabel}`}
           />
         </div>
 
@@ -524,14 +524,14 @@ export default async function SimpleTankDetailPage({
             <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,0.82fr)_minmax(20rem,1fr)] lg:items-center">
               <div className="min-w-0">
                 <p className="text-base font-medium text-zinc-500">
-                  Isi tangki
+                  Tank level
                 </p>
                 <p className="mt-2 text-4xl font-semibold tracking-normal text-zinc-950 sm:text-5xl">
                   {formatLiter(tank.volumeLiter)} /{" "}
                   {formatLiter(tank.capacityLiter)} L
                 </p>
                 <p className="mt-2 text-base text-zinc-500">
-                  saat ini / kapasitas maksimal
+                  current / maximum capacity
                 </p>
               </div>
 
@@ -542,28 +542,28 @@ export default async function SimpleTankDetailPage({
           <div className="grid min-w-0 gap-3">
             <SummaryCard
               icon={Wifi}
-              label="Status perangkat"
-              note={`Update terakhir ${tank.lastUpdateLabel}`}
+              label="Device status"
+              note={`Last update ${tank.lastUpdateLabel}`}
               tone={statusTone.icon}
               value={tank.deviceStatusLabel}
             />
             <SummaryCard
               icon={Activity}
-              label="Sisa jam"
-              note={`Konsumsi ${formatNumber(tank.consumptionLiterPerHour, 2)} L/jam`}
+              label="Remaining hours"
+              note={`Consumption ${formatNumber(tank.consumptionLiterPerHour, 2)} L/h`}
               tone="bg-blue-50 text-blue-700 ring-blue-100"
               value={tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-"}
             />
             <SummaryCard
               icon={Clock3}
-              label="Data diterima"
-              note="Waktu terakhir data masuk ke sistem"
+              label="Data received"
+              note="Last time data entered the system"
               tone="bg-blue-50 text-blue-700 ring-blue-100"
               value={tank.receivedAtLabel}
             />
             <SummaryCard
               icon={Database}
-              label="Perangkat"
+              label="Device"
               note={tank.deviceLabel}
               tone="bg-zinc-100 text-zinc-700 ring-zinc-200"
               value={tank.deviceCode}
@@ -576,14 +576,14 @@ export default async function SimpleTankDetailPage({
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase text-zinc-500">
-                  Tren volume
+                  Volume trend
                 </p>
                 <h2 className="mt-1 text-xl font-semibold tracking-normal text-zinc-950">
-                  Perubahan isi tangki
+                  Tank level changes
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-                  Pilih rentang tren harian, mingguan, atau bulanan. CSV yang
-                  diunduh mengikuti rentang tersebut.
+                  Choose a daily, weekly, or monthly trend range. The
+                  downloaded CSV follows that range.
                 </p>
               </div>
             </div>
@@ -608,14 +608,14 @@ export default async function SimpleTankDetailPage({
               </span>
               <div>
                 <p className="text-sm font-semibold uppercase text-zinc-500">
-                  Informasi operasional
+                  Operational information
                 </p>
                 <h2 className="mt-1 text-xl font-semibold tracking-normal text-zinc-950">
                   {tank.siteCode}
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">
-                  Data utama yang biasa dibutuhkan operator saat membuka detail
-                  satu STO.
+                  Key data operators usually need when opening one STO
+                  detail.
                 </p>
               </div>
             </div>
@@ -627,7 +627,7 @@ export default async function SimpleTankDetailPage({
               className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
             >
               <Server className="size-4" aria-hidden="true" />
-              Lihat semua STO
+              View all STOs
             </Link>
           </article>
         </section>

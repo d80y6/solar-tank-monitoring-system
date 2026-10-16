@@ -116,7 +116,7 @@ describe("mysql auth Telegram binding", () => {
         chatId: "123456789",
         tokenHash: "hash",
       }),
-    ).rejects.toThrow("Telegram ini sudah terhubung ke akun FTM lain.");
+    ).rejects.toThrow("This Telegram is already connected to another FTM account.");
 
     expect(mocks.commit).not.toHaveBeenCalled();
     expect(mocks.rollback).toHaveBeenCalledOnce();

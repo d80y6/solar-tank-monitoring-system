@@ -3,9 +3,9 @@ import { DashboardRouteLoading } from "@/components/dashboard/dashboard-route-lo
 export default function TechnicalDetailLoading() {
   return (
     <DashboardRouteLoading
-      label="Memuat analisis"
-      title="Menyiapkan analisis teknis"
-      description="Sistem sedang membaca data teknis, peta operasional, dan riwayat perangkat."
+      label="Loading analysis"
+      title="Preparing technical analysis"
+      description="The system is reading technical data, the operational map, and device history."
     />
   );
 }

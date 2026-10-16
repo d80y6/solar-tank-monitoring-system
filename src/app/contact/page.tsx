@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Kontak | FTM",
+  title: "Contact | FTM",
   description:
-    "Akses kontak operasional FTM dipindahkan ke area dashboard.",
+    "FTM operational contact access has moved to the dashboard area.",
 };
 
 export default function ContactRedirectPage() {

@@ -79,22 +79,22 @@ export default function SignInForm({
         | null;
 
       if (!response.ok || !result?.ok) {
-        throw new Error(result?.error ?? "Login gagal.");
+        throw new Error(result?.error ?? "Sign-in failed.");
       }
 
       if (result.data?.requiresOtp && result.data.challengeId) {
         setChallengeId(result.data.challengeId);
         setMessage(
           result.data.delivery === "log"
-            ? "Kode OTP admin dicetak di log server development."
-            : "Kode OTP admin sudah dikirim ke email.",
+            ? "The admin OTP code is printed in the development server log."
+            : "The admin OTP code has been sent to your email.",
         );
         return;
       }
 
       const nextPath = redirectTo || result.data?.redirectTo || "/dashboard";
 
-      setMessage("Login berhasil. Membuka dashboard...");
+      setMessage("Signed in. Opening dashboard...");
       setNavigating(true);
       shouldResetPending = false;
       startRouteTransition(() => {
@@ -106,7 +106,7 @@ export default function SignInForm({
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Login gagal. Periksa kembali data masuk Anda.",
+          : "Sign-in failed. Please check your credentials and try again.",
       );
     } finally {
       if (shouldResetPending) {
@@ -128,12 +128,12 @@ export default function SignInForm({
       : verified === "1"
         ? {
             className: "border-emerald-100 bg-emerald-50 text-emerald-800",
-            text: "Email berhasil diverifikasi. Jika admin sudah menyetujui akses, Anda bisa masuk.",
+            text: "Email verified successfully. If an admin has approved your access, you can sign in.",
           }
         : verified === "0"
           ? {
               className: "border-amber-100 bg-amber-50 text-amber-800",
-              text: verificationReason || "Verifikasi email belum berhasil.",
+              text: verificationReason || "Email verification was not successful.",
             }
           : null;
 
@@ -150,7 +150,7 @@ export default function SignInForm({
             className="mb-2 block text-sm font-semibold text-zinc-800"
             htmlFor="identity"
           >
-            Email atau nama pengguna
+            Email or username
           </label>
           <div className="relative">
             <Mail
@@ -165,7 +165,7 @@ export default function SignInForm({
               id="identity"
               inputMode="email"
               name="identity"
-              placeholder="nama@perusahaan.co.id"
+              placeholder="name@company.co.id"
               required
               type="text"
             />
@@ -180,13 +180,13 @@ export default function SignInForm({
               className="text-sm font-semibold text-zinc-800"
               htmlFor="password"
             >
-              Kata sandi
+              Password
             </label>
             <Link
               className="text-xs font-semibold text-blue-600 transition hover:text-blue-700"
               href="/forgot-password"
             >
-              Lupa password?
+              Forgot password?
             </Link>
           </div>
           <div className="relative">
@@ -200,13 +200,13 @@ export default function SignInForm({
               disabled={busy}
               id="password"
               name="password"
-              placeholder="Masukkan kata sandi"
+              placeholder="Enter your password"
               required
               type={showPassword ? "text" : "password"}
             />
             <button
               aria-label={
-                showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"
+                showPassword ? "Hide password" : "Show password"
               }
               className="absolute inset-y-0 right-0 grid w-12 place-items-center text-zinc-400 transition hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600"
               disabled={busy}
@@ -259,12 +259,12 @@ export default function SignInForm({
         type="submit"
       >
         {navigating || routePending
-          ? "Membuka dashboard..."
+          ? "Opening dashboard..."
           : pending
-            ? "Memproses..."
+            ? "Processing..."
             : challengeId
-              ? "Verifikasi kode"
-              : "Masuk"}
+              ? "Verify code"
+              : "Sign in"}
         <ArrowRight
           aria-hidden="true"
           className="size-4 transition group-hover:translate-x-0.5"

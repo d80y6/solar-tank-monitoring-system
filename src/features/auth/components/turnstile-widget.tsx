@@ -92,8 +92,7 @@ export function TurnstileWidget({
       <div ref={hostRef} />
       {scriptError ? (
         <p className="text-xs leading-5 text-red-700">
-          Verifikasi keamanan belum bisa dimuat. Periksa koneksi lalu muat ulang
-          halaman.
+          Security verification could not be loaded yet. Check your connection and reload the page.
         </p>
       ) : null}
     </div>

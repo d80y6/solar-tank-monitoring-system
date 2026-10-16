@@ -1,155 +1,159 @@
-# Status Operasional Saat Ini
+# Current Operational Truth
 
-Tanggal status: 2026-07-14
+Status date: 2026-07-14
 
-Dokumen ini menjadi acuan status operasional FTM. Informasi bertanggal
-merepresentasikan kondisi pada saat verifikasi dan diperbarui ketika cakupan,
-deployment, atau tingkat kesiapan sistem berubah.
+This document is the reference for FTM's operational status. Dated
+information represents the condition at verification time and is updated
+when coverage, deployment, or system readiness changes.
 
-## Status Produk Saat Ini
+## Current Product Status
 
-FTM adalah **pilot operasional internal yang aktif**. Sistem menerima telemetry
-perangkat fisik melalui deployment Vercel, menyimpannya di Aiven MySQL, dan
-menampilkannya kepada pengguna yang telah memperoleh akses. Konteks penerapannya
-berada di lingkungan Telkom
-Indonesia/Telkominfra untuk TIF area Pasuruan–Sidoarjo.
+FTM is an **active internal operational pilot**. The system receives
+telemetry from physical devices through the Vercel deployment, stores it
+in Aiven MySQL, and displays it to users who have been granted access.
+The rollout context is within the Telkom
+Indonesia/Telkominfra environment for the TIF Pasuruan–Sidoarjo area.
 
-Sistem sudah memiliki alur monitoring, auth, pengajuan device, pembuatan paket
-firmware, first valid ping activation, reset reading aman, export CSV berbasis
-periode, backup MySQL, Telegram, helpdesk, serta cleanup data device.
+The system already has monitoring flows, auth, device requests, firmware
+package generation, first valid ping activation, safe reading reset,
+period-based CSV export, MySQL backup, Telegram, helpdesk, and device
+data cleanup.
 
-Sistem belum boleh disebut production-ready penuh karena hardening firmware,
-restore drill, kalibrasi device lapangan, alerting, pembatasan akses per lokasi,
-dan SOP operasional belum selesai diuji.
+The system must not yet be called fully production-ready because firmware
+hardening, restore drills, field device calibration, alerting,
+per-location access restriction, and operational SOPs have not finished
+testing.
 
-## Snapshot Terverifikasi 13–14 Juli 2026
+## Verified Snapshot 13–14 July 2026
 
-| Indikator | Hasil |
+| Indicator | Result |
 |---|---|
-| Halaman utama dan pemeriksaan kesehatan Vercel | HTTP 200 |
-| Pemeriksaan kesiapan tanpa akses admin | HTTP 401, sesuai desain |
-| Penyimpanan operasional | Aiven MySQL aktif |
-| Registri MySQL | 3 lokasi, 3 tangki, 3 perangkat |
-| Riwayat telemetri pada snapshot 13 Juli | 9.272 pembacaan |
-| Kesegaran perangkat pada snapshot | 2 perangkat mengirim data terbaru, 1 perangkat terlambat |
-| Snapshot langsung dan agregat 5 menit | Siap digunakan |
-| Regional, Wilayah, Area, dan STO | Skema siap digunakan |
+| Landing page and Vercel health check | HTTP 200 |
+| Readiness check without admin access | HTTP 401, as designed |
+| Operational storage | Aiven MySQL active |
+| MySQL registry | 3 locations, 3 tanks, 3 devices |
+| Telemetry history in the 13 July snapshot | 9,272 readings |
+| Device freshness in the snapshot | 2 devices sending latest data, 1 device delayed |
+| Live snapshot and 5-minute aggregate | Ready to use |
+| Regional, territory, area, and STO | Schema ready to use |
 
-Angka tersebut adalah snapshot bertanggal, bukan janji bahwa semua perangkat
-selalu online. Target awal 5 STO dan arah ekspansi hingga 29 STO harus dibaca
-sebagai rencana bertahap, bukan jumlah deployment yang sudah tercapai.
+These figures are a dated snapshot, not a promise that all devices are
+always online. The initial target of 5 STOs and the expansion direction
+of up to 29 STOs must be read as a phased plan, not an achieved
+deployment count.
 
-## Yang Sudah Ada
+## What Exists
 
-- Login, register request, email verification, forgot/reset password.
-- Session cookie `httpOnly` dan role dasar `admin` / `user`.
-- Admin OTP email jika `AUTH_REQUIRE_ADMIN_OTP` aktif.
-- Cloudflare Turnstile untuk form publik jika env diaktifkan.
-- Admin user management: approve/reject request akses, ubah role, aktivasi/nonaktif, cabut sesi, kirim reset password.
-- Audit log auth/admin.
-- Account security page: ganti password, lihat sesi, revoke sesi lain, binding Telegram.
-- Device request dari user.
-- Admin review device request lewat web.
-- Sistem membuat site code/device code/device key otomatis.
-- Kapasitas tangki dihitung dari dimensi, bukan input manual user.
-- Konsumsi solar per jam dihitung dari beban lokasi, kapasitas diesel engine, dan cos phi.
-- Low level, critical level, dan interval kirim memakai standar sistem/profile, bukan input bebas user.
-- Firmware ZIP dibuat setelah admin approve.
-- Firmware ZIP disimpan terenkripsi dan didownload lewat token terbatas.
-- Device baru aktif setelah first valid ping dengan key yang cocok.
-- `POST /api/ingest` menerima payload device dan menyimpan reading.
-- Ingest MySQL menyimpan satu snapshot live per device dan satu rollup history per bucket 5 menit dalam satu transaksi.
-- Halaman ringkasan, halaman detail, dan API memilih waktu terbaru secara konsisten selama transisi penyimpanan lama ke agregat baru.
-- Ingest punya rate limit saat storage MySQL aktif.
-- Dashboard ringkas, dashboard detail, peta, detail tangki, dan grafik trend.
-- Lokasi dikelompokkan berurutan sebagai Regional, Wilayah, Area, lalu STO; dashboard dapat mencari dan memfilter setiap tingkat tersebut.
-- Download CSV reading dari halaman detail tangki dengan periode 1 hari, 7 hari, atau 30 hari mengikuti pilihan grafik.
-- Admin reset reading per STO dan reset semua reading tanpa menghapus registry/device.
-- Admin cleanup untuk data STO/device/uji tanpa menghapus akun user/admin, template firmware, atau hardware profile.
-- Script backup MySQL `pnpm db:backup:mysql` dan wrapper Task Scheduler `scripts/run-mysql-backup-task.ps1`.
-- Health check `/api/health` dan readiness check `/api/ready`.
-- Test suite dan CI `pnpm check`.
+- Sign in, register request, email verification, forgot/reset password.
+- `httpOnly` session cookie and basic `admin` / `user` roles.
+- Admin OTP email when `AUTH_REQUIRE_ADMIN_OTP` is active.
+- Cloudflare Turnstile for public forms when the env is enabled.
+- Admin user management: approve/reject access requests, change role, activate/disable, revoke sessions, send password reset.
+- Auth/admin audit log.
+- Account security page: change password, view sessions, revoke other sessions, Telegram binding.
+- Device request from users.
+- Admin device request review through the web.
+- The system generates site code/device code/device key automatically.
+- Tank capacity is calculated from dimensions, not manual user input.
+- Diesel consumption per hour is calculated from site load, diesel engine capacity, and cos phi.
+- Low level, critical level, and send interval use system/profile defaults, not free user input.
+- Firmware ZIP is created after admin approval.
+- Firmware ZIP is stored encrypted and downloaded through a limited token.
+- A new device activates after a first valid ping with a matching key.
+- `POST /api/ingest` accepts device payloads and stores readings.
+- MySQL ingest stores one live snapshot per device and one 5-minute rollup history row per bucket in a single transaction.
+- The summary page, detail page, and APIs consistently select the latest time during the old-storage to new-aggregate transition.
+- Ingest has rate limiting when MySQL storage is active.
+- Compact dashboard, detail dashboard, map, tank details, and trend charts.
+- Locations are grouped in order as regional, territory, area, then STO; the dashboard can search and filter each level.
+- Reading CSV download from the tank detail page with 1 day, 7 day, or 30 day periods following the chart selection.
+- Admin reading reset per STO and reset of all readings without deleting registry/devices.
+- Admin cleanup for STO/device/test data without deleting user/admin accounts, firmware templates, or hardware profiles.
+- MySQL backup script `pnpm db:backup:mysql` and Task Scheduler wrapper `scripts/run-mysql-backup-task.ps1`.
+- Health check `/api/health` and readiness check `/api/ready`.
+- Test suite and CI `pnpm check`.
 
-## Yang Belum Final
+## Not Final Yet
 
-- Persetujuan production final dan SOP operasional jangka panjang.
-- Restore database yang diuji rutin.
-- Monitoring/log service production.
-- Alert operasional level kritis/offline.
-- Telegram approve/reject device request. Saat ini Telegram untuk binding dan notifikasi, bukan approval utama.
-- RTU/Modbus/OPNIMUS integration. Ini fase lanjutan setelah rollout awal stabil.
-- Firmware TLS validation final. Template ESP8266 saat ini masih perlu keputusan security sebelum production.
-- One-click firmware compile/upload untuk user lapangan.
-- Role operasional lebih rinci di luar `admin` dan `user`.
-- CRUD UI untuk hardware profile dan firmware template.
-- Kalibrasi tangki/device real yang terdokumentasi.
+- Final production approval and long-term operational SOPs.
+- Routinely tested database restore.
+- Production monitoring/log service.
+- Critical-level/offline operational alerts.
+- Telegram device approve/reject. Telegram is currently for binding and notifications, not primary approval.
+- RTU/Modbus/OPNIMUS integration. This is a later phase after the initial rollout stabilizes.
+- Final firmware TLS validation. The current ESP8266 template still needs a security decision before production.
+- One-click firmware compile/upload for field users.
+- More detailed operational roles beyond `admin` and `user`.
+- CRUD UI for hardware profiles and firmware templates.
+- Documented real tank/device calibration.
 
-## Alur Resmi Perangkat Baru Saat Ini
+## Current New Device Flow
 
 ```text
-User login
-  -> ajukan perangkat
-  -> sistem hitung kapasitas dan konsumsi
-  -> request pending admin
-  -> admin approve/reject lewat web
-  -> jika approve, sistem buat key dan firmware ZIP
-  -> user download firmware dari email/link
-  -> user compile/upload firmware
-  -> device kirim first valid ping
-  -> device aktif dan tampil di dashboard
+User signs in
+  -> requests a device
+  -> system calculates capacity and consumption
+  -> request pending with admin
+  -> admin approves/rejects through the web
+  -> if approved, the system creates the key and firmware ZIP
+  -> user downloads the firmware from the email/link
+  -> user compiles/uploads the firmware
+  -> device sends first valid ping
+  -> device is active and appears on the dashboard
 ```
 
-Telegram belum menjadi jalur approve/reject resmi.
+Telegram is not yet the official approve/reject channel.
 
-## Alur Data Pemantauan Saat Ini
+## Current Monitoring Data Flow
 
 ```text
-Device atau simulator
+Device or simulator
   -> POST /api/ingest
-  -> validasi device id dan key
-  -> aktivasi first ping jika memenuhi lifecycle request
-  -> normalisasi payload
-  -> review config payload vs registry
-  -> simpan ke memory; atau pada MySQL:
-       -> UPSERT snapshot live per device
-       -> UPSERT agregat history 5 menit
-  -> dashboard/detail membaca registry dan reading
+  -> validate device id and key
+  -> first ping activation when the request lifecycle is met
+  -> payload normalization
+  -> payload config review against registry
+  -> store in memory; or on MySQL:
+       -> UPSERT live snapshot per device
+       -> UPSERT 5-minute history aggregate
+  -> dashboard/detail reads registry and readings
 ```
 
-Registry tetap menjadi sumber kebenaran jika payload membawa config yang berbeda jauh.
+The registry remains the source of truth when the payload carries
+configuration that differs significantly.
 
-## Kondisi Penerapan
+## Deployment Condition
 
-Untuk development:
+For development:
 
-- `memory` boleh dipakai.
-- data hilang saat server restart.
+- `memory` may be used.
+- data is lost when the server restarts.
 
-Untuk pilot/operasional yang berjalan saat ini:
+For the currently running pilot/operations:
 
-- aplikasi aktif di Vercel;
-- database aktif memakai Aiven MySQL;
-- gunakan `SOLAR_TANK_STORAGE_DRIVER=mysql`;
-- matikan fallback global device key;
-- siapkan SMTP, auth secret, package encryption key, backup output dir, dan admin bootstrap;
-- cek `/api/ready` sebelum menganggap sistem siap;
-- jalankan `pnpm db:backup:mysql` sebelum migration besar, cleanup besar, atau deploy;
-- jalankan `pnpm db:migrate:reading-rollup` sebelum men-deploy writer snapshot/rollup;
-- uji restore backup ke database staging/lokal sebelum mengklaim SOP backup final.
+- the application is live on Vercel;
+- the active database uses Aiven MySQL;
+- use `SOLAR_TANK_STORAGE_DRIVER=mysql`;
+- disable the global device key fallback;
+- prepare SMTP, auth secret, package encryption key, backup output dir, and admin bootstrap;
+- check `/api/ready` before considering the system ready;
+- run `pnpm db:backup:mysql` before large migrations, large resets, or deploys;
+- run `pnpm db:migrate:reading-rollup` before deploying the snapshot/rollup writer;
+- test restoring a backup to a staging/local database before claiming a final backup SOP.
 
-Deployment Vercel aktif dipakai untuk pilot dan peninjauan tim, tetapi belum
-menjadi bukti bahwa seluruh SOP produksi final sudah selesai. Migration
-Regional/Wilayah telah diterapkan pada database yang diperiksa dan pemeriksaan
-`mysql-location-taxonomy` lulus pada 14 Juli 2026. Environment baru tetap wajib
-menjalankan migration yang sama sebelum kode deployment digunakan.
+The active Vercel deployment is used for the pilot and team review, but
+it is not proof that all final production SOPs are complete. The
+Regional/Territory migration has been applied to the checked database and
+the `mysql-location-taxonomy` check passed on 14 July 2026. New
+environments must still run the same migrations before the deployed code
+is used.
 
-## Catatan Data
+## Data Notes
 
-Data demo, data pilot, dan data real harus dipisahkan.
+Demo data, pilot data, and real data must be kept separate.
 
-- `config/pilot-registry.example.json` hanya template aman.
-- `config/pilot-registry.local.json` jika ada adalah private dan tidak boleh commit.
-- Seed MySQL demo bukan bukti data real.
-- Screenshot/chat lama tidak boleh dijadikan sumber data operasional tanpa verifikasi.
-- Angka pada README atau landing harus menyebut tanggal snapshot dan tidak boleh
-  mengubah target rollout menjadi klaim deployment aktual.
+- `config/pilot-registry.example.json` is only a safe template.
+- `config/pilot-registry.local.json`, if present, is private and must not be committed.
+- MySQL demo seeds are not evidence of real data.
+- Old screenshots/chats must not be used as operational data sources without verification.
+- Figures in the README or landing page must state the snapshot date and must not turn rollout targets into actual deployment claims.

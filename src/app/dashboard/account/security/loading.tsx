@@ -3,9 +3,9 @@ import { DashboardRouteLoading } from "@/components/dashboard/dashboard-route-lo
 export default function AccountSecurityLoading() {
   return (
     <DashboardRouteLoading
-      label="Memuat keamanan"
-      title="Menyiapkan keamanan akun"
-      description="Sistem sedang membaca sesi aktif dan pengaturan keamanan akun."
+      label="Loading security"
+      title="Preparing account security"
+      description="The system is reading active sessions and account security settings."
     />
   );
 }

@@ -23,9 +23,9 @@ import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 const ADMIN_DEVICE_REQUEST_PATH = "/dashboard/admin/device-requests";
 const USER_DEVICE_REQUEST_PATH = "/dashboard/devices/request";
-const CLEANUP_SELECTED_CONFIRMATION = "BERSIHKAN PILIHAN DEVICE";
-const CLEANUP_SINGLE_CONFIRMATION = "BERSIHKAN ITEM DEVICE";
-const RESET_DEVICE_DATA_CONFIRMATION = "BERSIHKAN SEMUA DATA DEVICE";
+const CLEANUP_SELECTED_CONFIRMATION = "CLEANUP SELECTED DEVICE REQUESTS";
+const CLEANUP_SINGLE_CONFIRMATION = "CLEANUP SINGLE DEVICE REQUEST";
+const RESET_DEVICE_DATA_CONFIRMATION = "CLEANUP ALL DEVICE DATA";
 const DEVICE_REQUEST_SCHEMA_COLUMNS = [
   "device_sensor_type",
   "regional_label",
@@ -46,7 +46,7 @@ function getRequiredFormValue(formData: FormData, key: string): string {
   const value = String(formData.get(key) ?? "").trim();
 
   if (!value) {
-    throw new Error("Data aksi admin belum lengkap.");
+    throw new Error("Admin action data is incomplete.");
   }
 
   return value;
@@ -67,7 +67,7 @@ function assertValidAdminActionCsrf({
       token: csrfToken,
     })
   ) {
-    throw new Error("Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.");
+    throw new Error("Admin session is invalid. Reload the page and try again.");
   }
 }
 
@@ -91,16 +91,16 @@ function getActionError(error: unknown): DeviceRequestAdminActionState {
     return {
       status: "error",
       message:
-        "Aksi belum bisa diproses karena struktur database pengajuan perangkat belum lengkap. Jalankan seluruh migration terbaru lalu coba lagi.",
+        "Action could not be processed because the device request database schema is incomplete. Run all latest migrations and try again.",
     };
   }
 
   return {
     status: "error",
     message: getSafeErrorMessage(error, {
-      fallbackMessage: "Aksi pengajuan perangkat belum bisa diproses.",
+      fallbackMessage: "Device request action could not be processed yet.",
       internalMessage:
-        "Aksi belum bisa diproses karena layanan database belum siap. Periksa migration dan koneksi database.",
+        "Action could not be processed because the database service is not ready. Check the migrations and database connection.",
     }),
   };
 }
@@ -114,10 +114,10 @@ function getActionSuccess(message: string): DeviceRequestAdminActionState {
 
 function formatResetSummary(totalRows: number): string {
   if (totalRows === 0) {
-    return "Tidak ada data operasional perangkat yang perlu dibersihkan.";
+    return "No device operational data needs cleanup.";
   }
 
-  return `${totalRows} baris data operasional perangkat berhasil dibersihkan. Akun, admin, template firmware, dan profil hardware tetap disimpan.`;
+  return `${totalRows} rows of device operational data were cleaned up. Accounts, admins, firmware templates, and hardware profiles remain stored.`;
 }
 
 function formatCleanupSummary({
@@ -128,10 +128,10 @@ function formatCleanupSummary({
   totalRows: number;
 }): string {
   if (matchedRequestCount === 0) {
-    return "Tidak ada pengajuan perangkat yang cocok untuk dibersihkan.";
+    return "No device requests match the cleanup.";
   }
 
-  return `${matchedRequestCount} pengajuan perangkat dibersihkan. ${totalRows} baris data terkait dihapus tanpa menghapus akun, template firmware, atau profil hardware.`;
+  return `${matchedRequestCount} device requests cleaned up. ${totalRows} related data rows deleted without removing accounts, firmware templates, or hardware profiles.`;
 }
 
 function buildDevicePackageDownloadUrl(downloadToken: string): string {
@@ -142,7 +142,7 @@ function buildDevicePackageDownloadUrl(downloadToken: string): string {
 
 function assertMysqlStorageIsReady() {
   if (getMonitoringStorageDriver() !== "mysql") {
-    throw new Error("Tinjauan pengajuan perangkat memerlukan storage MySQL.");
+    throw new Error("Device request review requires MySQL storage.");
   }
 }
 
@@ -150,10 +150,10 @@ function revalidateMonitoringDevicePages() {
   revalidatePath(ADMIN_DEVICE_REQUEST_PATH);
   revalidatePath(USER_DEVICE_REQUEST_PATH);
   revalidatePath("/dashboard");
-  revalidatePath("/dashboard/ringkasan");
+  revalidatePath("/dashboard/summary");
   revalidatePath("/dashboard/detail");
   revalidatePath("/dashboard/tanks/[tankId]", "page");
-  revalidatePath("/dashboard/ringkas/tanks/[tankId]", "page");
+  revalidatePath("/dashboard/operations/tanks/[tankId]", "page");
 }
 
 function getRequestIdsFromForm(formData: FormData): string[] {
@@ -204,8 +204,8 @@ export async function approveDeviceRequestAction(
     return {
       ...getActionSuccess(
         delivery.delivered
-          ? "Pengajuan disetujui dan link firmware sudah dikirim."
-          : "Pengajuan disetujui dan paket firmware dibuat, tetapi email belum terkirim.",
+          ? "Request approved and firmware link sent."
+          : "Request approved and firmware package created, but the email was not delivered.",
       ),
       downloadUrl,
     };
@@ -236,7 +236,7 @@ export async function rejectDeviceRequestAction(
     revalidatePath(ADMIN_DEVICE_REQUEST_PATH);
     revalidatePath(USER_DEVICE_REQUEST_PATH);
 
-    return getActionSuccess("Pengajuan perangkat berhasil ditolak.");
+    return getActionSuccess("Device request rejected successfully.");
   } catch (error) {
     return getActionError(error);
   }
@@ -318,8 +318,8 @@ export async function resendDevicePackageAction(
     return {
       ...getActionSuccess(
         email.delivered
-          ? "Link firmware baru sudah dikirim ke email pengaju."
-          : "Link firmware baru dibuat, tetapi email belum terkirim.",
+          ? "New firmware link sent to the requester's email."
+          : "New firmware link created, but the email was not delivered.",
       ),
       downloadUrl: email.downloadUrl,
     };
@@ -358,8 +358,8 @@ export async function reissueDevicePackageAction(
     return {
       ...getActionSuccess(
         email.delivered
-          ? "Paket firmware dan key baru sudah dibuat lalu dikirim ke email pengaju."
-          : "Paket firmware dan key baru sudah dibuat, tetapi email belum terkirim.",
+          ? "New firmware package and key created and sent to the requester's email."
+          : "New firmware package and key created, but the email was not delivered.",
       ),
       downloadUrl: email.downloadUrl,
     };
@@ -389,7 +389,7 @@ export async function revokeDeviceProvisioningAction(
     revalidatePath(USER_DEVICE_REQUEST_PATH);
     revalidatePath("/dashboard");
 
-    return getActionSuccess("Akses perangkat berhasil dicabut.");
+    return getActionSuccess("Device access revoked successfully.");
   } catch (error) {
     return getActionError(error);
   }
@@ -409,7 +409,7 @@ export async function resetMonitoringDeviceDataAction(
 
     if (confirmation !== RESET_DEVICE_DATA_CONFIRMATION) {
       throw new Error(
-        `Ketik ${RESET_DEVICE_DATA_CONFIRMATION} untuk membersihkan data perangkat uji.`,
+        `Type ${RESET_DEVICE_DATA_CONFIRMATION} to clean up the test device data.`,
       );
     }
 
@@ -437,7 +437,7 @@ export async function cleanupDeviceRequestsAction(
     const requestIds = getRequestIdsFromForm(formData);
 
     if (requestIds.length === 0) {
-      throw new Error("Pilih minimal satu pengajuan perangkat untuk dibersihkan.");
+      throw new Error("Select at least one device request to clean up.");
     }
 
     if (cleanupMode === "single") {
@@ -447,18 +447,18 @@ export async function cleanupDeviceRequestsAction(
         requestIds.length !== 1 ||
         confirmation !== CLEANUP_SINGLE_CONFIRMATION
       ) {
-        throw new Error("Aksi pembersihan satu perangkat tidak valid.");
+        throw new Error("Single device cleanup action is invalid.");
       }
     } else if (cleanupMode === "selected") {
       const confirmation = getRequiredFormValue(formData, "confirmation");
 
       if (confirmation !== CLEANUP_SELECTED_CONFIRMATION) {
         throw new Error(
-          `Ketik ${CLEANUP_SELECTED_CONFIRMATION} untuk membersihkan pengajuan yang dipilih.`,
+          `Type ${CLEANUP_SELECTED_CONFIRMATION} to clean up the selected requests.`,
         );
       }
     } else {
-      throw new Error("Mode pembersihan perangkat tidak valid.");
+      throw new Error("Device cleanup mode is invalid.");
     }
 
     const result = await cleanupMonitoringDeviceRequestsInMysql({ requestIds });

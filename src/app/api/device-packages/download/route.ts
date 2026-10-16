@@ -32,7 +32,7 @@ function createErrorResponse(message: string, status: number) {
 export async function GET(request: Request) {
   if (getMonitoringStorageDriver() !== "mysql") {
     return createErrorResponse(
-      "Download firmware memerlukan storage MySQL.",
+      "Firmware download requires MySQL storage.",
       503,
     );
   }

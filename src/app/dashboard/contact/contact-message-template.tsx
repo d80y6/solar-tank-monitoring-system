@@ -25,11 +25,11 @@ export function ContactMessageTemplate({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-zinc-950">
-            Format pesan bantuan
+            Help message format
           </p>
           <p className="mt-1 text-sm leading-6 text-zinc-500">
-            Salin format ini sebelum menghubungi Telegram agar identitas akun,
-            halaman, dan kebutuhan bantuan langsung jelas.
+            Copy this format before contacting Telegram so the account identity,
+            page, and help request are immediately clear.
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
@@ -43,7 +43,7 @@ export function ContactMessageTemplate({
             ) : (
               <Copy className="size-4" aria-hidden="true" />
             )}
-            {copied ? "Tersalin" : "Salin"}
+            {copied ? "Copied" : "Copy"}
           </button>
           <a
             className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/15 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
@@ -52,7 +52,7 @@ export function ContactMessageTemplate({
             target="_blank"
           >
             <Send className="size-4" aria-hidden="true" />
-            Buka Telegram
+            Open Telegram
           </a>
         </div>
       </div>

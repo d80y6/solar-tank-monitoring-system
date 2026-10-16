@@ -6,34 +6,34 @@ import {
 } from "./simple-tank-detail-model";
 
 const TANK_READING_CSV_HEADERS = [
-  "id_reading",
-  "id_tangki",
-  "id_perangkat",
-  "waktu_pengukuran_utc",
-  "waktu_pengukuran_wib",
-  "waktu_diterima_utc",
-  "waktu_diterima_wib",
-  "jarak_sensor_cm",
-  "tinggi_solar_cm",
+  "reading_id",
+  "tank_id",
+  "device_id",
+  "measured_at_utc",
+  "measured_at_wib",
+  "received_at_utc",
+  "received_at_wib",
+  "sensor_distance_cm",
+  "fuel_height_cm",
   "volume_liter",
-  "persentase_isi",
-  "sisa_runtime_jam",
-  "baterai_volt",
-  "sinyal_rssi_dbm",
-  "status_konfigurasi",
-  "perlu_review",
-  "peringatan",
-  "resolusi",
-  "bucket_mulai_utc",
-  "bucket_mulai_wib",
-  "bucket_selesai_utc",
-  "bucket_selesai_wib",
-  "jumlah_sampel",
+  "fill_percent",
+  "remaining_runtime_hour",
+  "battery_volt",
+  "rssi_dbm",
+  "config_status",
+  "needs_review",
+  "warnings",
+  "resolution",
+  "bucket_start_utc",
+  "bucket_start_wib",
+  "bucket_end_utc",
+  "bucket_end_wib",
+  "sample_count",
   "volume_min_liter",
   "volume_max_liter",
-  "persentase_min",
-  "persentase_max",
-  "periode_unduhan",
+  "percent_min",
+  "percent_max",
+  "download_period",
 ] as const;
 
 const DISPLAY_TIME_ZONE = "Asia/Jakarta";
@@ -130,7 +130,7 @@ function formatCsvDateTime(value: string) {
     return value;
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "numeric",
     hour: "2-digit",
     hour12: false,
@@ -145,7 +145,7 @@ function formatCsvDateTime(value: string) {
 }
 
 function formatPeriodDate(date: Date) {
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "numeric",
     month: "long",
     timeZone: DISPLAY_TIME_ZONE,
@@ -217,11 +217,11 @@ export function buildReadingExportPeriod(
   const dateRangeLabel =
     startDateLabel === endDateLabel
       ? startDateLabel
-      : `${startDateLabel} sampai ${endDateLabel}`;
+      : `${startDateLabel} to ${endDateLabel}`;
   const filenameDateRange =
     startFilenameDate === endFilenameDate
       ? startFilenameDate
-      : `${startFilenameDate}_sampai_${endFilenameDate}`;
+      : `${startFilenameDate}_to_${endFilenameDate}`;
 
   return {
     end,

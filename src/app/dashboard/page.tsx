@@ -15,9 +15,9 @@ import Link from "next/link";
 import { connection } from "next/server";
 
 export const metadata: Metadata = {
-  title: "Manajemen Tangki Bahan Bakar | FTM",
+  title: "Fuel Tank Management | FTM",
   description:
-    "Tampilan operasional per STO untuk memantau volume tangki bahan bakar, status perangkat, dan akses cepat ke detail tangki.",
+    "Per-STO operational view for monitoring fuel tank volume, device status, and quick access to tank details.",
 };
 
 export const runtime = "nodejs";
@@ -66,13 +66,13 @@ export default async function SimpleDashboardPage() {
     <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { current: true, label: "Manajemen Tangki" },
+          { current: true, label: "Tank Management" },
           ...(isAdmin
             ? [
-                { href: "/dashboard/detail", label: "Analisis Teknis" },
+                { href: "/dashboard/detail", label: "Technical Analysis" },
                 {
                   href: "/dashboard/admin/users",
-                  label: "Manajemen Pengguna",
+                  label: "User Management",
                 },
               ]
             : []),
@@ -84,11 +84,10 @@ export default async function SimpleDashboardPage() {
         <section className="mb-4 flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-sm font-semibold uppercase text-zinc-500">
-              Operasional perangkat
+              Device operations
             </p>
             <p className="mt-1 text-sm leading-6 text-zinc-600">
-              Ajukan perangkat baru atau tinjau pengajuan yang menunggu
-              persetujuan.
+              Request a new device or review requests awaiting approval.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -97,7 +96,7 @@ export default async function SimpleDashboardPage() {
               className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-600/15 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
             >
               <Plus className="size-4" aria-hidden="true" />
-              Tambah perangkat
+              Add device
             </Link>
             {isAdmin ? (
               <Link
@@ -105,7 +104,7 @@ export default async function SimpleDashboardPage() {
                 className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
               >
                 <ClipboardCheck className="size-4" aria-hidden="true" />
-                Tinjau pengajuan
+                Review requests
               </Link>
             ) : null}
           </div>

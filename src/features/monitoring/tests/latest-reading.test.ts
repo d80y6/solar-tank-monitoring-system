@@ -79,7 +79,7 @@ describe("latest reading selection", () => {
 
     expect(tph).toMatchObject({
       deviceStatus: "online",
-      updateLabel: "20 dtk lalu",
+      updateLabel: "20 sec ago",
     });
     expect(overview.summary.onlineDevices).toBe(1);
   });

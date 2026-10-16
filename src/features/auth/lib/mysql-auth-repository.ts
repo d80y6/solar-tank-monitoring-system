@@ -227,7 +227,7 @@ function toRequiredIso(value: Date | string): string {
   const isoValue = toIso(value);
 
   if (!isoValue) {
-    throw new Error("Timestamp auth dari MySQL tidak valid.");
+    throw new Error("Auth timestamp from MySQL is invalid.");
   }
 
   return isoValue;
@@ -638,7 +638,7 @@ async function findAuthUserLifecycleForUpdate(
   const row = rows[0];
 
   if (!row || !isAuthRole(row.role) || !isAuthUserStatus(row.status)) {
-    throw new Error("Pengguna tidak ditemukan.");
+    throw new Error("User not found.");
   }
 
   return {
@@ -679,7 +679,7 @@ async function assertActiveAdminCanChange({
   const remainingActiveAdmins = rows.filter((row) => row.id !== target.id);
 
   if (remainingActiveAdmins.length < 1) {
-    throw new Error("Minimal harus ada satu admin aktif.");
+    throw new Error("There must be at least one active admin.");
   }
 }
 
@@ -714,7 +714,7 @@ export async function updateAuthUserRole({
     );
 
     if (target.status === "pending") {
-      throw new Error("Pengguna pending harus diproses dari pengajuan akses.");
+      throw new Error("Pending users must be processed from access requests.");
     }
 
     if (
@@ -722,7 +722,7 @@ export async function updateAuthUserRole({
       shouldRequireEmailVerificationForApproval() &&
       !target.emailVerifiedAt
     ) {
-      throw new Error("Email pengguna belum diverifikasi.");
+      throw new Error("User email is not verified.");
     }
 
     await assertActiveAdminCanChange({
@@ -760,7 +760,7 @@ export async function setAuthUserStatus({
   status: AuthUserStatus;
 }): Promise<void> {
   if (status === "pending") {
-    throw new Error("Status pending hanya untuk pengajuan akses baru.");
+    throw new Error("Pending status is only for new access requests.");
   }
 
   const pool = getMysqlPool();
@@ -775,7 +775,7 @@ export async function setAuthUserStatus({
     );
 
     if (target.status === "pending") {
-      throw new Error("Pengguna pending harus diproses dari pengajuan akses.");
+      throw new Error("Pending users must be processed from access requests.");
     }
 
     await assertActiveAdminCanChange({
@@ -839,7 +839,7 @@ export async function deleteAuthUser({
     const row = rows[0];
 
     if (!row || !isAuthRole(row.role) || !isAuthUserStatus(row.status)) {
-      throw new Error("Pengguna tidak ditemukan.");
+      throw new Error("User not found.");
     }
 
     await assertActiveAdminCanChange({
@@ -862,7 +862,7 @@ export async function deleteAuthUser({
 
     if (toCount(deviceRequestRows[0]?.count) > 0) {
       throw new Error(
-        "Pengguna ini punya pengajuan perangkat. Nonaktifkan akun agar jejak operasional tetap aman.",
+        "This user has device requests. Disable the account to keep the operational trail safe.",
       );
     }
 
@@ -1173,7 +1173,7 @@ export async function approveAccessRequest({
       | undefined;
 
     if (!row || !isAuthRole(row.requested_role)) {
-      throw new Error("Pengajuan akses tidak ditemukan.");
+      throw new Error("Access request not found.");
     }
 
     if (
@@ -1181,7 +1181,7 @@ export async function approveAccessRequest({
       !row.email_verified_at
     ) {
       throw new Error(
-        "Email pengguna belum diverifikasi. Kirim ulang link verifikasi bila perlu.",
+        "User email is not verified. Resend the verification link if needed.",
       );
     }
 
@@ -1242,7 +1242,7 @@ export async function rejectAccessRequest({
     const row = rows[0] as { user_id: string } | undefined;
 
     if (!row) {
-      throw new Error("Pengajuan akses tidak ditemukan.");
+      throw new Error("Access request not found.");
     }
 
     await connection.execute(
@@ -1554,7 +1554,7 @@ export async function completeTelegramBindingInMysql({
     );
 
     if (conflictingUsers[0]) {
-      throw new Error("Telegram ini sudah terhubung ke akun FTM lain.");
+      throw new Error("This Telegram is already connected to another FTM account.");
     }
 
     const [userUpdate] = await connection.execute<ResultSetHeader>(
@@ -1566,7 +1566,7 @@ export async function completeTelegramBindingInMysql({
     );
 
     if (userUpdate.affectedRows !== 1) {
-      throw new Error("Akun untuk binding Telegram tidak ditemukan.");
+      throw new Error("Account for Telegram binding not found.");
     }
 
     const [tokenUpdate] = await connection.execute<ResultSetHeader>(
@@ -1579,7 +1579,7 @@ export async function completeTelegramBindingInMysql({
     );
 
     if (tokenUpdate.affectedRows !== 1) {
-      throw new Error("Token Telegram sudah tidak valid.");
+      throw new Error("Telegram token is invalid.");
     }
 
     await connection.commit();

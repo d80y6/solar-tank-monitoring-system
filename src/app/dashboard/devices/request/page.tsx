@@ -19,9 +19,9 @@ import type {
 import { DeviceRequestForm } from "./device-request-form";
 
 export const metadata: Metadata = {
-  title: "Ajukan Perangkat | FTM",
+  title: "Request a Device | FTM",
   description:
-    "Pengajuan perangkat telemetri baru untuk proses tinjauan admin dan persiapan paket firmware FTM.",
+    "New telemetry device request for admin review and FTM firmware package preparation.",
 };
 
 export const dynamic = "force-dynamic";
@@ -32,7 +32,7 @@ function formatDate(value: string | null | undefined) {
     return "-";
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -64,8 +64,8 @@ function getStatusClass(status: DeviceRequestStatus) {
 
 function getTankShapeLabel(request: MonitoringDeviceRequest) {
   return request.tankShape === "rectangular"
-    ? "Tangki balok"
-    : "Tangki silinder horizontal";
+    ? "Rectangular tank"
+    : "Horizontal cylinder tank";
 }
 
 function RequestHistory({
@@ -78,22 +78,22 @@ function RequestHistory({
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <p className="text-sm font-semibold uppercase text-zinc-500">
-            Riwayat pengajuan
+            Request history
           </p>
           <h2 className="mt-1 break-words text-xl font-semibold">
-            Status perangkat yang pernah diajukan
+            Status of devices you have requested
           </h2>
         </div>
         <span className="inline-flex w-fit items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700 ring-1 ring-blue-100">
           <Clock3 className="size-4" aria-hidden="true" />
-          {requests.length} pengajuan
+          {requests.length} requests
         </span>
       </div>
 
       <div className="mt-5 grid min-w-0 gap-3">
         {requests.length === 0 ? (
           <div className="min-w-0 rounded-lg border border-dashed border-zinc-300 p-4 text-sm leading-6 text-zinc-500 sm:p-6">
-            Belum ada pengajuan perangkat dari akun ini.
+            No device requests from this account yet.
           </div>
         ) : (
           requests.map((request) => (
@@ -122,14 +122,14 @@ function RequestHistory({
                     Regional: {request.regionalLabel}
                   </p>
                   <p className="min-w-0 break-words">
-                    Wilayah: {request.wilayahLabel}
+                    Territory: {request.wilayahLabel}
                   </p>
                   <p className="min-w-0 break-words">Area: {request.areaLabel}</p>
-                  <p className="min-w-0 break-words">Perangkat: {request.deviceCode}</p>
+                  <p className="min-w-0 break-words">Device: {request.deviceCode}</p>
                   <p>{getTankShapeLabel(request)}</p>
                   <p>{getDeviceSensorTypeLabel(request.deviceSensorType)}</p>
-                  <p>Kapasitas: {request.capacityLiter} L</p>
-                  <p>Konsumsi: {request.consumptionLiterPerHour} L/jam</p>
+                  <p>Capacity: {request.capacityLiter} L</p>
+                  <p>Consumption: {request.consumptionLiterPerHour} L/hr</p>
                 </div>
                 {request.rejectionReason ? (
                   <p className="mt-3 min-w-0 break-words rounded-lg bg-red-50 px-3 py-2 text-sm leading-6 text-red-700 ring-1 ring-red-100">
@@ -138,8 +138,8 @@ function RequestHistory({
                 ) : null}
               </div>
               <div className="grid min-w-0 gap-1 text-sm text-zinc-500 lg:text-right">
-                <p>Diajukan: {formatDate(request.createdAt)}</p>
-                <p>Ditinjau: {formatDate(request.adminReviewedAt)}</p>
+                <p>Submitted: {formatDate(request.createdAt)}</p>
+                <p>Reviewed: {formatDate(request.adminReviewedAt)}</p>
               </div>
             </article>
           ))
@@ -163,12 +163,12 @@ export default async function DeviceRequestPage() {
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
+          { href: "/dashboard", label: "Tank Management" },
           ...(user.role === "admin"
             ? [
                 {
                   href: "/dashboard/admin/device-requests",
-                  label: "Tinjau Pengajuan",
+                  label: "Review requests",
                 },
               ]
             : []),
@@ -181,32 +181,32 @@ export default async function DeviceRequestPage() {
           <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] xl:items-center">
             <div className="min-w-0">
               <p className="text-sm font-semibold uppercase text-zinc-500">
-                Pengajuan perangkat
+                Device request
               </p>
               <h1 className="mt-2 max-w-3xl break-words text-2xl font-semibold sm:text-4xl">
-                Siapkan perangkat baru untuk ditinjau admin
+                Prepare a new device for admin review
               </h1>
               <p className="mt-3 max-w-3xl break-words text-sm leading-6 text-zinc-500 sm:text-base">
-                Isi data STO, tangki, mode sensor, dan beban genset. Setelah
-                admin menyetujui, sistem membuat kode device, device key, paket
-                firmware, dan link download ke email kerja akun ini.
+                Fill in the STO, tank, sensor mode, and generator load. After an
+                admin approves, the system creates the device code, device key,
+                firmware package, and download link to this account&apos;s work email.
               </p>
             </div>
             <div className="grid min-w-0 gap-3 sm:grid-cols-3">
               {[
                 {
-                  label: "Data STO",
-                  body: "Nama, wilayah, koordinat, dan kode otomatis.",
+                  label: "STO data",
+                  body: "Name, territory, coordinates, and automatic code.",
                   icon: FileCheck2,
                 },
                 {
-                  label: "Profil perangkat",
-                  body: "Mode sensor, board, pin trigger, dan pin echo.",
+                  label: "Device profile",
+                  body: "Sensor mode, board, trigger pin, and echo pin.",
                   icon: Cpu,
                 },
                 {
-                  label: "Tinjauan admin",
-                  body: "Perangkat belum aktif sebelum disetujui.",
+                  label: "Admin review",
+                  body: "The device stays inactive until approved.",
                   icon: ShieldCheck,
                 },
               ].map((item) => {
@@ -235,19 +235,19 @@ export default async function DeviceRequestPage() {
 
         {!isMysqlEnabled ? (
           <section className="w-full min-w-0 break-words rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800 sm:p-5">
-            Fitur pengajuan perangkat memerlukan storage MySQL. Aktifkan
+            The device request feature requires MySQL storage. Set
             <span className="font-semibold"> SOLAR_TANK_STORAGE_DRIVER=mysql </span>
-            dan jalankan migrasi provisioning perangkat sebelum dipakai.
+            and run the device provisioning migrations before use.
           </section>
         ) : null}
 
         <section className="w-full min-w-0 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-5 min-w-0">
             <p className="text-sm font-semibold uppercase text-zinc-500">
-              Form pengajuan
+              Request form
             </p>
             <h2 className="mt-1 break-words text-xl font-semibold">
-              Data perangkat dan tangki
+              Device and tank data
             </h2>
           </div>
           <DeviceRequestForm hardwareProfiles={hardwareProfiles} />

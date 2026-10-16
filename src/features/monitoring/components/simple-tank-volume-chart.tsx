@@ -21,7 +21,7 @@ const FALLBACK_CHART_SIZE = {
 };
 
 function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID", {
+  return new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 0,
   }).format(value);
 }
@@ -278,10 +278,10 @@ export function SimpleTankVolumeChart({
       <div className="mt-5 grid min-h-72 place-items-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50 p-6 text-center">
         <div>
           <p className="text-base font-semibold text-zinc-950">
-            Belum ada riwayat volume
+            No volume history yet
           </p>
           <p className="mt-2 max-w-md text-sm leading-6 text-zinc-500">
-            Grafik akan tampil setelah perangkat mengirim pembacaan volume.
+            The chart appears once a device sends volume readings.
           </p>
         </div>
       </div>
@@ -291,19 +291,19 @@ export function SimpleTankVolumeChart({
   return (
     <div className="mt-5 min-w-0 max-w-full">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {/* Filter rentang tren */}
+        {/* Trend range filter */}
         <div className="relative w-full sm:w-56" ref={rangeMenuRef}>
           <button
             aria-expanded={isRangeMenuOpen}
             aria-haspopup="listbox"
-            aria-label="Pilih rentang grafik"
+            aria-label="Select chart range"
             className="flex h-12 w-full items-center justify-between gap-3 rounded-lg border border-zinc-300 bg-white px-4 text-left text-sm font-semibold text-zinc-950 shadow-sm transition hover:border-blue-200 hover:bg-blue-50/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
             onClick={() => setIsRangeMenuOpen((current) => !current)}
             type="button"
           >
             <span className="min-w-0">
               <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
-                Rentang waktu
+                Time range
               </span>
               <span className="mt-0.5 block truncate">
                 {selectedRangeOption.label}
@@ -343,7 +343,7 @@ export function SimpleTankVolumeChart({
                 >
                   {option.label}
                   {selectedRange === option.key ? (
-                    <span className="text-xs text-white/80">Aktif</span>
+                    <span className="text-xs text-white/80">Active</span>
                   ) : null}
                 </button>
               ))}
@@ -352,21 +352,21 @@ export function SimpleTankVolumeChart({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="w-fit rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700 ring-1 ring-blue-100">
-            {trend.points.length} titik data
+            {trend.points.length} data points
           </span>
           {trend.gaps.length > 0 ? (
             <span className="w-fit rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700 ring-1 ring-amber-100">
-              {trend.gaps.length} jeda data
+              {trend.gaps.length} data gaps
             </span>
           ) : null}
           {exportHref ? (
             <a
-              aria-label={`Unduh CSV untuk rentang ${selectedRangeOption.label}`}
+              aria-label={`Download CSV for the ${selectedRangeOption.label} range`}
               className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
               href={exportHref}
             >
               <Download className="size-4" aria-hidden="true" />
-              Unduh CSV
+              Download CSV
             </a>
           ) : null}
         </div>
@@ -375,8 +375,8 @@ export function SimpleTankVolumeChart({
       <div className="mt-3 flex flex-col gap-1 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
         <span>{trend.range.bucketLabel}</span>
         <span>
-          {trend.totalSlots} slot waktu, jeda lebih dari{" "}
-          {trend.gapThresholdMinutes} menit ditandai garis putus-putus
+          {trend.totalSlots} time slots, gaps longer than{" "}
+          {trend.gapThresholdMinutes} minutes are marked with dashed lines
         </span>
       </div>
 
@@ -385,7 +385,7 @@ export function SimpleTankVolumeChart({
           ref={svgRef}
           className="block aspect-[640/260] h-auto w-full min-w-0 max-w-full touch-pan-y sm:aspect-auto sm:h-72"
           role="img"
-          aria-label="Grafik garis perubahan volume solar"
+          aria-label="Diesel volume change line chart"
           viewBox={`0 0 ${chartSize.width} ${chartSize.height}`}
           onPointerLeave={() => setActiveIndex(null)}
           onPointerMove={handlePointerMove}
@@ -539,7 +539,7 @@ export function SimpleTankVolumeChart({
             </p>
             {activePoint.sampleCount > 1 ? (
               <p className="mt-1 text-xs font-medium text-zinc-500">
-                rata-rata {activePoint.sampleCount} data
+                average of {activePoint.sampleCount} samples
               </p>
             ) : null}
           </div>
@@ -548,7 +548,7 @@ export function SimpleTankVolumeChart({
 
       {trend.gaps.length > 0 ? (
         <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          <p className="font-semibold">Jeda data terdeteksi</p>
+          <p className="font-semibold">Data gap detected</p>
           <div className="mt-2 grid gap-2">
             {trend.gaps.slice(0, 3).map((gap) => (
               <div
@@ -556,7 +556,7 @@ export function SimpleTankVolumeChart({
                 key={gap.id}
               >
                 <span>
-                  {gap.fromLabel} sampai {gap.toLabel}
+                  {gap.fromLabel} to {gap.toLabel}
                 </span>
                 <span className="font-semibold">{gap.durationLabel}</span>
               </div>
@@ -564,7 +564,7 @@ export function SimpleTankVolumeChart({
           </div>
           {trend.gaps.length > 3 ? (
             <p className="mt-2 text-xs font-medium">
-              {trend.gaps.length - 3} jeda lain tersedia pada rentang ini.
+              {trend.gaps.length - 3} more gaps available in this range.
             </p>
           ) : null}
         </div>

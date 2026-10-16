@@ -133,7 +133,7 @@ function SubmitButton({
   variant: ButtonVariant;
 }) {
   const { pending } = useFormStatus();
-  const label = pending ? "Memproses..." : children;
+  const label = pending ? "Processing..." : children;
 
   return (
     <button
@@ -429,22 +429,22 @@ export function AdminRoleForm({
       </select>
       <button
         aria-haspopup="dialog"
-        aria-label={`Simpan role ${targetUserName}`}
+        aria-label={`Save role for ${targetUserName}`}
         className={`inline-flex items-center justify-center rounded-lg bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 ${
           compact ? "size-8 px-0" : "h-9 px-3"
         }`}
         disabled={submitDisabled}
         onClick={() => setIsConfirmationOpen(true)}
-        title={`Simpan role ${targetUserName}`}
+        title={`Save role for ${targetUserName}`}
         type="button"
       >
         {compact ? (
           <>
             <Check className="size-4" aria-hidden="true" />
-            <span className="sr-only">Simpan</span>
+            <span className="sr-only">Save</span>
           </>
         ) : (
-          "Simpan"
+          "Save"
         )}
       </button>
 
@@ -496,12 +496,12 @@ function AdminRoleConfirmationDialog({
   return (
     <AdminConfirmationDialog
       confirmation={{
-        confirmLabel: "Ya, ubah role",
+        confirmLabel: "Yes, change role",
         description: isPromotion
-          ? `${targetUserName} akan memperoleh akses penuh ke fitur administrasi dan data operasional.`
-          : `${targetUserName} tidak lagi dapat membuka fitur administrasi setelah role diubah menjadi User.`,
-        eyebrow: "Perubahan hak akses",
-        title: `Ubah role ${targetUserName} menjadi ${isPromotion ? "Admin" : "User"}?`,
+          ? `${targetUserName} will gain full access to administration features and operational data.`
+          : `${targetUserName} will no longer be able to open administration features after the role is changed to User.`,
+        eyebrow: "Access change",
+        title: `Change ${targetUserName}'s role to ${isPromotion ? "Admin" : "User"}?`,
         tone: "warning",
       }}
       confirmIcon={<ShieldCheck className="size-4" aria-hidden="true" />}

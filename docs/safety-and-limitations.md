@@ -1,138 +1,139 @@
-# Batasan dan Keselamatan
+# Safety and Limitations
 
-Dokumen ini menjelaskan batas sistem dan hal keselamatan yang harus diperhatikan.
+This document explains the system limits and the safety points that must be observed.
 
-## Status Keamanan Saat Ini
+## Current Security Status
 
-Repositori ini menopang pilot operasional internal yang sudah menerima data dari
-perangkat nyata. Status tersebut tidak sama dengan production-hardened.
+This repository supports an active internal operational pilot that already
+receives data from real devices. That status is not the same as
+production-hardened.
 
-Belum boleh dianggap:
+Must not be considered:
 
 - production-ready;
-- aman untuk perluasan perangkat tanpa review keamanan dan keselamatan;
-- hasil sensor terkalibrasi untuk seluruh tangki;
-- satu-satunya sumber keputusan operasional;
-- persetujuan resmi deployment nasional.
+- safe for device expansion without security and safety review;
+- calibrated sensor results for all tanks;
+- the single source of operational decisions;
+- official approval for national deployment.
 
-## Batas Software
+## Software Limits
 
-Yang sudah ada:
+Available:
 
-- data contoh dan simulator khusus development;
-- API ingest lokal dan deployment;
-- validasi hash key per device;
-- memory store development;
-- snapshot live dan history rollup pada MySQL;
-- registry MySQL yang telah dipakai pilot;
-- auth user/admin berbasis MySQL;
-- session, OTP admin, email verification, reset password, dan audit auth;
-- rate limit untuk auth dan endpoint ingest saat storage MySQL aktif;
-- pengajuan perangkat, review admin, pembuatan device key, dan paket firmware ZIP;
-- first valid ping activation agar device baru tidak langsung aktif sebelum key cocok;
-- cleanup data device/uji dari admin tanpa menghapus akun atau template firmware;
-- validasi registry pilot dari file lokal yang tidak di-commit;
-- smoke test payload real-format;
+- development-only sample data and simulator;
+- local and deployed ingest API;
+- per-device key hash validation;
+- development memory store;
+- live snapshot and rollup history on MySQL;
+- MySQL registry already used by the pilot;
+- MySQL-based user/admin auth;
+- sessions, admin OTP, email verification, password reset, and auth audit;
+- rate limiting for auth and ingest endpoints when MySQL storage is active;
+- device requests, admin review, device key generation, and firmware ZIP packages;
+- first valid ping activation so new devices are not active before the key matches;
+- admin cleanup of device/test data without deleting accounts or firmware templates;
+- local pilot registry validation from a Git-untracked file;
+- real-format payload smoke tests;
 - simulator;
-- test domain.
+- domain tests.
 
-Yang belum ada:
+Not yet available:
 
-- backup terenkripsi dan restore drill yang teruji;
-- role operasional rinci di luar `admin` dan `user`;
-- backup dan restore yang diuji rutin;
-- monitoring server;
-- alert operasional level kritis/offline;
-- kalibrasi serta persetujuan keselamatan hardware untuk setiap lokasi;
-- halaman admin untuk mengelola registry device, hardware profile, dan firmware template secara penuh;
-- keputusan deployment production final dan proteksi perimeter environment final;
-- approval/reject device lewat Telegram.
+- encrypted backups and tested restore drills;
+- detailed operational roles beyond `admin` and `user`;
+- routinely tested backup and restore;
+- server monitoring;
+- critical-level/offline operational alerts;
+- hardware calibration and safety approval for every location;
+- admin pages to fully manage device registry, hardware profiles, and firmware templates;
+- final production deployment decisions and final environment perimeter protection;
+- device approve/reject through Telegram.
 
-## Batas Data
+## Data Limits
 
-Data di repo harus public-safe.
+Data in the repo must be public-safe.
 
-Jangan masukkan:
+Do not include:
 
-- data telemetry real;
-- koordinat sensitif;
-- domain internal;
-- IP internal;
-- credential;
-- screenshot dashboard internal;
-- konfigurasi jaringan;
-- API key production.
+- real telemetry data;
+- sensitive coordinates;
+- internal domains;
+- internal IPs;
+- credentials;
+- internal dashboard screenshots;
+- network configuration;
+- production API keys.
 
-Untuk pilot, data real boleh dipakai hanya lewat:
+For the pilot, real data may be used only through:
 
-- environment variable lokal/Vercel;
-- database cloud/server yang memang dituju;
-- `config/pilot-registry.local.json` yang di-ignore Git.
+- local/Vercel environment variables;
+- the intended cloud/server database;
+- the Git-ignored `config/pilot-registry.local.json`.
 
-File contoh `config/pilot-registry.example.json` tidak boleh dianggap data final
-lapangan.
+The sample file `config/pilot-registry.example.json` must not be treated
+as final field data.
 
-## Batas Hardware
+## Hardware Limits
 
-Pemasangan perangkat di sekitar bahan bakar harus mengikuti prosedur resmi.
+Installing devices near fuel must follow official procedures.
 
-Jangan:
+Do not:
 
-- memasang sensor sendiri tanpa izin;
-- membuka atau mengebor tangki;
-- menaruh rangkaian terbuka dekat bahan bakar;
-- menguji perangkat di area berisiko tanpa pendamping;
-- mengklaim sensor aman sebelum validasi.
+- install sensors yourself without permission;
+- open or drill into tanks;
+- place open circuits near fuel;
+- test devices in risky areas without a companion;
+- claim sensors are safe before validation.
 
-Pengujian awal sebaiknya memakai:
+Early testing should use:
 
-- simulator software;
-- wadah air;
-- lingkungan aman;
-- perangkat low voltage;
-- pendamping yang memahami prosedur.
+- software simulation;
+- water containers;
+- a safe environment;
+- low-voltage devices;
+- a companion who understands the procedure.
 
-## Batas Rumus
+## Formula Limits
 
-Rumus tabung horizontal sudah disiapkan, tetapi hasil nyata tetap perlu kalibrasi.
+The horizontal cylinder formula is prepared, but real results still need calibration.
 
-Yang harus divalidasi:
+That must be validated:
 
-- diameter tangki;
-- panjang tangki;
-- kapasitas real;
-- posisi sensor;
-- blind spot sensor;
-- bentuk tangki tidak ideal;
-- toleransi error;
-- efek permukaan cairan.
+- tank diameter;
+- tank length;
+- real capacity;
+- sensor position;
+- sensor blind spots;
+- non-ideal tank shapes;
+- error tolerance;
+- liquid surface effects.
 
-## Batas Keputusan Operasional
+## Operational Decision Limits
 
-Dashboard membantu membaca kondisi.
+The dashboard helps read conditions.
 
-Dashboard tidak menggantikan:
+The dashboard does not replace:
 
-- inspeksi lapangan;
-- SOP operasional;
-- keputusan teknisi;
-- prosedur keselamatan;
-- validasi mentor atau penanggung jawab.
+- field inspection;
+- operational SOPs;
+- technician decisions;
+- safety procedures;
+- mentor or responsible-person validation.
 
-## Sebelum Production-Hardened
+## Before Production-Hardened
 
-Checklist minimum:
+Minimum checklist:
 
-- data model disetujui;
-- payload device disepakati;
+- data model approved;
+- device payload agreed;
 - security review;
-- database dan backup;
+- database and backup;
 - HTTPS;
-- proteksi perimeter pada environment final;
-- rate limit aplikasi dan proteksi request di proxy;
-- role user;
+- perimeter protection on the final environment;
+- application rate limiting and request protection at the proxy;
+- user roles;
 - audit log;
-- rotasi key device;
-- dokumentasi operasional;
-- uji perangkat di lingkungan aman;
-- validasi akurasi volume.
+- device key rotation;
+- operational documentation;
+- device testing in a safe environment;
+- volume accuracy validation.

@@ -19,7 +19,7 @@ export function getMysqlDatabaseUrl(): string {
 
   if (!value) {
     throw new Error(
-      "MYSQL_DATABASE_URL wajib diisi ketika SOLAR_TANK_STORAGE_DRIVER=mysql.",
+      "MYSQL_DATABASE_URL is required when SOLAR_TANK_STORAGE_DRIVER=mysql.",
     );
   }
 

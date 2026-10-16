@@ -96,7 +96,7 @@ function roundMetric(value: number): number {
 }
 
 function formatMetric(value: number): string {
-  return new Intl.NumberFormat("id-ID", {
+  return new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 2,
   }).format(value);
 }
@@ -172,7 +172,7 @@ function calculateConsumptionPreview({
 }
 
 function ComputedMetric({
-  emptyLabel = "otomatis",
+  emptyLabel = "auto",
   help,
   label,
   unit,
@@ -249,7 +249,7 @@ function SubmitButton({
       type="submit"
     >
       <Send className="size-4" aria-hidden="true" />
-      {pending ? "Mengirim..." : "Ajukan perangkat"}
+      {pending ? "Sending..." : "Request device"}
     </button>
   );
 }
@@ -276,7 +276,7 @@ function ActionMessage({ state }: { state: DeviceRequestFormState }) {
         <div className="min-w-0">
           <p className="font-semibold">{state.message}</p>
           {state.requestCode ? (
-            <p className="mt-1 text-xs">Kode pengajuan: {state.requestCode}</p>
+            <p className="mt-1 text-xs">Request code: {state.requestCode}</p>
           ) : null}
           {state.issues && state.issues.length > 0 ? (
             <ul className="mt-3 grid gap-1 text-xs leading-5">
@@ -348,9 +348,9 @@ export function DeviceRequestForm({
     >
       <div className="grid w-full min-w-0 gap-3 sm:grid-cols-3">
         {[
-          "Kode STO dan kode device dibuat otomatis",
-          "Device key dibuat setelah admin approve",
-          "Batas level dan interval kirim memakai standar sistem",
+          "STO code and device code are created automatically",
+          "Device key is created after admin approval",
+          "Level limits and send interval use system defaults",
         ].map((item) => (
           <div
             className="min-w-0 break-words rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-semibold leading-6 text-zinc-700"
@@ -364,13 +364,13 @@ export function DeviceRequestForm({
       <section className="grid min-w-0 gap-5 border-t border-zinc-100 pt-5">
         <SectionHeader
           icon={<MapPin className="size-5" aria-hidden="true" />}
-          title="Lokasi STO"
+          title="STO location"
         >
-          Data ini menentukan pengelompokan lokasi dan titik STO pada peta.
+          This data determines location grouping and STO map points.
         </SectionHeader>
 
         <div className="grid w-full min-w-0 max-w-6xl gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <FormField label="Nama STO" help="Contoh: STO Bangil atau STO TPH">
+          <FormField label="STO name" help="Example: STO Bangil or STO TPH">
             <input
               className={inputClassName()}
               name="siteName"
@@ -380,10 +380,10 @@ export function DeviceRequestForm({
           </FormField>
           <FormField
             label="Regional"
-            help="Kelompok wilayah besar Telkom, misalnya TREG 5."
+            help="Telkom's large territory group, for example TREG 5."
           >
             <select className={inputClassName()} name="regionalLabel" required>
-              <option value="">Pilih regional</option>
+              <option value="">Select regional</option>
               {FTM_REGIONAL_OPTIONS.map((regional) => (
                 <option key={regional} value={regional}>
                   {regional}
@@ -392,11 +392,11 @@ export function DeviceRequestForm({
             </select>
           </FormField>
           <FormField
-            label="Wilayah"
-            help="Wilayah operasional di bawah regional, misalnya TIF 3."
+            label="Territory"
+            help="Operational territory under a regional, for example TIF 3."
           >
             <select className={inputClassName()} name="wilayahLabel" required>
-              <option value="">Pilih wilayah</option>
+              <option value="">Select territory</option>
               {FTM_WILAYAH_OPTIONS.map((wilayah) => (
                 <option key={wilayah} value={wilayah}>
                   {wilayah}
@@ -406,7 +406,7 @@ export function DeviceRequestForm({
           </FormField>
           <FormField
             label="Area"
-            help="Nama area kerja atau kota, misalnya Pasuruan."
+            help="Work area or city, for example Pasuruan."
           >
             <input
               className={inputClassName()}
@@ -417,7 +417,7 @@ export function DeviceRequestForm({
           </FormField>
           <FormField
             label="Latitude"
-            help="Opsional. Mendukung hingga 7 angka desimal."
+            help="Optional. Supports up to 7 decimal places."
           >
             <NumberInput
               max="90"
@@ -429,7 +429,7 @@ export function DeviceRequestForm({
           </FormField>
           <FormField
             label="Longitude"
-            help="Opsional. Mendukung hingga 7 angka desimal."
+            help="Optional. Supports up to 7 decimal places."
           >
             <NumberInput
               max="180"
@@ -445,10 +445,10 @@ export function DeviceRequestForm({
       <section className="grid min-w-0 gap-5 border-t border-zinc-100 pt-5">
         <SectionHeader
           icon={<Fuel className="size-5" aria-hidden="true" />}
-          title="Sensor dan Tangki"
+          title="Sensor and tank"
         >
-          Pilih tipe tangki, mode sensor, profile hardware, dan dimensi fisik
-          yang dipakai di lokasi.
+          Choose the tank type, sensor mode, hardware profile, and physical
+          dimensions used on site.
         </SectionHeader>
 
         <div className="grid w-full min-w-0 gap-3 sm:grid-cols-2">
@@ -462,10 +462,10 @@ export function DeviceRequestForm({
             type="button"
           >
             <span className="text-sm font-semibold text-zinc-950">
-              Tangki balok
+              Rectangular tank
             </span>
             <span className="mt-1 block text-xs leading-5 text-zinc-500">
-              Panjang, lebar, tinggi, dan tinggi sensor.
+              Length, width, height, and sensor height.
             </span>
           </button>
           <button
@@ -478,10 +478,10 @@ export function DeviceRequestForm({
             type="button"
           >
             <span className="text-sm font-semibold text-zinc-950">
-              Tangki silinder horizontal
+              Horizontal cylinder tank
             </span>
             <span className="mt-1 block text-xs leading-5 text-zinc-500">
-              Panjang tabung, diameter, dan tinggi sensor.
+              Cylinder length, diameter, and sensor height.
             </span>
           </button>
           <input name="tankShape" type="hidden" value={tankShape} />
@@ -489,19 +489,19 @@ export function DeviceRequestForm({
 
         <div className="grid w-full min-w-0 max-w-5xl gap-4 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)]">
           <FormField
-            label="Mode sensor"
-            help="Paket firmware aktif saat ini untuk sensor fuel."
+            label="Sensor mode"
+            help="The currently active firmware package for fuel sensors."
           >
             <select className={inputClassName()} name="deviceSensorType" required>
-              <option value="fuel">Sensor fuel</option>
+              <option value="fuel">Fuel sensor</option>
               <option value="energy" disabled>
-                Sensor energy (belum aktif)
+                Energy sensor (not active yet)
               </option>
             </select>
           </FormField>
           <FormField
-            label="Profil hardware"
-            help="Profile menentukan board, sensor, dan pin yang digunakan."
+            label="Hardware profile"
+            help="The profile determines the board, sensor, and pins used."
           >
             <select
               className={inputClassName()}
@@ -511,7 +511,7 @@ export function DeviceRequestForm({
               required
             >
               {matchingProfiles.length === 0 ? (
-                <option value="">Belum ada profil aktif untuk tipe ini</option>
+                <option value="">No active profile for this type yet</option>
               ) : (
                 matchingProfiles.map((profile) => (
                   <option key={profile.id} value={profile.id}>
@@ -525,12 +525,12 @@ export function DeviceRequestForm({
 
         <div className="grid w-full min-w-0 max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
           <ComputedMetric
-            help="Dari dimensi tangki."
-            label="Kapasitas liter"
+            help="From tank dimensions."
+            label="Capacity in liters"
             unit="L"
             value={calculatedCapacityLiter}
           />
-          <FormField label="Panjang cm">
+          <FormField label="Length cm">
             <NumberInput
               name="lengthCm"
               onValueChange={setLengthCm}
@@ -541,7 +541,7 @@ export function DeviceRequestForm({
           </FormField>
           {tankShape === "rectangular" ? (
             <>
-              <FormField label="Lebar cm">
+              <FormField label="Width cm">
                 <NumberInput
                   name="widthCm"
                   onValueChange={setWidthCm}
@@ -550,7 +550,7 @@ export function DeviceRequestForm({
                   value={widthCm}
                 />
               </FormField>
-              <FormField label="Tinggi cm">
+              <FormField label="Height cm">
                 <NumberInput
                   name="heightCm"
                   onValueChange={setHeightCm}
@@ -572,8 +572,8 @@ export function DeviceRequestForm({
             </FormField>
           )}
           <FormField
-            label="Acuan sensor cm"
-            help="Tinggi sensor dari atas tangki."
+            label="Sensor reference cm"
+            help="Sensor height from the top of the tank."
           >
             <NumberInput name="sensorMountHeightCm" placeholder="60" required />
           </FormField>
@@ -583,14 +583,14 @@ export function DeviceRequestForm({
       <section className="grid min-w-0 gap-5 border-t border-zinc-100 pt-5">
         <SectionHeader
           icon={<Gauge className="size-5" aria-hidden="true" />}
-          title="Beban Genset"
+          title="Generator load"
         >
-          Sistem menghitung konsumsi bahan bakar per jam dari beban lokasi, kapasitas
-          diesel engine, dan cos phi.
+          The system calculates hourly fuel consumption from site load, diesel
+          engine capacity, and cos phi.
         </SectionHeader>
 
         <div className="grid w-full min-w-0 max-w-6xl gap-4 sm:grid-cols-2 xl:grid-cols-5">
-          <FormField label="Beban lokasi">
+          <FormField label="Site load">
             <NumberInput
               name="loadValue"
               onValueChange={setLoadValue}
@@ -599,7 +599,7 @@ export function DeviceRequestForm({
               value={loadValue}
             />
           </FormField>
-          <FormField label="Satuan beban">
+          <FormField label="Load unit">
             <select
               className={inputClassName()}
               name="loadUnit"
@@ -612,8 +612,8 @@ export function DeviceRequestForm({
             </select>
           </FormField>
           <FormField
-            label="Kapasitas diesel engine"
-            help="Isi dalam kVA."
+            label="Diesel engine capacity"
+            help="Enter in kVA."
           >
             <NumberInput
               name="dieselEngineCapacityKva"
@@ -623,7 +623,7 @@ export function DeviceRequestForm({
               value={dieselEngineCapacityKva}
             />
           </FormField>
-          <FormField label="Cos phi" help="Umumnya 0,8. Isi 0 sampai 1.">
+          <FormField label="Cos phi" help="Typically 0.8. Enter 0 to 1.">
             <NumberInput
               max="1"
               min="0.01"
@@ -635,9 +635,9 @@ export function DeviceRequestForm({
             />
           </FormField>
           <ComputedMetric
-            help="Dipakai estimasi runtime."
-            label="Konsumsi bahan bakar"
-            unit="L/jam"
+            help="Used for runtime estimates."
+            label="Fuel consumption"
+            unit="L/hr"
             value={calculatedConsumptionLiterPerHour}
           />
         </div>
@@ -645,9 +645,9 @@ export function DeviceRequestForm({
 
       {!canSubmit ? (
         <div className="w-full min-w-0 max-w-5xl break-words rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
-          Profil perangkat aktif belum tersedia untuk tipe tangki ini. Admin
-          perlu mengaktifkan template firmware dan profil hardware di database
-          setelah konfigurasi pin dikonfirmasi.
+          No active device profile is available for this tank type yet. An admin
+          needs to enable the firmware template and hardware profile in the
+          database after the pin configuration is confirmed.
         </div>
       ) : null}
 

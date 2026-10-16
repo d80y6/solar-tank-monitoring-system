@@ -32,9 +32,9 @@ const INITIAL_STATE: DeviceRequestAdminActionState = {
   status: "idle",
   message: "",
 };
-const CLEANUP_SELECTED_CONFIRMATION = "BERSIHKAN PILIHAN DEVICE";
-const CLEANUP_SINGLE_CONFIRMATION = "BERSIHKAN ITEM DEVICE";
-const RESET_CONFIRMATION = "BERSIHKAN SEMUA DATA DEVICE";
+const CLEANUP_SELECTED_CONFIRMATION = "CLEANUP SELECTED DEVICE REQUESTS";
+const CLEANUP_SINGLE_CONFIRMATION = "CLEANUP SINGLE DEVICE REQUEST";
+const RESET_CONFIRMATION = "CLEANUP ALL DEVICE DATA";
 
 function ActionMessage({ state }: { state: DeviceRequestAdminActionState }) {
   if (state.status === "idle" || !state.message) {
@@ -58,7 +58,7 @@ function ActionMessage({ state }: { state: DeviceRequestAdminActionState }) {
           target="_blank"
         >
           <Download className="size-3.5" aria-hidden="true" />
-          Download paket firmware
+          Download firmware package
         </a>
       ) : null}
     </div>
@@ -108,7 +108,7 @@ function SubmitButton({
       type="submit"
     >
       <Icon className="size-4" aria-hidden="true" />
-      {pending ? "Memproses..." : children}
+      {pending ? "Processing..." : children}
     </button>
   );
 }
@@ -158,7 +158,7 @@ function ConfirmedSubmitButton({
         type="button"
       >
         <Icon className="size-4" aria-hidden="true" />
-        {pending ? "Memproses..." : children}
+        {pending ? "Processing..." : children}
       </button>
       <button hidden ref={hiddenSubmitRef} type="submit" />
 
@@ -197,7 +197,7 @@ export function ApproveDeviceRequestForm({
       <input name="csrfToken" type="hidden" value={csrfToken} />
       <input name="requestId" type="hidden" value={requestId} />
       <SubmitButton disabled={disabled} icon="check" variant="primary">
-        Setujui
+        Approve
       </SubmitButton>
       <ActionMessage state={state} />
     </form>
@@ -227,11 +227,11 @@ export function RejectDeviceRequestForm({
         disabled={disabled}
         maxLength={1000}
         name="rejectionReason"
-        placeholder="Alasan penolakan, misalnya kode perangkat bentrok atau dimensi belum cocok."
+        placeholder="Rejection reason, for example conflicting device code or mismatched dimensions."
         required
       />
       <SubmitButton disabled={disabled} icon="x" variant="dangerOutline">
-        Tolak
+        Reject
       </SubmitButton>
       <ActionMessage state={state} />
     </form>
@@ -297,7 +297,7 @@ export function ResendDevicePackageForm({
       requestId={requestId}
       variant="neutral"
     >
-      Kirim ulang link
+      Resend link
     </PackageActionForm>
   );
 }
@@ -313,11 +313,11 @@ export function ReissueDevicePackageForm({
     <PackageActionForm
       action={reissueDevicePackageAction}
       confirmation={{
-        confirmLabel: "Ya, buat ulang paket",
+        confirmLabel: "Yes, recreate package",
         description:
-          "Paket dan kredensial lama akan dicabut, lalu sistem membuat paket provisioning baru untuk perangkat ini.",
-        eyebrow: "Rotasi kredensial perangkat",
-        title: "Buat ulang paket provisioning?",
+          "The old package and credentials will be revoked, then the system creates a new provisioning package for this device.",
+        eyebrow: "Device credential rotation",
+        title: "Recreate provisioning package?",
         tone: "warning",
       }}
       csrfToken={csrfToken}
@@ -325,7 +325,7 @@ export function ReissueDevicePackageForm({
       requestId={requestId}
       variant="warning"
     >
-      Buat ulang paket
+      Recreate package
     </PackageActionForm>
   );
 }
@@ -341,11 +341,11 @@ export function RevokeDeviceProvisioningForm({
     <PackageActionForm
       action={revokeDeviceProvisioningAction}
       confirmation={{
-        confirmLabel: "Ya, cabut akses",
+        confirmLabel: "Yes, revoke access",
         description:
-          "Perangkat tidak lagi dapat mengirim telemetry menggunakan kredensial provisioning yang sekarang.",
-        eyebrow: "Cabut akses perangkat",
-        title: "Cabut akses provisioning perangkat?",
+          "The device can no longer send telemetry using the current provisioning credentials.",
+        eyebrow: "Revoke device access",
+        title: "Revoke device provisioning access?",
         tone: "danger",
       }}
       csrfToken={csrfToken}
@@ -353,7 +353,7 @@ export function RevokeDeviceProvisioningForm({
       requestId={requestId}
       variant="dangerOutline"
     >
-      Cabut akses
+      Revoke access
     </PackageActionForm>
   );
 }
@@ -384,16 +384,16 @@ export function CleanupDeviceRequestForm({
       />
       <ConfirmedSubmitButton
         confirmation={{
-          confirmLabel: "Ya, hapus data",
-          description: `Pengajuan, paket firmware, event, reading, dan perangkat terkait ${requestLabel} akan dihapus jika tidak dipakai data lain.`,
-          eyebrow: "Pembersihan data perangkat",
-          title: `Hapus data ${requestLabel}?`,
+          confirmLabel: "Yes, delete data",
+          description: `The request, firmware package, events, readings, and device related to ${requestLabel} will be deleted if no other data uses them.`,
+          eyebrow: "Device data cleanup",
+          title: `Delete data for ${requestLabel}?`,
           tone: "danger",
         }}
         icon="trash"
         variant="dangerOutline"
       >
-        Hapus data
+        Delete data
       </ConfirmedSubmitButton>
       <ActionMessage state={state} />
     </form>
@@ -421,7 +421,7 @@ export function CleanupSelectedDeviceRequestsForm({
       <input name="csrfToken" type="hidden" value={csrfToken} />
       <input name="cleanupMode" type="hidden" value="selected" />
       <label className="grid gap-2 text-sm font-semibold text-zinc-950">
-        Hapus pengajuan yang dicentang
+        Delete checked requests
         <input
           autoComplete="off"
           className="h-11 rounded-lg border border-amber-200 bg-white px-3 text-sm font-semibold text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-amber-500 focus:ring-4 focus:ring-amber-600/15"
@@ -432,22 +432,22 @@ export function CleanupSelectedDeviceRequestsForm({
       </label>
       <ConfirmedSubmitButton
         confirmation={{
-          confirmLabel: "Ya, bersihkan pilihan",
+          confirmLabel: "Yes, clean up selection",
           description:
-            "Semua pengajuan yang dicentang beserta data perangkat terkait akan dibersihkan sesuai aturan keamanan relasi data.",
-          eyebrow: "Pembersihan data terpilih",
-          title: "Bersihkan semua pengajuan yang dicentang?",
+            "All checked requests along with related device data will be cleaned up according to data relation safety rules.",
+          eyebrow: "Selected data cleanup",
+          title: "Clean up all checked requests?",
           tone: "warning",
         }}
         icon="trash"
         variant="warning"
       >
-        Bersihkan pilihan
+        Clean up selection
       </ConfirmedSubmitButton>
       <p className="text-xs leading-5 text-zinc-500 lg:col-span-2">
-        Centang satu atau beberapa pengajuan, ketik tepat{" "}
+        Check one or more requests, type exactly{" "}
         <span className="font-semibold">{CLEANUP_SELECTED_CONFIRMATION}</span>,
-        lalu bersihkan. Sistem hanya menghapus data yang terkait pilihan.
+        then clean up. The system only deletes data related to the selection.
       </p>
       <div className="lg:col-span-2">
         <ActionMessage state={state} />
@@ -470,7 +470,7 @@ export function ResetMonitoringDeviceDataForm({
     <form action={formAction} className="grid gap-3">
       <input name="csrfToken" type="hidden" value={csrfToken} />
       <label className="grid gap-2 text-sm font-semibold text-zinc-950">
-        Frasa konfirmasi
+        Confirmation phrase
         <input
           autoComplete="off"
           className="h-11 rounded-lg border border-red-200 bg-white px-3 text-sm font-semibold text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-red-500 focus:ring-4 focus:ring-red-600/15"
@@ -480,24 +480,24 @@ export function ResetMonitoringDeviceDataForm({
         />
       </label>
       <p className="text-xs leading-5 text-zinc-500">
-        Ketik tepat <span className="font-semibold">{RESET_CONFIRMATION}</span>{" "}
-        untuk membersihkan semua data STO, tangki, perangkat, reading, pengajuan,
-        paket firmware, dan event provisioning. Akun pengguna, admin, template
-        firmware, dan profil hardware tidak ikut dihapus.
+        Type exactly <span className="font-semibold">{RESET_CONFIRMATION}</span>{" "}
+        to clean up all STO, tank, device, reading, request, firmware package, and
+        provisioning event data. User accounts, admins, firmware templates, and
+        hardware profiles are not deleted.
       </p>
       <ConfirmedSubmitButton
         confirmation={{
-          confirmLabel: "Ya, bersihkan semuanya",
+          confirmLabel: "Yes, clean up everything",
           description:
-            "Seluruh data operasional STO, tangki, perangkat, reading, pengajuan, paket firmware, dan event provisioning akan dihapus. Akun pengguna dan template tetap dipertahankan.",
-          eyebrow: "Reset data operasional",
-          title: "Bersihkan semua data operasional perangkat?",
+            "All STO, tank, device, reading, request, firmware package, and provisioning event operational data will be deleted. User accounts and templates are retained.",
+          eyebrow: "Operational data reset",
+          title: "Clean up all device operational data?",
           tone: "danger",
         }}
         icon="trash"
         variant="danger"
       >
-        Bersihkan semua data
+        Clean up all data
       </ConfirmedSubmitButton>
       <ActionMessage state={state} />
     </form>

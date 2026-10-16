@@ -15,7 +15,7 @@ Set-Location $ProjectDir
 pnpm db:backup:mysql *>&1 | Tee-Object -FilePath $LogPath -Append
 
 if ($LASTEXITCODE -ne 0) {
-  throw "Backup MySQL gagal. Cek log: $LogPath"
+  throw "MySQL backup failed. Check the log: $LogPath"
 }
 
-"[$(Get-Date -Format o)] Backup MySQL selesai" | Out-File -FilePath $LogPath -Encoding utf8 -Append
+"[$(Get-Date -Format o)] MySQL backup completed" | Out-File -FilePath $LogPath -Encoding utf8 -Append

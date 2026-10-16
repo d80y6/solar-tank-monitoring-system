@@ -3,9 +3,9 @@ import { DashboardRouteLoading } from "@/components/dashboard/dashboard-route-lo
 export default function TankOperationalDetailLoading() {
   return (
     <DashboardRouteLoading
-      label="Memuat detail"
-      title="Menyiapkan detail operasional"
-      description="Sistem sedang membaca status perangkat, volume, dan tren tangki terbaru."
+      label="Loading details"
+      title="Preparing operational details"
+      description="The system is reading device status, volume, and the latest tank trends."
     />
   );
 }

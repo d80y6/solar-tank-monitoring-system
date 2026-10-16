@@ -15,7 +15,7 @@ export function LiveClock({
 
   const formatter = useMemo(
     () =>
-      new Intl.DateTimeFormat("id-ID", {
+      new Intl.DateTimeFormat("en-US", {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",

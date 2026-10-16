@@ -30,7 +30,7 @@ const CAPACITY_TOLERANCE: NumberTolerance = {
 const CONSUMPTION_TOLERANCE: NumberTolerance = {
   minorRatio: 0.05,
   majorRatio: 0.2,
-  unit: "L/jam",
+  unit: "L/h",
 };
 
 const PERCENT_TOLERANCE: NumberTolerance = {
@@ -40,16 +40,16 @@ const PERCENT_TOLERANCE: NumberTolerance = {
 };
 
 const configLabels: Record<keyof TankConfigSnapshot, string> = {
-  shape: "Bentuk tangki",
-  capacityLiter: "Kapasitas tangki",
-  diameterCm: "Diameter tangki",
-  lengthCm: "Panjang tangki",
-  heightCm: "Tinggi tangki",
-  widthCm: "Lebar tangki",
-  sensorMountHeightCm: "Tinggi sensor",
+  shape: "Tank shape",
+  capacityLiter: "Tank capacity",
+  diameterCm: "Tank diameter",
+  lengthCm: "Tank length",
+  heightCm: "Tank height",
+  widthCm: "Tank width",
+  sensorMountHeightCm: "Sensor height",
   lowLevelPercent: "Low level",
   criticalLevelPercent: "Critical level",
-  consumptionLiterPerHour: "Konsumsi per jam",
+  consumptionLiterPerHour: "Consumption per hour",
 };
 
 export function isPayloadRecord(value: unknown): value is PayloadRecord {
@@ -157,7 +157,7 @@ function formatShape(shape: TankShape | undefined): string {
     return "-";
   }
 
-  return shape === "rectangular" ? "Tangki balok" : "Silinder horizontal";
+  return shape === "rectangular" ? "Rectangular tank" : "Horizontal cylinder";
 }
 
 function formatNumberValue(value: number | undefined, unit: string): string {
@@ -181,7 +181,7 @@ function formatSnapshotValue(
     : field === "capacityLiter"
       ? "L"
       : field === "consumptionLiterPerHour"
-        ? "L/jam"
+        ? "L/h"
         : "cm";
 
   return formatNumberValue(value as number | undefined, unit);
@@ -245,7 +245,7 @@ function validatePositiveNumber(
       createInvalidNumberIssue({
         field,
         payloadValue: candidate.rawValue,
-        message: `${configLabels[field]} dari payload bukan angka valid.`,
+        message: `${configLabels[field]} from payload is not a valid number.`,
       }),
     ];
   }
@@ -255,7 +255,7 @@ function validatePositiveNumber(
       createInvalidNumberIssue({
         field,
         payloadValue: candidate.rawValue,
-        message: `${configLabels[field]} dari payload harus lebih besar dari 0.`,
+        message: `${configLabels[field]} from payload must be greater than 0.`,
       }),
     ];
   }
@@ -279,7 +279,7 @@ function validatePercentNumber(
       createInvalidNumberIssue({
         field,
         payloadValue: candidate.rawValue,
-        message: `${configLabels[field]} dari payload harus berada di rentang 0-100%.`,
+        message: `${configLabels[field]} from payload must be within 0-100%.`,
       }),
     ];
   }
@@ -299,12 +299,12 @@ function collectInvalidConfigIssues(payload: unknown): TankConfigIssue[] {
   if (rawShape && !normalizeTankShape(rawShape)) {
     issues.push({
       field: "shape_raw",
-      label: "Bentuk tangki",
+      label: "Tank shape",
       severity: "invalid",
       registryValue: "-",
       payloadValue: rawShape,
       message:
-        "Bentuk tangki dari payload tidak dikenali. Gunakan rectangular atau horizontal-cylinder.",
+        "Tank shape from payload is not recognized. Use rectangular or horizontal-cylinder.",
     });
   }
 
@@ -497,7 +497,7 @@ function compareShape(
       severity: "mismatch",
       registryValue: registry.shape,
       payloadValue: payload.shape,
-      message: "Bentuk tangki payload berbeda dari registry resmi.",
+      message: "Payload tank shape differs from the official registry.",
     }),
   ];
 }
@@ -535,7 +535,7 @@ function compareNumberField(
       severity,
       registryValue,
       payloadValue,
-      message: `${configLabels[field]} payload berbeda ${differencePercent}% dari registry.`,
+      message: `${configLabels[field]} payload differs by ${differencePercent}% from the registry.`,
     }),
   ];
 }
@@ -567,24 +567,24 @@ function buildConfigSummary({
   isPayloadComplete: boolean;
 }): string {
   if (status === "invalid_config") {
-    return "Config payload tidak valid";
+    return "Payload config is invalid";
   }
 
   if (status === "config_mismatch") {
-    return "Config mismatch perlu review";
+    return "Config mismatch needs review";
   }
 
   if (status === "minor_config_difference") {
-    return "Ada perbedaan kecil konfigurasi";
+    return "Minor configuration difference";
   }
 
   if (!hasPayloadConfig) {
-    return "Memakai konfigurasi registry";
+    return "Using registry configuration";
   }
 
   return isPayloadComplete
-    ? "Config payload sesuai toleransi"
-    : "Config payload parsial, sisanya registry";
+    ? "Payload config within tolerance"
+    : "Partial payload config, remainder from registry";
 }
 
 function canApplyPayloadConfig(status: TankConfigReview["status"]): boolean {

@@ -1,281 +1,278 @@
 # Development Log
 
-Dokumen ini mencatat perkembangan implementasi secara ringkas.
+This document records implementation progress concisely.
 
-## 2026-06-24 - Fondasi Repo dan Dokumentasi Awal
+## 2026-06-24 - Repository Foundation and Initial Documentation
 
-Pekerjaan:
+Work:
 
-- scaffold repositori;
-- README awal;
-- struktur dokumentasi;
-- batas keamanan publik;
-- konfigurasi Next.js, TypeScript, Tailwind, ESLint, Vitest.
+- repository scaffold;
+- initial README;
+- documentation structure;
+- public security boundaries;
+- Next.js, TypeScript, Tailwind, ESLint, Vitest configuration.
 
 ## 2026-06-25 - Landing Page
 
-Pekerjaan:
+Work:
 
-- membuat landing page Bahasa Indonesia;
-- menyesuaikan konteks menjadi monitoring tangki;
-- menambahkan navigasi ke dashboard;
-- menjaga gaya visual bersih dan profesional.
+- created the landing page;
+- adjusted the context to tank monitoring;
+- added navigation to the dashboard;
+- kept a clean, professional visual style.
 
-## 2026-06-25 - Dashboard dan Detail Frontend
+## 2026-06-25 - Dashboard and Detail Frontend
 
-Pekerjaan:
+Work:
 
-- membuat halaman `/dashboard`;
-- membuat halaman `/dashboard/tanks/[tankId]`;
-- menampilkan peta ilustratif;
-- menampilkan status lokasi;
-- menampilkan visual tangki dan parameter sensor.
+- created the `/dashboard` page;
+- created the `/dashboard/tanks/[tankId]` page;
+- displayed an illustrative map;
+- displayed location status;
+- displayed tank visuals and sensor parameters.
 
-Catatan:
+Note:
 
 ```text
-Halaman awal memakai data contoh agar layout dan istilah operasional bisa divalidasi sebelum API ingest dibuat.
+The first pages used sample data so layout and operational terms could be validated before the ingest API was built.
 ```
 
-## 2026-06-25 - Domain Monitoring
+## 2026-06-25 - Monitoring Domain
 
-Pekerjaan:
+Work:
 
-- membuat type monitoring;
-- membuat mock site, tank, device, reading;
-- membuat runtime logic;
-- membuat status logic;
-- membuat tank volume logic;
-- membuat normalizer payload;
-- membuat view model dashboard dan detail;
-- menambahkan unit test.
+- created monitoring types;
+- created mock sites, tanks, devices, readings;
+- created runtime logic;
+- created status logic;
+- created tank volume logic;
+- created the payload normalizer;
+- created dashboard and detail view models;
+- added unit tests.
 
-## 2026-06-26 - API Read-only
+## 2026-06-26 - Read-only API
 
-Pekerjaan:
+Work:
 
 - `GET /api/dashboard/overview`;
 - `GET /api/tanks/[tankId]`;
 - `GET /api/tanks/[tankId]/readings`;
-- endpoint membaca data dari domain/view model.
+- endpoints read data from domain/view models.
 
-## 2026-06-26 - API Ingest dan Memory Store
+## 2026-06-26 - Ingest API and Memory Store
 
-Pekerjaan:
+Work:
 
 - `POST /api/ingest`;
-- validasi `X-Device-Id`;
-- validasi `X-Api-Key`;
-- normalisasi payload CAT-like;
-- memory store lokal;
-- test ingest dan error case.
+- `X-Device-Id` validation;
+- `X-Api-Key` validation;
+- CAT-like payload normalization;
+- local memory store;
+- ingest tests and error cases.
 
-## 2026-06-26 - Simulator Device
+## 2026-06-26 - Device Simulator
 
-Pekerjaan:
+Work:
 
 - `scripts/simulate-device.mjs`;
-- script `pnpm simulate:device`;
-- mode sekali jalan;
-- mode berulang;
-- opsi device, key, interval, persen awal, dan critical mode;
-- verifikasi payload masuk ke API.
+- `pnpm simulate:device` script;
+- one-shot mode;
+- repeat mode;
+- device, key, interval, start percent, and critical mode options;
+- verification that payloads reach the API.
 
-## 2026-06-26 - Dokumentasi dan Maintenance Repo
+## 2026-06-26 - Documentation and Repository Maintenance
 
-Pekerjaan:
+Work:
 
-- README disinkronkan dengan kondisi aktual;
-- dokumen `docs/` diisi;
-- CONTRIBUTING dan SECURITY diperjelas;
-- `.env.example` diperbarui;
-- GitHub Actions CI ditambahkan;
-- issue template ditambahkan;
-- placeholder `.gitkeep` dibersihkan.
+- README synchronized with actual conditions;
+- `docs/` filled in;
+- CONTRIBUTING and SECURITY clarified;
+- `.env.example` updated;
+- GitHub Actions CI added;
+- issue templates added;
+- placeholder `.gitkeep` files cleaned.
 
 ## 2026-06-26 - Persistent Storage Foundation
 
-Pekerjaan:
+Work:
 
-- migration MySQL untuk site, tank, device, dan reading;
-- seed demo MySQL;
-- repository MySQL untuk reading;
-- storage facade untuk memilih memory atau MySQL;
-- query reading awal memakai batas global untuk fondasi storage;
-- memory store tetap tersedia untuk development lokal, tetapi mode MySQL tidak menampilkan data contoh ketika tabel reading kosong.
+- MySQL migrations for sites, tanks, devices, and readings;
+- MySQL demo seed;
+- MySQL reading repository;
+- storage facade to select memory or MySQL;
+- initial reading queries used global bounds for the storage foundation;
+- the memory store remains available for local development, but MySQL mode shows no sample data when the reading table is empty.
 
-## 2026-06-26 - Auto-refresh Dashboard dan Detail
+## 2026-06-26 - Auto-refresh Dashboard and Detail
 
-Pekerjaan:
+Work:
 
-- komponen refresh manual;
+- manual refresh component;
 - pause/resume auto-refresh;
-- auto-refresh berhenti saat tab tidak aktif;
-- interval default 20 detik lewat env;
-- jam dashboard real-time sebagai client component kecil.
+- auto-refresh stops when the tab is inactive;
+- default interval of 20 seconds via env;
+- real-time dashboard clock as a small client component.
 
-## 2026-06-26 - Device Key Per Device
+## 2026-06-26 - Per-Device Key
 
-Pekerjaan:
+Work:
 
-- hash key per device contoh;
-- validasi key ingest memakai hash;
-- fallback global tetap tersedia untuk development;
-- simulator memakai key demo sesuai device;
-- test device key ditambahkan.
+- hashed key per sample device;
+- ingest key validation using the hash;
+- global fallback remains available for development;
+- simulator uses the demo key matching the device;
+- device key tests added.
 
 ## 2026-06-27 - Deployment Readiness
 
-Pekerjaan:
+Work:
 
-- menambahkan `GET /api/health` untuk mengecek aplikasi hidup tanpa menyentuh database;
-- menambahkan `GET /api/ready` untuk mengecek kesiapan storage aktif;
-- menambahkan probe MySQL langsung agar readiness tidak tertutup fallback memory;
-- menambahkan error boundary dashboard dan detail tangki;
-- memperjelas pesan error bahwa perubahan `.env.local` perlu restart dev server;
-- menambahkan test deployment probes;
-- menyinkronkan README, kontrak API, deployment, arsitektur, dan quickstart reviewer.
+- added `GET /api/health` to check the application is alive without touching the database;
+- added `GET /api/ready` to check active storage readiness;
+- added a direct MySQL probe so readiness is not masked by the memory fallback;
+- added dashboard and tank detail error boundaries;
+- clarified the error message that `.env.local` changes require a dev server restart;
+- added deployment probe tests;
+- synchronized README, API contract, deployment, architecture, and reviewer quickstart.
 
-## 2026-06-28 - Cloud MySQL dan Navigasi Detail STO
+## 2026-06-28 - Cloud MySQL and STO Detail Navigation
 
-Pekerjaan:
+Work:
 
-- memisahkan registry site, tangki, device, dan hash key ke repository MySQL;
-- membuat dashboard, detail, dan API membaca registry aktif dari memory atau MySQL;
-- menambahkan script `pnpm db:migrate:mysql`, `pnpm db:seed:mysql`, dan `pnpm db:setup:mysql`;
-- menambahkan konfigurasi `MYSQL_CONNECTION_LIMIT`, `MYSQL_SSL_MODE`, dan `MYSQL_SSL_CA` untuk deployment cloud MySQL;
-- menjaga query reading MySQL mengambil data kronologis untuk grafik detail;
-- membuat marker STO dan tabel dashboard bisa membuka halaman detail tangki terkait;
-- membuat marker lokasi di halaman detail bisa pindah ke detail STO lain;
-- menghapus payload sementara dari working tree agar tidak ikut commit.
+- split site, tank, device, and key hash registry into a MySQL repository;
+- made the dashboard, detail, and APIs read the active registry from memory or MySQL;
+- added `pnpm db:migrate:mysql`, `pnpm db:seed:mysql`, and `pnpm db:setup:mysql` scripts;
+- added `MYSQL_CONNECTION_LIMIT`, `MYSQL_SSL_MODE`, and `MYSQL_SSL_CA` configuration for cloud MySQL deployment;
+- kept MySQL reading queries fetching chronological data for detail charts;
+- made STO markers and dashboard rows open the related tank detail page;
+- made location markers on the detail page jump to another STO detail;
+- removed temporary payloads from the working tree so they are not committed.
 
-## 2026-06-30 - Payload Real Device dan Pilot Readiness
+## 2026-06-30 - Real Device Payload and Pilot Readiness
 
-Pekerjaan:
+Work:
 
-- menambahkan review config payload vs registry agar sistem tidak diam-diam percaya config dari device jika berbeda jauh;
-- menambahkan sumber data pembacaan seperti volume dari device atau backend;
-- menambahkan panel review config di detail tangki;
-- menambahkan `config/pilot-registry.example.json` sebagai template public-safe;
-- menambahkan `pnpm pilot:hash-key` untuk membuat key dan hash device;
-- menambahkan `pnpm pilot:registry` untuk validasi dan apply registry pilot lokal ke MySQL;
-- menambahkan `pnpm pilot:smoke` untuk mengirim payload real-format ke `/api/ingest`;
-- menambahkan dokumentasi `docs/pilot-readiness.md`.
+- added payload config vs registry review so the system does not silently trust device configuration when it differs significantly;
+- added reading data sources such as volume from device or backend;
+- added a config review panel on the tank detail page;
+- added `config/pilot-registry.example.json` as a public-safe template;
+- added `pnpm pilot:hash-key` to create device key and hash;
+- added `pnpm pilot:registry` to validate and apply the local pilot registry to MySQL;
+- added `pnpm pilot:smoke` to send real-format payloads to `/api/ingest`;
+- added `docs/pilot-readiness.md` documentation.
 
-Catatan:
-
-```text
-Data real, key asli, koordinat sensitif, dan file registry lokal tidak boleh di-commit. Jalur pilot memakai file .local.json yang diabaikan Git.
-```
-
-## 2026-06-30 - Fase Peta Real dan Panduan Lapangan
-
-Pekerjaan:
-
-- mengganti peta ilustratif dashboard menjadi peta berbasis tile dan koordinat registry;
-- menambahkan zoom, drag, recenter, search, filter status, tooltip marker, dan detail overview interaktif;
-- menambahkan latitude dan longitude ke dashboard view model agar API dan UI membawa posisi registry;
-- menambahkan `docs/field-pilot-5-sto-guide.md` sebagai panduan lapangan untuk 5 STO;
-- menegaskan bahwa marker peta berasal dari registry manual, bukan payload GPS device.
-
-## 2026-07-06 - Maintenance Data Device/Uji
-
-Pekerjaan:
-
-- menambahkan panel admin untuk membersihkan satu data device/uji, beberapa pilihan, atau semua data device/uji sebelum uji real diulang;
-- membatasi pembersihan hanya ke data operasional monitoring dan provisioning;
-- menjaga pembersihan pilihan agar site/tangki yang masih dipakai data lain tidak ikut terhapus;
-- menjaga akun admin/user, audit auth, template firmware, dan profil hardware tetap tersimpan;
-- menambahkan konfirmasi manual agar admin tidak menghapus data tanpa sengaja;
-- menambahkan test repository untuk memastikan urutan pembersihan mengikuti relasi database;
-- memperbarui README, pilot readiness, dan data model.
-
-## 2026-07-07 - Sinkronisasi Dokumentasi Operasional
-
-Pekerjaan:
-
-- menambahkan `docs/current-operational-truth.md` sebagai sumber ringkas kondisi project terkini;
-- menyelaraskan README, SECURITY, deployment, safety, system boundaries, data model, dan roadmap agar tidak menyebut fitur yang sudah ada sebagai belum ada;
-- menegaskan bahwa approval device tetap melalui web admin, sementara Telegram masih untuk binding/notifikasi;
-- menegaskan bahwa RTU/Modbus, alert production, backup/restore teruji, dan hardening deployment final masih pekerjaan lanjutan;
-- mencatat bahwa kapasitas tangki dan konsumsi estimasi berasal dari perhitungan sistem, bukan input manual bebas user.
-
-Catatan:
+Note:
 
 ```text
-Perubahan ini hanya dokumentasi. Detail deployment pilihan akhir tidak dipublikasikan di repo utama pada tahap ini.
+Real data, raw keys, sensitive coordinates, and local registry files must not be committed. The pilot path uses Git-ignored .local.json files.
 ```
 
-## 2026-07-11 - Snapshot Live dan Rollup Reading 5 Menit
+## 2026-06-30 - Real Map Phase and Field Guide
 
-Pekerjaan:
+Work:
 
-- menambahkan migration 007 untuk metadata rollup dan tabel snapshot terbaru;
-- mengubah ingest MySQL menjadi dua upsert atomik: snapshot live dan bucket 5 menit;
-- menyimpan mean, min, max, sample count, dan quality pada history ringkas;
-- membuat overview, detail, dan API memilih reading paling segar secara konsisten selama transisi writer;
-- memperbarui grafik dan CSV agar memahami agregat;
-- memastikan reset/cleanup juga menghapus snapshot terkait;
-- menambahkan readiness check schema rollup;
-- menambah pengujian regresi untuk snapshot stale versus raw yang lebih baru;
-- memperbarui dokumentasi storage, deployment, API, model data, dan pilot.
-- memperbarui action CI ke major stabil berbasis runtime Node 24 agar tidak bergantung pada action Node 20 yang sudah deprecated.
+- replaced the illustrative dashboard map with a tile-based map using registry coordinates;
+- added zoom, drag, recenter, search, status filter, marker tooltip, and interactive detail overview;
+- added latitude and longitude to the dashboard view model so the API and UI carry registry positions;
+- added `docs/field-pilot-5-sto-guide.md` as the field guide for 5 STOs;
+- reaffirmed that map markers come from manual registry, not device GPS payloads.
 
-Verifikasi sebelum publikasi:
+## 2026-07-06 - Device/Test Data Maintenance
+
+Work:
+
+- added an admin panel to clean up one device/test datum, several selected items, or all device/test data before real tests are repeated;
+- limited cleanup to monitoring and provisioning operational data only;
+- kept selective cleanup so sites/tanks still used by other data are not deleted;
+- kept admin/user accounts, auth audit, firmware templates, and hardware profiles stored;
+- added manual confirmation so admins do not delete data accidentally;
+- added repository tests to ensure cleanup order follows database relations;
+- updated README, pilot readiness, and data model.
+
+## 2026-07-07 - Operational Documentation Sync
+
+Work:
+
+- added `docs/current-operational-truth.md` as a concise source of current project conditions;
+- aligned README, SECURITY, deployment, safety, system boundaries, data model, and roadmap so existing features are not described as missing;
+- reaffirmed that device approval stays through the web admin while Telegram remains for binding/notifications;
+- reaffirmed that RTU/Modbus, production alerts, tested backup/restore, and final deployment hardening are still follow-up work;
+- recorded that tank capacity and estimated consumption come from system calculations, not free user input.
+
+Note:
 
 ```text
-backup MySQL berhasil dan tidak masuk Git
-migration 007 berhasil serta aman diulang pada object yang sudah ada
-typecheck, lint, seluruh test, dan build production wajib lulus
+This change is documentation only. Final chosen deployment details are not published in the main repository at this stage.
 ```
 
-## 2026-07-14 - Review Pengelompokan Lokasi dan Branding Dashboard
+## 2026-07-11 - Live Snapshot and 5-Minute Reading Rollup
 
-Pekerjaan dari PR #15 yang ditinjau:
+Work:
 
-- menambah Regional dan Wilayah di atas Area/STO;
-- menambah pencarian dan filter lokasi pada dashboard;
-- membawa data lokasi ke pengajuan serta paket perangkat;
-- memperjelas istilah tinggi ruang kosong pada pembacaan sensor;
-- menambah identitas Telkom pada kartu STO;
-- memperjelas pesan sesudah Telegram berhasil dihubungkan.
+- added migration 007 for rollup metadata and the latest snapshot table;
+- changed MySQL ingest into two atomic upserts: live snapshot and 5-minute bucket;
+- stored mean, min, max, sample count, and quality in the compact history;
+- made overview, detail, and APIs select the freshest reading consistently during the writer transition;
+- updated charts and CSV to understand aggregates;
+- made sure reset/cleanup also deletes related snapshots;
+- added rollup schema readiness check;
+- added regression tests for stale snapshot versus newer raw;
+- updated storage, deployment, API, data model, and pilot documentation.
+- updated the CI action to a stable major based on Node 24 runtime so it does not depend on the deprecated Node 20 action.
 
-Penyempurnaan saat review:
+Verification before publication:
 
-- readiness deployment sekarang mendeteksi database lama yang belum memiliki Regional/Wilayah;
-- registry pilot dapat menyimpan Regional/Wilayah dan tetap aman untuk file lama;
-- penulisan `TREG5`/`TIF3` dirapikan otomatis ke bentuk resmi;
-- urutan dan petunjuk form lokasi dibuat lebih mudah dipahami;
-- test menjaga pemetaan database, pengajuan, paket firmware, dan pemeriksaan deployment;
-- README, panduan deployment, model data, pilot, API, manual pengguna, dan PDF diselaraskan.
+```text
+MySQL backup succeeded and is not in Git
+migration 007 succeeded and is safe to rerun on existing objects
+typecheck, lint, all tests, and production build must pass
+```
 
-## 2026-07-14 - Penyelarasan Status Pilot Operasional Publik
+## 2026-07-14 - Location Grouping and Dashboard Branding Review
 
-Pekerjaan:
+Work from PR #15 that was reviewed:
 
-- memosisikan README berdasarkan bukti deployment dan database nyata;
-- membedakan kondisi terverifikasi 3 site dari target rollout awal 5 STO dan
-  arah ekspansi 29 STO;
-- menghapus istilah nomor batch internal dari dokumentasi dan pesan pengguna;
-- mengganti klaim jumlah lokasi dan pemantauan tanpa henti dengan snapshot pilot
-  yang dapat dibuktikan;
-- menyelaraskan status operasional, deployment, safety, system boundaries, dan
-  roadmap tanpa mengklaim production-ready;
-- menjaga data contoh tetap tersedia hanya sebagai fasilitas development.
+- added regional and territory above area/STO;
+- added location search and filter on the dashboard;
+- brought location data into device requests and device packages;
+- clarified the empty space height term on sensor readings;
+- added Telkom identity to the STO cards;
+- clarified the message after Telegram connects successfully.
 
-## Status Verifikasi Terakhir
+Refinements during review:
 
-Perintah:
+- deployment readiness now detects an old database that lacks regional/territory;
+- the pilot registry can store regional/territory and stays safe for old files;
+- `TREG5`/`TIF3` input is automatically tidied to the official form;
+- location form order and hints were made easier to understand;
+- tests cover database mapping, device requests, firmware packages, and deployment checks;
+- README, deployment guide, data model, pilot, API, user manual, and PDF were aligned.
+
+## 2026-07-14 - Public Operational Pilot Status Alignment
+
+Work:
+
+- positioned the README on real deployment and database evidence;
+- separated the verified 3-site condition from the initial 5-STO rollout target and the 29-STO expansion direction;
+- removed internal batch numbering terms from documentation and user messages;
+- replaced uninterrupted location and monitoring count claims with a verifiable pilot snapshot;
+- aligned operational status, deployment, safety, system boundaries, and roadmap without claiming production-ready;
+- kept sample data available only as a development facility.
+
+## Last Verification Status
+
+Command:
 
 ```powershell
 pnpm check
 ```
 
-Ekspektasi:
+Expectation:
 
 ```text
-typecheck lulus
-lint lulus
-test lulus
-build lulus
+typecheck passes
+lint passes
+test passes
+build passes
 ```

@@ -19,7 +19,7 @@ function getEnv(name) {
 }
 
 function fail(message) {
-  console.error(`Backup MySQL gagal: ${message}`);
+  console.error(`MySQL backup failed: ${message}`);
   process.exit(1);
 }
 
@@ -37,7 +37,7 @@ function parseRetentionDays() {
   const parsed = Number(raw);
 
   if (!Number.isFinite(parsed) || parsed < 0) {
-    fail("MYSQL_BACKUP_RETENTION_DAYS harus angka 0 atau lebih.");
+    fail("MYSQL_BACKUP_RETENTION_DAYS must be a number of 0 or more.");
   }
 
   return parsed;
@@ -47,30 +47,30 @@ function getDatabaseUrl() {
   const raw = getEnv("MYSQL_DATABASE_URL");
 
   if (!raw) {
-    fail("MYSQL_DATABASE_URL belum diisi.");
+    fail("MYSQL_DATABASE_URL is not set.");
   }
 
   try {
     const url = new URL(raw);
 
     if (url.protocol !== "mysql:") {
-      fail("MYSQL_DATABASE_URL harus memakai protocol mysql://.");
+      fail("MYSQL_DATABASE_URL must use the mysql:// protocol.");
     }
 
     if (!url.username || !url.password || !url.hostname) {
-      fail("MYSQL_DATABASE_URL harus berisi user, password, dan host.");
+      fail("MYSQL_DATABASE_URL must contain user, password, and host.");
     }
 
     const database = decodeURIComponent(url.pathname.replace(/^\/+/, ""));
 
     if (!database) {
-      fail("MYSQL_DATABASE_URL harus berisi nama database.");
+      fail("MYSQL_DATABASE_URL must contain a database name.");
     }
 
     return { database, url };
   } catch (error) {
     if (error instanceof TypeError) {
-      fail("MYSQL_DATABASE_URL tidak valid.");
+      fail("MYSQL_DATABASE_URL is invalid.");
     }
 
     throw error;
@@ -167,7 +167,7 @@ async function runMysqlDump({ args, outputPath, password }) {
     await rm(outputPath, { force: true });
 
     if (error.code === "ENOENT") {
-      fail("perintah mysqldump tidak ditemukan. Install MySQL client dan pastikan PATH benar.");
+      fail("mysqldump command not found. Install the MySQL client and make sure PATH is correct.");
     }
 
     throw error;
@@ -177,7 +177,7 @@ async function runMysqlDump({ args, outputPath, password }) {
 
   if (exitCode !== 0) {
     await rm(outputPath, { force: true });
-    fail(stderr.trim() || `mysqldump keluar dengan kode ${exitCode}.`);
+    fail(stderr.trim() || `mysqldump exited with code ${exitCode}.`);
   }
 }
 
@@ -199,9 +199,9 @@ async function main() {
   const deleted = await cleanupOldBackups({ outputDir, retentionDays });
   const fileStat = await stat(outputPath);
 
-  console.log(`Backup MySQL selesai: ${outputPath}`);
+  console.log(`MySQL backup completed: ${outputPath}`);
   console.log(`Ukuran file: ${fileStat.size} bytes`);
-  console.log(`Retention: ${retentionDays} hari, file lama dihapus: ${deleted}`);
+  console.log(`Retention: ${retentionDays} days, old files deleted: ${deleted}`);
 }
 
 main().catch((error) => {

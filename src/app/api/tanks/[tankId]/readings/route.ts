@@ -38,7 +38,7 @@ export async function GET(
     return Response.json(
       {
         ok: false,
-        error: "Riwayat tangki tidak ditemukan.",
+        error: "Tank history not found.",
       },
       { status: 404 },
     );

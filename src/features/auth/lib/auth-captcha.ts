@@ -30,7 +30,7 @@ export async function verifyCaptchaToken({
     return {
       ok: false,
       enforced: true,
-      error: "Provider verifikasi keamanan tidak dikenali.",
+      error: "Security verification provider is not recognized.",
     };
   }
 
@@ -40,7 +40,7 @@ export async function verifyCaptchaToken({
     return {
       ok: false,
       enforced: true,
-      error: "Verifikasi keamanan belum dikonfigurasi.",
+      error: "Security verification is not configured.",
     };
   }
 
@@ -48,7 +48,7 @@ export async function verifyCaptchaToken({
     return {
       ok: false,
       enforced: true,
-      error: "Selesaikan verifikasi keamanan terlebih dahulu.",
+      error: "Complete the security verification first.",
     };
   }
 
@@ -72,7 +72,7 @@ export async function verifyCaptchaToken({
     return {
       ok: false,
       enforced: true,
-      error: "Verifikasi keamanan belum bisa diproses.",
+      error: "Security verification could not be processed yet.",
     };
   }
 
@@ -90,7 +90,7 @@ export async function verifyCaptchaToken({
     enforced: true,
     error:
       isMissingInput && !isProductionLikeEnvironment()
-        ? "Token verifikasi keamanan kosong. Nonaktifkan AUTH_CAPTCHA_PROVIDER untuk development lokal."
-        : "Verifikasi keamanan tidak valid.",
+        ? "Security verification token is empty. Disable AUTH_CAPTCHA_PROVIDER for local development."
+        : "Security verification is invalid.",
   };
 }

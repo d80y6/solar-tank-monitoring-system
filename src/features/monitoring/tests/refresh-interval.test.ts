@@ -22,7 +22,7 @@ describe("monitoring refresh interval", () => {
   });
 
   it("formats seconds and mixed minute intervals for the UI", () => {
-    expect(formatMonitoringRefreshInterval(20_000)).toBe("20 dtk");
-    expect(formatMonitoringRefreshInterval(90_000)).toBe("1 mnt 30 dtk");
+    expect(formatMonitoringRefreshInterval(20_000)).toBe("20 sec");
+    expect(formatMonitoringRefreshInterval(90_000)).toBe("1 min 30 sec");
   });
 });

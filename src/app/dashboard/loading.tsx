@@ -1,5 +1,5 @@
 import { DashboardRouteLoading } from "@/components/dashboard/dashboard-route-loading";
 
 export default function DashboardLoading() {
-  return <DashboardRouteLoading label="Memuat dashboard" />;
+  return <DashboardRouteLoading label="Loading dashboard" />;
 }

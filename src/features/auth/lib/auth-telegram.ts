@@ -107,7 +107,7 @@ export async function sendTelegramMessage({
   const token = getTelegramBotToken();
 
   if (!token) {
-    return { delivered: false, reason: "Telegram bot belum dikonfigurasi." };
+    return { delivered: false, reason: "Telegram bot is not configured." };
   }
 
   const response = await fetch(
@@ -129,7 +129,7 @@ export async function sendTelegramMessage({
   if (!response.ok) {
     return {
       delivered: false,
-      reason: "Pesan Telegram belum bisa dikirim.",
+      reason: "Telegram message could not be sent yet.",
     };
   }
 

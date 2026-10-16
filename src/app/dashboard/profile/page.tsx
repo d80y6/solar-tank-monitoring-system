@@ -9,7 +9,7 @@ import { ProfileForm } from "./profile-form";
 export const metadata: Metadata = {
   title: "Profile | FTM",
   description:
-    "Halaman profile akun FTM untuk melihat dan memperbarui data pengguna.",
+    "FTM account profile page for viewing and updating user data.",
 };
 
 export const dynamic = "force-dynamic";
@@ -70,7 +70,7 @@ export default async function ProfilePage() {
   return (
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
-        navItems={[{ href: "/dashboard", label: "Manajemen Tangki" }]}
+        navItems={[{ href: "/dashboard", label: "Tank Management" }]}
         user={user}
       />
 
@@ -110,13 +110,13 @@ export default async function ProfilePage() {
         <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <h2 className="text-2xl font-semibold tracking-tight text-zinc-950">
-              Lokasi Kerja
+              Work Location
             </h2>
             <EditAnchor />
           </div>
           <dl className="mt-7 grid gap-x-12 gap-y-7 sm:grid-cols-2">
-            <InfoValue label="Negara" value={PROFILE_LOCATION.country} />
-            <InfoValue label="Kota/Area" value={PROFILE_LOCATION.cityState} />
+            <InfoValue label="Country" value={PROFILE_LOCATION.country} />
+            <InfoValue label="City/Area" value={PROFILE_LOCATION.cityState} />
           </dl>
         </section>
       </div>

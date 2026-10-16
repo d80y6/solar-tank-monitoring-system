@@ -1,16 +1,16 @@
 # Reviewer Quickstart
 
-Dokumen ini untuk orang yang ingin mengecek repo dengan cepat.
+This document is for people who want to check the repo quickly.
 
-## 1. Clone dan Install
+## 1. Clone and Install
 
-Pastikan sudah ada:
+Make sure you have:
 
 - Git;
-- Node.js 20 atau lebih baru;
+- Node.js 20 or newer;
 - pnpm 9.x.
 
-Jika `pnpm` belum tersedia:
+If `pnpm` is not available yet:
 
 ```powershell
 corepack enable
@@ -23,129 +23,126 @@ cd solar-tank-monitoring-system
 pnpm install
 ```
 
-## 2. Jalankan Aplikasi
+## 2. Run the Application
 
 ```powershell
 pnpm dev
 ```
 
-Buka:
+Open:
 
 ```text
 http://localhost:3000
 ```
 
-Halaman yang bisa dilihat:
+Pages you can view:
 
-| URL | Isi |
+| URL | Content |
 |---|---|
 | `/` | landing page |
-| `/login` | login pengguna |
-| `/register` | pengajuan akses pengguna baru |
-| `/forgot-password` | permintaan reset kata sandi |
-| `/dashboard` | monitoring operasional tangki |
-| `/dashboard/ringkas/tanks/tank-tph-main` | detail operasional tangki contoh |
-| `/dashboard/detail` | analisis teknis khusus admin |
-| `/dashboard/admin/users` | manajemen pengguna khusus admin |
-| `/dashboard/admin/audit` | audit keamanan auth khusus admin |
+| `/login` | user sign-in |
+| `/register` | new user access request |
+| `/forgot-password` | password reset request |
+| `/dashboard` | operational tank monitoring |
+| `/dashboard/operations/tanks/tank-tph-main` | sample tank operational detail |
+| `/dashboard/detail` | admin-only technical analysis |
+| `/dashboard/admin/users` | admin-only user management |
+| `/dashboard/admin/audit` | admin-only auth security audit |
 
-## 3. Cek Aplikasi dan Storage
+## 3. Check the Application and Storage
 
-Cek aplikasi hidup:
+Check the application is alive:
 
 ```powershell
 curl.exe http://localhost:3000/api/health
 ```
 
-Cek storage aktif siap:
+Check active storage readiness:
 
 ```powershell
 curl.exe http://localhost:3000/api/ready
 ```
 
-Jika mode default `memory` dipakai, `/api/ready` tetap sukses tetapi statusnya
-`degraded` karena data memory tidak permanen. Jika mode `mysql` dipakai dan
-database belum siap, `/api/ready` akan mengembalikan HTTP `503`.
+If the default `memory` mode is used, `/api/ready` still succeeds but its status is `degraded` because memory data is not permanent. If `mysql` mode is used and the database is not ready, `/api/ready` returns HTTP `503`.
 
-## 4. Jalankan Pengecekan
+## 4. Run the Checks
 
 ```powershell
 pnpm check
 ```
 
-Perintah ini menjalankan:
+This command runs:
 
 ```text
 typecheck -> lint -> test -> build
 ```
 
-## 5. Coba Simulator Memory Mode
+## 5. Try the Memory Mode Simulator
 
-Pastikan dev server masih berjalan.
+Make sure the dev server is still running.
 
-Di terminal lain:
+In another terminal:
 
 ```powershell
 pnpm simulate:device --device demo-tph-01 --start-percent 73 --once
 ```
 
-Output yang diharapkan:
+Expected output:
 
 ```text
-[simulator] terkirim demo-tph-01 | 73% | 3650 L | jarak 40.5 cm | HTTP 201
+[simulator] delivered demo-tph-01 | 73% | 3650 L | distance 40.5 cm | HTTP 201
 ```
 
-Simulator otomatis memakai key demo sesuai device. Jika ingin mengisi key manual:
+The simulator automatically uses the demo key matching the device. To fill in the key manually:
 
 ```powershell
 pnpm simulate:device --device demo-tph-01 --key demo-tph-key --once
 ```
 
-## 6. Cek API Detail
+## 6. Check the Detail API
 
 ```powershell
 curl.exe http://localhost:3000/api/tanks/tank-tph-main
 ```
 
-Cari nilai:
+Look for the values:
 
 ```text
 fillPercent = 73
 volumeLiter = 3650
 ```
 
-## 7. Cek History
+## 7. Check History
 
 ```powershell
 curl.exe "http://localhost:3000/api/tanks/tank-tph-main/readings?range=24h"
 ```
 
-History harus bertambah setelah simulator mengirim data.
+History should grow after the simulator sends data.
 
-## 8. Hal yang Perlu Dipahami Reviewer
+## 8. What Reviewers Need to Understand
 
-- UI dashboard/detail membaca storage aktif yang sama dengan endpoint API.
-- `/api/health` hanya mengecek aplikasi hidup.
-- `/api/ready` mengecek apakah storage aktif siap dipakai.
-- Mode MySQL membaca registry site, tangki, device, dan hash key dari database.
-- Registry pilot bisa disiapkan lewat `pnpm pilot:registry`, tetapi file real harus lokal dan tidak boleh masuk Git.
-- Smoke test payload real-format bisa dikirim lewat `pnpm pilot:smoke`.
-- Login/register sudah terhubung ke auth database jika migration auth dan admin awal sudah disiapkan.
-- Pengajuan akses user baru masuk status pending dan harus ditinjau admin.
-- Form publik dapat dilindungi Cloudflare Turnstile jika `AUTH_CAPTCHA_PROVIDER="turnstile"` dan key lengkap.
-- OTP admin, verifikasi email, serta reset password membutuhkan SMTP atau dev log non-production yang diizinkan.
-- API sudah bisa menerima data simulator.
-- Saat server baru berjalan, memory mode menyiapkan data demo dengan timestamp relatif agar dashboard tidak langsung terlihat basi.
-- Memory store hilang ketika server restart.
-- MySQL mode tersedia untuk latihan persistent reading, tetapi belum berarti production-ready.
-- Key per device sudah divalidasi memakai hash pada data contoh development.
-- Data real hanya boleh dipakai lewat file lokal/env yang tidak di-commit.
-- Repo tidak boleh memuat credential atau data internal.
+- The dashboard/detail UI reads the same active storage as the API endpoints.
+- `/api/health` only checks that the application is alive.
+- `/api/ready` checks whether active storage is usable.
+- MySQL mode reads the site, tank, device, and key hash registry from the database.
+- The pilot registry can be prepared via `pnpm pilot:registry`, but real files must stay local and never enter Git.
+- Real-format smoke payloads can be sent via `pnpm pilot:smoke`.
+- Sign-in/register already connect to the auth database once auth migrations and the initial admin are prepared.
+- New user access requests enter pending status and must be reviewed by an admin.
+- Public forms can be protected by Cloudflare Turnstile if `AUTH_CAPTCHA_PROVIDER="turnstile"` and the keys are complete.
+- Admin OTP, email verification, and password reset require SMTP or an allowed non-production dev log.
+- The API can already receive simulator data.
+- When the server first starts, memory mode prepares demo data with relative timestamps so the dashboard does not immediately look stale.
+- The memory store is lost when the server restarts.
+- MySQL mode is available for persistent reading practice, but that alone does not mean production-ready.
+- Per-device keys are validated using hashes in the development sample data.
+- Real data may only be used through local/env files that are not committed.
+- The repo must not contain credentials or internal data.
 
-## 9. Coba Mode MySQL Jika Database Tersedia
+## 9. Try MySQL Mode If a Database Is Available
 
-Mode default tetap `memory`. Jika reviewer punya database MySQL lokal atau cloud
-khusus demo, isi `.env.local`:
+The default mode remains `memory`. If the reviewer has a local or cloud MySQL database for the demo, fill in `.env.local`:
 
 ```env
 SOLAR_TANK_STORAGE_DRIVER="mysql"
@@ -153,30 +150,29 @@ MYSQL_DATABASE_URL="mysql://user:password@host:port/database"
 MYSQL_CONNECTION_LIMIT="2"
 MYSQL_SSL_MODE="disabled"
 SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"
-AUTH_SECRET="ganti-dengan-secret-minimal-32-karakter"
+AUTH_SECRET="replace-with-secret-minimum-32-characters"
 AUTH_REQUIRE_ADMIN_OTP="true"
 AUTH_ENABLE_REGISTER="true"
 AUTH_ALLOW_PASSWORD_RESET="true"
 AUTH_CAPTCHA_PROVIDER="disabled"
 ```
 
-Untuk cloud MySQL yang mewajibkan TLS, gunakan:
+For cloud MySQL that requires TLS, use:
 
 ```env
 MYSQL_SSL_MODE="required"
 ```
 
-Jika provider memberi CA certificate, isi `MYSQL_SSL_CA`.
+If the provider supplies a CA certificate, fill in `MYSQL_SSL_CA`.
 
-Jalankan migration dan seed:
+Run the migrations and seed:
 
 ```powershell
 pnpm db:setup:mysql
 pnpm auth:create-admin
 ```
 
-Jika database sudah pernah dibuat sebelum field operasional pengajuan perangkat
-tersedia, jalankan juga migration berikut agar schema lama tetap kompatibel:
+If the database was created before the device request operational fields were available, also run these migrations so the old schema stays compatible:
 
 ```powershell
 pnpm db:migrate:device-provisioning
@@ -184,17 +180,15 @@ pnpm db:migrate:device-request-fields
 pnpm db:migrate:reading-rollup
 ```
 
-Setelah mengubah `.env.local`, restart `pnpm dev`, lalu cek:
+After changing `.env.local`, restart `pnpm dev`, then check:
 
 ```powershell
 curl.exe http://localhost:3000/api/ready
 ```
 
-## 10. Coba Alur Pilot Jika Data Sudah Disetujui
+## 10. Try the Pilot Flow If Data Is Approved
 
-Bagian ini hanya untuk reviewer yang memang punya data pilot yang boleh dipakai.
-Jangan memakai koordinat, key, atau connection string asli di file yang akan
-di-commit.
+This section is only for reviewers who actually have pilot data they may use. Do not use real coordinates, keys, or connection strings in files that will be committed.
 
 ```powershell
 pnpm db:migrate:mysql
@@ -202,20 +196,20 @@ pnpm pilot:hash-key
 Copy-Item config/pilot-registry.example.json config/pilot-registry.local.json
 ```
 
-Setelah itu edit `config/pilot-registry.local.json`:
+Then edit `config/pilot-registry.local.json`:
 
-- isi 5 STO yang disetujui;
-- ganti `coordinateStatus` menjadi `approved`;
-- isi hash key device dari `pnpm pilot:hash-key`;
-- pastikan kapasitas dan dimensi tangki sesuai data yang dipakai.
+- fill in the 5 approved STOs;
+- change `coordinateStatus` to `approved`;
+- fill in the device key hash from `pnpm pilot:hash-key`;
+- make sure capacity and tank dimensions match the data in use.
 
-Validasi tanpa menulis database:
+Validate without writing to the database:
 
 ```powershell
 pnpm pilot:registry -- --dry-run
 ```
 
-Jika sudah sukses:
+If it succeeds:
 
 ```powershell
 pnpm pilot:registry
@@ -226,29 +220,28 @@ Smoke test:
 ```powershell
 $env:PILOT_API_BASE_URL="http://localhost:3000"
 $env:PILOT_DEVICE_ID="pilot-tph-01"
-$env:PILOT_DEVICE_KEY="key-asli-device"
+$env:PILOT_DEVICE_KEY="real-device-key"
 pnpm pilot:smoke
 ```
 
-## 11. Jika Ada Error
+## 11. If There Is an Error
 
-Jika `pnpm simulate:device` gagal:
+If `pnpm simulate:device` fails:
 
-- pastikan `pnpm dev` berjalan;
-- pastikan port `3000` benar;
-- pastikan key sesuai device, misalnya `demo-tph-key` untuk `demo-tph-01`;
-- jika memakai fallback global, pastikan `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` tidak diset ke `false`;
-- coba `pnpm simulate:device --help`.
+- make sure `pnpm dev` is running;
+- make sure port `3000` is correct;
+- make sure the key matches the device, e.g. `demo-tph-key` for `demo-tph-01`;
+- if using the global fallback, make sure `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` is not set to `false`;
+- try `pnpm simulate:device --help`.
 
-Jika dashboard menampilkan "Data monitoring belum bisa dibaca":
+If the dashboard shows a monitoring data read error:
 
-- buka `http://localhost:3000/api/ready`;
-- jika `/api/ready` HTTP `503`, cek `MYSQL_DATABASE_URL`, status database,
-  SSL/allowlist provider, dan koneksi jaringan;
-- jika baru mengubah `.env.local`, hentikan lalu jalankan ulang `pnpm dev`.
+- open `http://localhost:3000/api/ready`;
+- if `/api/ready` returns HTTP `503`, check `MYSQL_DATABASE_URL`, database status, SSL/allowlist at the provider, and network connectivity;
+- if you just changed `.env.local`, stop then restart `pnpm dev`.
 
-Jika `pnpm check` gagal:
+If `pnpm check` fails:
 
-- baca error pertama;
-- jangan push sebelum diperbaiki;
-- jalankan ulang setelah perbaikan.
+- read the first error;
+- do not push before fixing it;
+- run it again after the fix.

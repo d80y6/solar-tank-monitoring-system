@@ -1,28 +1,28 @@
-# Model Domain dan Perhitungan
+# Domain Model and Calculations
 
-Dokumen ini menjelaskan rumus dan status yang menjadi inti sistem monitoring.
+This document explains the formulas and statuses at the core of the monitoring system.
 
-## Konsep Utama
+## Key Concepts
 
-Sensor biasanya membaca jarak dari sensor ke permukaan cairan.
+The sensor usually reads the distance from the sensor to the liquid surface.
 
-Data yang ingin dilihat pengguna adalah liter, persen, dan runtime.
+What users want to see is liters, percent, and runtime.
 
-Karena itu perlu konversi:
+That is why conversion is needed:
 
 ```text
 distance -> fuel height -> volume -> percent -> runtime -> status
 ```
 
-## Tinggi Bahan Bakar
+## Fuel Height
 
-Jika sensor dipasang di atas tangki:
+If the sensor is mounted above the tank:
 
 ```text
 fuelHeightCm = sensorMountHeightCm - sensorDistanceCm
 ```
 
-Contoh:
+Example:
 
 ```text
 sensorMountHeightCm = 150
@@ -30,69 +30,69 @@ sensorDistanceCm = 40.5
 fuelHeightCm = 109.5
 ```
 
-Nilai harus dibatasi agar tidak kurang dari 0 dan tidak melebihi tinggi maksimum tangki.
+Values must be clamped so they are not below 0 and do not exceed the tank's maximum height.
 
-## Volume Tangki Tabung Horizontal
+## Horizontal Cylinder Tank Volume
 
-Untuk tangki tabung tidur, volume tidak linear terhadap tinggi.
+For a horizontal cylinder tank, volume is not linear against height.
 
-Artinya:
+That means:
 
 ```text
-tinggi 50% tidak bisa selalu dianggap volume 50% tanpa rumus yang benar.
+a 50% height cannot always be treated as a 50% volume without the correct formula.
 ```
 
-Rumus luas segmen lingkaran:
+Circular segment area formula:
 
 ```text
-r = radius tangki
-h = tinggi cairan
-L = panjang tangki
+r = tank radius
+h = liquid height
+L = tank length
 
 area = r^2 * acos((r - h) / r) - (r - h) * sqrt(2*r*h - h^2)
 volumeLiter = area * L / 1000
 ```
 
-Kode perhitungan berada di:
+The calculation code lives at:
 
 ```text
 src/features/monitoring/lib/tank-volume.ts
 ```
 
-## Volume Tangki Balok
+## Rectangular Tank Volume
 
-Untuk tangki balok atau rectangular, volume lebih sederhana.
-
-```text
-volumeLiter = panjangCm x lebarCm x tinggiCairanCm / 1000
-```
-
-Contoh perhitungan:
+For a rectangular tank, volume is simpler.
 
 ```text
-panjang = 150 cm
-lebar   = 60 cm
-tinggi cairan = 49,8 cm
-
-volume = 150 x 60 x 49,8 / 1000
-       = 448,2 liter
+volumeLiter = lengthCm x widthCm x liquidHeightCm / 1000
 ```
 
-Jika kapasitas tangki 540 liter:
+Example calculation:
 
 ```text
-448,2 / 540 x 100 = 83%
+length = 150 cm
+width  = 60 cm
+liquid height = 49.8 cm
+
+volume = 150 x 60 x 49.8 / 1000
+       = 448.2 liters
 ```
 
-Payload real-format dapat membawa config rectangular dari device. Sistem tetap membandingkan config itu dengan registry agar perbedaan besar tidak tersembunyi.
+If the tank capacity is 540 liters:
 
-## Persentase Isi
+```text
+448.2 / 540 x 100 = 83%
+```
+
+Real-format payloads can carry rectangular configuration from the device. The system still compares that configuration with the registry so large differences are not hidden.
+
+## Fill Percentage
 
 ```text
 fillPercent = volumeLiter / capacityLiter * 100
 ```
 
-Contoh:
+Example:
 
 ```text
 volumeLiter = 3650
@@ -102,13 +102,13 @@ fillPercent = 73
 
 ## Runtime
 
-Runtime adalah estimasi berapa jam bahan bakar cukup jika konsumsi per jam sesuai asumsi.
+Runtime is an estimate of how many hours the fuel lasts if hourly consumption matches the assumptions.
 
 ```text
 runtimeHour = volumeLiter / consumptionLiterPerHour
 ```
 
-Contoh:
+Example:
 
 ```text
 volumeLiter = 3650
@@ -116,51 +116,48 @@ consumptionLiterPerHour = 25
 runtimeHour = 146
 ```
 
-Kode runtime berada di:
+The runtime code lives at:
 
 ```text
 src/features/monitoring/lib/runtime.ts
 ```
 
-## Status Runtime
+## Runtime Status
 
-Aturan awal:
+Initial rules:
 
 | Runtime | Status |
 |---:|---|
-| `< 13 jam` | Kritis |
-| `13 - < 16 jam` | Waspada |
-| `16 - 24 jam` | Aman terbatas |
-| `> 24 jam` | Aman panjang |
+| `< 13 hrs` | Critical |
+| `13 - < 16 hrs` | Warning |
+| `16 - 24 hrs` | Limited safe |
+| `> 24 hrs` | Long safe |
 
-Aturan ini bisa berubah setelah ada validasi operasional.
+These rules may change after operational validation.
 
-## Status Device
+## Device Status
 
-Device dinilai dari umur data terakhir dibanding interval kirim yang diharapkan.
+A device is judged by the age of its latest data compared to the expected send interval.
 
-Contoh:
+Example:
 
 ```text
 expectedReportIntervalSec = 20
 ```
 
-Artinya device diharapkan mengirim setiap 20 detik. Nilai ini berasal dari
-registry/profile perangkat dan dapat berbeda untuk perangkat demo atau mode
-hemat bandwidth. Status online/delayed/offline selalu memakai nilai device
-terdaftar, bukan angka yang di-hardcode di UI.
+That means the device is expected to send every 20 seconds. This value comes from the device registry/profile and can differ for demo devices or bandwidth-saving modes. Online/delayed/offline status always uses the registered device values, not numbers hardcoded in the UI.
 
-Jika data terakhir terlalu lama, status bisa menjadi delayed atau offline.
+If the latest data is too old, the status can become delayed or offline.
 
-## Normalisasi Payload
+## Payload Normalization
 
-Payload device bisa punya variasi nama field.
+Device payloads can have field name variations.
 
-Normalizer bertugas membuatnya seragam.
+The normalizer makes them uniform.
 
-Contoh mapping:
+Example mapping:
 
-| Payload masuk | Field internal |
+| Incoming payload | Internal field |
 |---|---|
 | `distance` | `sensorDistanceCm` |
 | `raw.H_cm` | `fuelHeightCm` |
@@ -171,29 +168,29 @@ Contoh mapping:
 | `raw.local_H_cm` | `fuelHeightCm` |
 | `raw.local_volume_l` | `volumeLiter` |
 | `raw.local_percent` | `fillPercent` |
-| `tank_shape` | snapshot config payload |
-| `capacity_liter` | snapshot config payload |
-| `consumption_liter_per_hour` | snapshot config payload |
+| `tank_shape` | payload config snapshot |
+| `capacity_liter` | payload config snapshot |
+| `consumption_liter_per_hour` | payload config snapshot |
 
-Kode normalizer:
+Normalizer code:
 
 ```text
 src/features/monitoring/lib/normalize-reading.ts
 ```
 
-## Kenapa Perlu Test
+## Why Tests Are Needed
 
-Angka volume, runtime, dan status memengaruhi keputusan operasional.
+Volume, runtime, and status numbers affect operational decisions.
 
-Karena itu logika domain harus diuji.
+That is why the domain logic must be tested.
 
-Test berada di:
+Tests live at:
 
 ```text
 src/features/monitoring/tests
 ```
 
-Jalankan:
+Run:
 
 ```powershell
 pnpm test

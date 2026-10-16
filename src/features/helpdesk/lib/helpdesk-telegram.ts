@@ -84,7 +84,7 @@ export async function handleTelegramTopicInfoCommand(
     await sendHelpdeskCommandReply({
       chatId: message.chatId,
       messageThreadId: message.messageThreadId,
-      text: "Command ini hanya tersedia untuk admin FTM yang sudah menghubungkan Telegram.",
+      text: "This command is only available to FTM admins who have connected Telegram.",
     });
     return true;
   }
@@ -93,12 +93,12 @@ export async function handleTelegramTopicInfoCommand(
     chatId: message.chatId,
     messageThreadId: message.messageThreadId,
     text: [
-      "Topic Telegram terdeteksi.",
+      "Telegram topic detected.",
       "",
       `TELEGRAM_ADMIN_GROUP_CHAT_ID=\"${message.chatId}\"`,
       message.messageThreadId
         ? `MESSAGE_THREAD_ID=\"${message.messageThreadId}\"`
-        : "MESSAGE_THREAD_ID tidak tersedia. Pastikan command dikirim di dalam topic.",
+        : "MESSAGE_THREAD_ID is unavailable. Make sure the command is sent inside a topic.",
     ].join("\n"),
   });
 
@@ -121,7 +121,7 @@ export async function handleTelegramHelpdeskCommand(
     await sendHelpdeskCommandReply({
       chatId: message.chatId,
       messageThreadId: message.messageThreadId,
-      text: "Command helpdesk hanya tersedia untuk admin FTM yang sudah menghubungkan Telegram.",
+      text: "The helpdesk command is only available to FTM admins who have connected Telegram.",
     });
     return true;
   }
@@ -132,7 +132,7 @@ export async function handleTelegramHelpdeskCommand(
     await sendHelpdeskCommandReply({
       chatId: message.chatId,
       messageThreadId: message.messageThreadId,
-      text: `Sesi helpdesk ${command.sessionCode} tidak ditemukan.`,
+      text: `Helpdesk session ${command.sessionCode} not found.`,
     });
     return true;
   }
@@ -143,7 +143,7 @@ export async function handleTelegramHelpdeskCommand(
       sessionId: session.id,
     });
     await addHelpdeskMessage({
-      body: "Sesi helpdesk ditutup oleh admin.",
+      body: "Helpdesk session closed by admin.",
       senderLabel: "FTM",
       senderType: "system",
       sessionId: session.id,
@@ -152,7 +152,7 @@ export async function handleTelegramHelpdeskCommand(
     await sendHelpdeskCommandReply({
       chatId: message.chatId,
       messageThreadId: message.messageThreadId,
-      text: `Sesi ${session.sessionCode} sudah ditutup.`,
+      text: `Session ${session.sessionCode} is closed.`,
     });
     return true;
   }
@@ -161,7 +161,7 @@ export async function handleTelegramHelpdeskCommand(
     await sendHelpdeskCommandReply({
       chatId: message.chatId,
       messageThreadId: message.messageThreadId,
-      text: `Sesi ${session.sessionCode} sudah ditutup. Balasan tidak dikirim.`,
+      text: `Session ${session.sessionCode} is closed. Reply not sent.`,
     });
     return true;
   }
@@ -177,7 +177,7 @@ export async function handleTelegramHelpdeskCommand(
     chatId: message.chatId,
     messageThreadId: message.messageThreadId,
     text: [
-      "Balasan helpdesk terkirim.",
+      "Helpdesk reply sent.",
       "",
       summarizeHelpdeskSession(session),
     ].join("\n"),

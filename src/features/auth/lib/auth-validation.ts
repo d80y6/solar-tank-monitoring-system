@@ -74,12 +74,12 @@ export function normalizeIndonesianMobilePhone(value: unknown): string {
   const rawValue = String(value ?? "").trim();
 
   if (!rawValue) {
-    throw new Error("Nomor telepon wajib diisi.");
+    throw new Error("Phone number is required.");
   }
 
   if (/[a-zA-Z]/.test(rawValue)) {
     throw new Error(
-      "Nomor telepon wajib memakai angka, contoh 081234567890 atau +6281234567890.",
+      "Phone number must use digits, e.g. 081234567890 or +6281234567890.",
     );
   }
 
@@ -98,7 +98,7 @@ export function normalizeIndonesianMobilePhone(value: unknown): string {
 
   if (!INDONESIAN_MOBILE_PHONE_PATTERN.test(normalizedValue)) {
     throw new Error(
-      "Nomor telepon wajib berupa nomor seluler Indonesia yang valid, contoh 081234567890 atau +6281234567890.",
+      "Phone number must be a valid Indonesian mobile number, e.g. 081234567890 or +6281234567890.",
     );
   }
 
@@ -111,11 +111,11 @@ export function parseLoginPayload(payload: unknown): LoginPayload {
   const password = String(record.password ?? "");
 
   if (!identity || password.length < 1) {
-    throw new Error("Data masuk belum lengkap.");
+    throw new Error("Sign-in data is incomplete.");
   }
 
   if (password.length > MAX_PASSWORD_LENGTH) {
-    throw new Error("Kata sandi terlalu panjang.");
+    throw new Error("Password is too long.");
   }
 
   return { identity, password };
@@ -123,15 +123,15 @@ export function parseLoginPayload(payload: unknown): LoginPayload {
 
 function assertStrongPassword(password: string) {
   if (password.length < 10) {
-    throw new Error("Kata sandi minimal 10 karakter.");
+    throw new Error("Password must be at least 10 characters.");
   }
 
   if (password.length > MAX_PASSWORD_LENGTH) {
-    throw new Error("Kata sandi maksimal 256 karakter.");
+    throw new Error("Password can be at most 256 characters.");
   }
 
   if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
-    throw new Error("Kata sandi wajib berisi huruf dan angka.");
+    throw new Error("Password must contain letters and numbers.");
   }
 }
 
@@ -154,23 +154,23 @@ export function parseRegisterAccessPayload(
   const accessReason = normalizeOptionalText(record.accessReason, 1000);
 
   if (fullName.length < 2) {
-    throw new Error("Nama lengkap wajib diisi.");
+    throw new Error("Full name is required.");
   }
 
   if (!USERNAME_PATTERN.test(username)) {
     throw new Error(
-      "Nama pengguna hanya boleh berisi huruf, angka, titik, garis bawah, atau strip.",
+      "Username may only contain letters, numbers, dots, underscores, or hyphens.",
     );
   }
 
   if (!EMAIL_PATTERN.test(email)) {
-    throw new Error("Email kerja tidak valid.");
+    throw new Error("Work email is invalid.");
   }
 
   assertStrongPassword(password);
 
   if (password !== confirmPassword) {
-    throw new Error("Konfirmasi kata sandi belum sama.");
+    throw new Error("Password confirmation does not match yet.");
   }
 
   return {
@@ -192,7 +192,7 @@ export function parseForgotPasswordPayload(
   const identity = normalizeIdentity(record.identity);
 
   if (!identity) {
-    throw new Error("Email atau nama pengguna wajib diisi.");
+    throw new Error("Email or username is required.");
   }
 
   return {
@@ -210,13 +210,13 @@ export function parseResetPasswordPayload(
   const confirmPassword = String(record.confirmPassword ?? "");
 
   if (!token) {
-    throw new Error("Token reset tidak valid.");
+    throw new Error("Reset token is invalid.");
   }
 
   assertStrongPassword(password);
 
   if (password !== confirmPassword) {
-    throw new Error("Konfirmasi kata sandi belum sama.");
+    throw new Error("Password confirmation does not match yet.");
   }
 
   return { token, password, confirmPassword };
@@ -231,17 +231,17 @@ export function parseChangePasswordPayload(
   const confirmPassword = String(record.confirmPassword ?? "");
 
   if (!currentPassword) {
-    throw new Error("Kata sandi saat ini wajib diisi.");
+    throw new Error("Current password is required.");
   }
 
   assertStrongPassword(password);
 
   if (currentPassword === password) {
-    throw new Error("Kata sandi baru harus berbeda dari kata sandi lama.");
+    throw new Error("New password must differ from the old password.");
   }
 
   if (password !== confirmPassword) {
-    throw new Error("Konfirmasi kata sandi belum sama.");
+    throw new Error("Password confirmation does not match yet.");
   }
 
   return { currentPassword, password, confirmPassword };
@@ -254,7 +254,7 @@ export function parseResendVerificationPayload(
   const identity = normalizeIdentity(record.identity);
 
   if (!identity) {
-    throw new Error("Email atau nama pengguna wajib diisi.");
+    throw new Error("Email or username is required.");
   }
 
   return {
@@ -270,7 +270,7 @@ export function parseTelegramBindPayload(
   const token = String(record.token ?? "").trim();
 
   if (!token) {
-    throw new Error("Token Telegram tidak valid.");
+    throw new Error("Telegram token is invalid.");
   }
 
   return { token };

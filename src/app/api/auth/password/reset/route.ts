@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error: "Terlalu banyak percobaan reset. Coba lagi nanti.",
+          error: "Too many reset attempts. Try again later.",
         },
         {
           status: 429,
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       ok: true,
       data: {
         message:
-          "Kata sandi berhasil diganti. Silakan masuk ulang dengan kata sandi baru.",
+          "Password changed successfully. Please sign in again with your new password.",
       },
     });
   } catch (error) {
@@ -55,9 +55,9 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         error: getSafeErrorMessage(error, {
-          fallbackMessage: "Reset kata sandi belum bisa diproses.",
+          fallbackMessage: "Password reset could not be processed yet.",
           internalMessage:
-            "Reset kata sandi belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
+            "Password reset could not be processed because the service is being prepared. Try again later.",
         }),
       },
       { status: getSafeErrorStatus(error) },
