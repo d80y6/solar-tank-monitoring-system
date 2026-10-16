@@ -1,10 +1,7 @@
 INSERT INTO monitoring_sites
   (id, code, name, area_label, regional_label, wilayah_label, latitude, longitude, is_active)
 VALUES
-  ('site-tph', 'TPH', 'STO TPH', 'Area demo', 'TREG 5', 'TIF 3', -7.6500000, 112.9000000, TRUE),
-  ('site-nja', 'NJA', 'STO NJA', 'Area demo', 'TREG 5', 'TIF 3', -7.6800000, 112.8600000, TRUE),
-  ('site-jto', 'JTO', 'STO JTO', 'Area demo', 'TREG 5', 'TIF 3', -7.7200000, 112.8800000, TRUE),
-  ('site-skp', 'SKP', 'STO SKP', 'Area demo', 'TREG 5', 'TIF 3', -7.7000000, 112.9400000, TRUE)
+  ('site-sah', 'SAH', 'HSA SAH', 'Al Jamanh', 'Bani Al hareth', 'Amanat Alasemah', 15.369445, 44.191006, TRUE)
 ON DUPLICATE KEY UPDATE
   code = VALUES(code),
   name = VALUES(name),
@@ -31,10 +28,7 @@ INSERT INTO monitoring_tanks
     is_active
   )
 VALUES
-  ('tank-tph-main', 'site-tph', 'Tangki utama', 'horizontal-cylinder', 5000, 150, 283, 150, 30, 15, 25, TRUE),
-  ('tank-nja-main', 'site-nja', 'Tangki utama', 'horizontal-cylinder', 5000, 150, 283, 150, 30, 15, 25, TRUE),
-  ('tank-jto-main', 'site-jto', 'Tangki utama', 'horizontal-cylinder', 5000, 150, 283, 150, 30, 15, 25, TRUE),
-  ('tank-skp-main', 'site-skp', 'Tangki utama', 'horizontal-cylinder', 5000, 150, 283, 150, 30, 15, 25, TRUE)
+  ('tank-sah-main', 'site-sah', 'Gasolin Tank', 'horizontal-cylinder', 29000, 290, 500, 290, 30, 15, 25, TRUE)
 ON DUPLICATE KEY UPDATE
   site_id = VALUES(site_id),
   name = VALUES(name),
@@ -60,11 +54,8 @@ INSERT INTO monitoring_devices
     is_active
   )
 VALUES
-  ('device-tph-main', 'site-tph', 'tank-tph-main', 'demo-tph-01', 'NodeMCU Ultrasonic Demo', 300, 'sha256:749a381823e9c3e494badf95003e255a389eb65b1f894a058a54f27b1834d1f4', TRUE),
-  ('device-nja-main', 'site-nja', 'tank-nja-main', 'demo-nja-01', 'NodeMCU Ultrasonic Demo', 300, 'sha256:b700ffe64480089f21b90066d3900ce529d9ddfc5f7b4ac4804dc2c9876188aa', TRUE),
-  ('device-jto-main', 'site-jto', 'tank-jto-main', 'demo-jto-01', 'NodeMCU Ultrasonic Demo', 300, 'sha256:625067fdabde596e7fc076429db5d271e54b97ca690fefe188d9e81eaeb54688', TRUE),
-  ('device-skp-main', 'site-skp', 'tank-skp-main', 'demo-skp-01', 'NodeMCU Ultrasonic Demo', 300, 'sha256:075c5a726900bd6bcaf8c5695a87a0928fa7f283a39bd735706011232ed9544b', TRUE)
-ON DUPLICATE KEY UPDATE
+  ('device-tph-main', 'site-sah', 'tank-sah-main', 'sens-sah-01', 'NodeMCU Ultrasonic', 300, 'sha256:749a381823e9c3e494badf95003e255a389eb65b1f894a058a54f27b1834d1f4', TRUE)
+  ON DUPLICATE KEY UPDATE
   site_id = VALUES(site_id),
   tank_id = VALUES(tank_id),
   code = VALUES(code),
