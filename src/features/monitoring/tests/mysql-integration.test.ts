@@ -37,6 +37,8 @@ const runId = randomBytes(4).toString("hex");
 
 suite("MySQL integration", () => {
   let pool: import("mysql2/promise").Pool;
+  let actorUserId: string | null = null;
+  const actorEmail = `integration-${runId}@example.test`;
 
   beforeAll(async () => {
     const { getMysqlPool } = await import(
@@ -45,6 +47,26 @@ suite("MySQL integration", () => {
 
     pool = getMysqlPool();
     await pool.query("SELECT 1");
+
+    // monitoring_devices.key_rotated_by_user_id, monitoring_alerts.*_by_user_id,
+    // and auth_audit_events.actor_user_id are foreign keys into auth_users, so
+    // an actor has to exist before those code paths can be exercised.
+    const { createAdminUserIfMissing } = await import(
+      "@/features/auth/lib/mysql-auth-repository"
+    );
+
+    try {
+      const actor = await createAdminUserIfMissing({
+        email: actorEmail,
+        fullName: `Integration Actor ${runId}`,
+        password: `integration-password-${runId}`,
+        username: `integration${runId}`,
+      });
+
+      actorUserId = actor.userId;
+    } catch {
+      actorUserId = null;
+    }
   });
 
   afterAll(async () => {
@@ -53,6 +75,14 @@ suite("MySQL integration", () => {
     }
 
     // Remove everything this suite created so the database can be reused.
+    if (actorUserId) {
+      // Foreign keys are ON DELETE SET NULL for the rows the actor touched, so
+      // this only removes the account itself.
+      await pool
+        .execute("DELETE FROM auth_users WHERE id = ?", [actorUserId])
+        .catch(() => undefined);
+    }
+
     await pool
       .execute("DELETE FROM auth_user_site_scopes WHERE id LIKE ?", [
         `integration_${runId}%`,
@@ -146,7 +176,9 @@ suite("MySQL integration", () => {
       eventType: "ingest_rejected",
       ipAddress: "203.0.113.9",
       metadata: { reason: "integration-test" },
-      requestId: `req-${runId}`,
+      // request_id is a foreign key into monitoring_device_requests, so a
+      // synthetic value would be rejected by the database.
+      requestId: null,
       responseStatus: 401,
       userAgent: "vitest",
     });
@@ -199,12 +231,30 @@ suite("MySQL integration", () => {
     expect(first).toBe(true);
     expect(replay).toBe(false);
 
+    // The prune floor is one minute (a shorter window would delete nonces that
+    // are still protecting live requests), so insert an aged nonce to prune.
+    const agedNonce = `integration-aged-${runId}`;
+
+    await recordIngestNonce({
+      deviceId: "device-tph-main",
+      nonce: agedNonce,
+      now: new Date(Date.now() - 10 * 60_000),
+      requestTimestamp: new Date(Date.now() - 10 * 60_000),
+      retentionMinutes: 120,
+    });
+
     const pruned = await deleteIngestNoncesOlderThanInMysql({
-      olderThanMinutes: 0,
-      now: new Date(Date.now() + 1_000),
+      olderThanMinutes: 5,
     });
 
     expect(pruned).toBeGreaterThanOrEqual(1);
+
+    const [remaining] = await pool.execute<Array<RowDataPacket & { count: number }>>(
+      "SELECT COUNT(*) AS count FROM monitoring_ingest_nonces WHERE device_id = ?",
+      ["device-tph-main"],
+    );
+
+    expect(Number(remaining[0]?.count)).toBe(1);
   });
 
   it("rotates a device key and keeps the previous key inside the grace window", async () => {
@@ -214,9 +264,11 @@ suite("MySQL integration", () => {
       "@/features/monitoring/lib/device-key"
     );
 
+    expect(actorUserId, "the suite needs an actor account").toBeTruthy();
+
     const rotation = await rotateMonitoringDeviceKeyInMysql({
       actorLabel: `integration-${runId}`,
-      actorUserId: "integration",
+      actorUserId: actorUserId ?? "",
       deviceId: "device-tph-main",
       graceHours: 72,
     });
@@ -260,10 +312,7 @@ suite("MySQL integration", () => {
 
     expect(siteId).toBeTruthy();
 
-    const [userRows] = await pool.query<Array<RowDataPacket & { id: string }>>(
-      "SELECT id FROM auth_users ORDER BY created_at ASC LIMIT 1",
-    );
-    const userId = userRows[0]?.id;
+    const userId = actorUserId;
 
     if (!siteId || !userId) {
       // A database without an administrator account cannot test scopes.
@@ -302,7 +351,7 @@ suite("MySQL integration", () => {
     const eventType = `integration_event_${runId}`;
 
     await recordAuthAuditEvent({
-      actorUserId: null,
+      actorUserId,
       eventType,
       metadata: { runId },
       targetUserId: null,
@@ -422,7 +471,7 @@ suite("MySQL integration", () => {
 
     const acknowledged = await acknowledgeMonitoringAlertInMysql({
       actorLabel: "integration",
-      actorUserId: "integration",
+      actorUserId: actorUserId ?? "",
       alertId: alert.id,
       note: "integration acknowledge",
     });
@@ -431,7 +480,7 @@ suite("MySQL integration", () => {
 
     const resolved = await resolveMonitoringAlertInMysql({
       actorLabel: "integration",
-      actorUserId: "integration",
+      actorUserId: actorUserId ?? "",
       alertId: alert.id,
       note: "integration resolve",
     });
