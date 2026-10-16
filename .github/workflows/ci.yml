@@ -83,5 +83,24 @@ jobs:
       - name: Verify the migration ledger
         run: pnpm db:migrations:check
 
+      # The JSON report lets the next step publish each failing test as an
+      # annotation, which is far easier to read than the full job log.
       - name: Run integration tests against MySQL
-        run: pnpm test
+        run: >-
+          pnpm exec vitest run
+          --passWithNoTests
+          --reporter=default
+          --reporter=json
+          --outputFile=/tmp/vitest-report.json
+
+      - name: Annotate failing tests
+        if: failure()
+        run: node scripts/report-vitest-failures.mjs /tmp/vitest-report.json
+
+      - name: Print the database state on failure
+        if: failure()
+        run: |
+          mysql --host=127.0.0.1 --port=3306 --user=root solar_tank_ci \
+            --execute="SELECT id FROM schema_migrations ORDER BY id" || true
+          mysql --host=127.0.0.1 --port=3306 --user=root solar_tank_ci \
+            --execute="SHOW TABLES" || true
