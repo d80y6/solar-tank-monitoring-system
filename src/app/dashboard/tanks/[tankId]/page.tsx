@@ -770,8 +770,8 @@ function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
       label: "Payload",
       shape: payloadConfig?.shape
         ? payloadConfig.shape === "rectangular"
-          ? "Tangki balok"
-          : "Silinder horizontal"
+          ? "Rectangular tank"
+          : "Horizontal cylinder"
         : "-",
       capacity: formatSnapshotItem(payloadConfig?.capacityLiter, " L"),
       source: "device report",

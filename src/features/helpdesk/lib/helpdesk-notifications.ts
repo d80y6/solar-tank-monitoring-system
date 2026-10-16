@@ -17,11 +17,11 @@ export async function notifyAdminsHelpdeskMessageCreated({
     "",
     summarizeHelpdeskSession(session),
     "",
-    "Pesan user:",
+    "User message:",
     message.body,
     "",
-    `Balas: /reply ${session.sessionCode} isi balasan`,
-    `Tutup: /close ${session.sessionCode}`,
+    `Reply: /reply ${session.sessionCode} <your reply>`,
+    `Close: /close ${session.sessionCode}`,
   ].join("\n");
 
   return sendAdminTelegramNotification(text, { topic: "live-chat" });

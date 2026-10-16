@@ -4,6 +4,7 @@ import { verifyCaptchaToken } from "@/features/auth/lib/auth-captcha";
 import { resendEmailVerification } from "@/features/auth/lib/auth-service";
 import { parseResendVerificationPayload } from "@/features/auth/lib/auth-validation";
 import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { requireSameOrigin } from "@/features/auth/lib/request-origin";
 import {
   getSafeErrorMessage,
   getSafeErrorStatus,
@@ -21,6 +22,12 @@ function getClientIp(request: NextRequest): string | null {
 }
 
 export async function POST(request: NextRequest) {
+  const originBlock = requireSameOrigin(request);
+
+  if (originBlock) {
+    return originBlock;
+  }
+
   try {
     const payload = parseResendVerificationPayload(await request.json());
     const ip = getClientIp(request) ?? "unknown-ip";

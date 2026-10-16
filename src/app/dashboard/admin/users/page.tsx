@@ -775,7 +775,7 @@ export default async function AdminUsersPage({
       <DashboardHeader
         navItems={[
           { href: "/dashboard", label: "Tank Management" },
-          { current: true, label: "Manajemen Pengguna" },
+          { current: true, label: "User Management" },
           {
             href: "/dashboard/admin/device-requests",
             label: "Review requests",
@@ -1069,7 +1069,7 @@ export default async function AdminUsersPage({
                         </div>
                         <div>
                           <p className="font-semibold uppercase tracking-[0.14em] text-zinc-400">
-                            Dibuat
+                            Created
                           </p>
                           <p className="mt-1 leading-5">
                             {formatDate(user.createdAt)}

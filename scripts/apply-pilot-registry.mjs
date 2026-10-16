@@ -40,19 +40,19 @@ loadEnvConfig(process.cwd());
 
 function printHelp() {
   globalThis.console.log(`
-Apply registry pilot STO ke MySQL.
+Apply the pilot STO registry to MySQL.
 
-Pemakaian:
+Usage:
   pnpm pilot:registry -- --dry-run
   pnpm pilot:registry
   pnpm pilot:registry -- --file config/pilot-registry.local.json
 
-Opsi:
+Options:
   --file <path>            Default: config/pilot-registry.local.json
   --dry-run                Validate the file without writing to the database
   --allow-placeholder      Only for template practice, not for a real pilot
-  --min-sites <angka>      Default: 5
-  --help                   Tampilkan bantuan
+  --min-sites <number>     Default: 5
+  --help                   Show this help
 
 The real registry file must be local and must not be committed.
 `);

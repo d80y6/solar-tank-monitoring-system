@@ -1,37 +1,37 @@
 ---
-name: Laporan bug
-about: Laporkan masalah yang bisa direproduksi
+name: Bug report
+about: Report a reproducible problem
 title: "bug: "
 labels: bug
 assignees: ""
 ---
 
-## Ringkasan
+## Summary
 
-Jelaskan masalahnya secara singkat.
+Describe the problem briefly.
 
-## Langkah Reproduksi
+## Reproduction Steps
 
-1. Jalankan ...
-2. Buka ...
-3. Klik ...
-4. Error muncul ...
+1. Run ...
+2. Open ...
+3. Click ...
+4. The error appears ...
 
-## Hasil Saat Ini
+## Current Result
 
-Tuliskan hasil yang terjadi.
+Describe what happens now.
 
-## Hasil yang Diharapkan
+## Expected Result
 
-Tuliskan hasil yang seharusnya terjadi.
+Describe what should happen instead.
 
-## Lingkungan
+## Environment
 
 - OS:
 - Node.js:
 - pnpm:
 - Browser:
 
-## Catatan
+## Notes
 
-Jangan menempelkan credential, data real, API key, atau informasi internal.
+Never paste credentials, real data, API keys, or internal information.

@@ -287,7 +287,7 @@ function RequestDetailModal({
                   </DetailItem>
                   <DetailItem label="Cos phi">{formatNumber(request.cosPhi)}</DetailItem>
                   <DetailItem label="Calculated consumption">
-                    {formatNumber(request.consumptionLiterPerHour, " L/jam")}
+                    {formatNumber(request.consumptionLiterPerHour, " L/hour")}
                   </DetailItem>
                   <DetailItem label="Reviewed">
                     {formatDate(request.adminReviewedAt)}

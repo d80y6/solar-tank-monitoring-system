@@ -88,7 +88,7 @@ describe("mysql device request repository mappers", () => {
       validation_warnings_json: JSON.stringify([
         {
           field: "capacityLiter",
-          message: "Perlu cek kapasitas.",
+          message: "Capacity needs review.",
           severity: "warning",
         },
       ]),
@@ -112,7 +112,7 @@ describe("mysql device request repository mappers", () => {
       validationWarnings: [
         {
           field: "capacityLiter",
-          message: "Perlu cek kapasitas.",
+          message: "Capacity needs review.",
           severity: "warning",
         },
       ],

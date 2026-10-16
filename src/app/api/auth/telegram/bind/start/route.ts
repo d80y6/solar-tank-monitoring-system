@@ -4,11 +4,18 @@ import { requireApiUser } from "@/features/auth/lib/auth-guards";
 import { startTelegramBinding } from "@/features/auth/lib/auth-service";
 import { isTelegramConfigured } from "@/features/auth/lib/auth-telegram";
 import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { requireSameOrigin } from "@/features/auth/lib/request-origin";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  const originBlock = requireSameOrigin(request);
+
+  if (originBlock) {
+    return originBlock;
+  }
+
   const auth = await requireApiUser(request);
 
   if (!auth.ok) {

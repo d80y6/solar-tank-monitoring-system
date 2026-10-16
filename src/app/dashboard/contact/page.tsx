@@ -52,7 +52,7 @@ function buildContactMessage({
   return [
     "Hello Mr. Astra, I need help with FTM.",
     "",
-    `Nama: ${fullName}`,
+    `Name: ${fullName}`,
     `Username: ${username}`,
     `Email: ${email}`,
     `Account role: ${formatRole(role)}`,

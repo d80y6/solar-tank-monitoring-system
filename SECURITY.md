@@ -1,30 +1,31 @@
-# Kebijakan Keamanan
+# Security Policy
 
-Repositori ini bersifat public-safe. Artinya, semua contoh data, payload, konfigurasi, dan dokumentasi harus aman jika dibaca publik.
+This repository is public-safe: every example payload, configuration value, and
+document must be safe to read publicly.
 
-## Jangan Commit Data Rahasia
+## Never Commit Sensitive Data
 
-Jangan pernah commit:
+Never commit:
 
-- API key asli;
-- token deployment;
-- password database;
-- file `.env.local`;
-- credential WiFi;
-- private key;
-- domain produksi;
-- alamat IP internal;
-- payload telemetry real;
-- data lokasi sensitif;
-- backup database;
-- konfigurasi server privat;
-- screenshot yang berisi informasi internal.
+- real API keys;
+- deployment tokens;
+- database passwords;
+- `.env.local` files;
+- WiFi credentials;
+- private keys;
+- production domains;
+- internal IP addresses;
+- real telemetry payloads;
+- sensitive location data;
+- database backups;
+- private server configuration;
+- screenshots that contain internal information.
 
-Gunakan `.env.example` hanya untuk nama variabel dan nilai dummy.
+Use `.env.example` only for variable names and dummy values.
 
-## Key Device Lokal
+## Local Device Keys
 
-Untuk development lokal, API ingest dapat memakai key demo per device. Contoh:
+For local development the ingest API can use the demo key of each device:
 
 ```text
 demo-tph-01 -> demo-tph-key
@@ -33,94 +34,108 @@ demo-jto-01 -> demo-jto-key
 demo-skp-01 -> demo-skp-key
 ```
 
-Key tersebut hanya contoh. Jangan gunakan untuk production.
+Those keys are examples only and must never be used in production.
 
-Fallback global `local-development-key` masih tersedia untuk latihan awal jika belum dimatikan. Jika ingin mengganti key fallback lokal:
+The global `local-development-key` fallback remains available for early practice
+until it is switched off. To change the local fallback key:
 
 ```powershell
-$env:SOLAR_TANK_LOCAL_DEVICE_KEY="ganti-dengan-key-lokal"
+$env:SOLAR_TANK_LOCAL_DEVICE_KEY="replace-with-a-local-key"
 pnpm dev
 ```
 
-Lalu simulator dijalankan dengan key yang sama:
+Then run the simulator with the same key:
 
 ```powershell
-pnpm simulate:device --key ganti-dengan-key-lokal --once
+pnpm simulate:device --key replace-with-a-local-key --once
 ```
 
-## Batas Keamanan Saat Ini
+## Current Security Boundary
 
-Yang sudah ada:
+Already in place:
 
-- API ingest mengecek `X-Device-Id`;
-- API ingest mengecek `X-Api-Key` atau `X-Device-Key`;
-- device harus terdaftar di data contoh development;
-- device tidak aktif ditolak;
-- payload device yang tidak sesuai header ditolak;
-- hash key per device pada data contoh development;
-- fallback key global bisa dimatikan lewat `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"`;
-- data bisa disimpan di memory store lokal atau MySQL reading repository.
-- login pengguna berbasis database MySQL;
-- session disimpan sebagai token hash di database dan cookie browser memakai `httpOnly`, `sameSite=lax`, serta `secure` saat environment production;
-- role `admin` dan `user` dipakai untuk membatasi halaman admin;
-- password memakai Argon2id dan hash legacy ditandai untuk upgrade;
-- login admin dapat diwajibkan memakai OTP email;
-- pengajuan akses publik masuk status pending dan harus direview admin;
-- verifikasi email, reset password, dan perubahan password memakai token sekali pakai berbasis hash;
-- form publik bisa dilindungi Cloudflare Turnstile melalui `AUTH_CAPTCHA_PROVIDER="turnstile"`;
-- rate limit tersedia untuk login, pengajuan akses, lupa password, dan pengiriman ulang verifikasi email;
-- endpoint ingest memiliki rate limit saat storage MySQL aktif;
-- audit event auth mencatat login, OTP, reset password, verifikasi email, perubahan role, aktivasi/nonaktif akun, dan aksi sesi;
-- halaman keamanan akun tersedia untuk ganti kata sandi, melihat sesi aktif, mencabut sesi lain, dan binding Telegram.
-- alur pengajuan perangkat membuat device key dan firmware package setelah admin approve;
-- paket firmware disimpan terenkripsi dan didownload lewat token terbatas;
-- device baru tidak aktif sebelum first valid ping dengan key yang cocok;
-- admin cleanup data device/uji tidak menghapus akun user/admin, template firmware, atau hardware profile.
+- the ingest API checks `X-Device-Id`, `X-Api-Key` (or `X-Device-Key`), the
+  device registry, and the active state of the device;
+- a device payload whose identity does not match its headers is rejected;
+- per-device key hashes are compared in constant time;
+- the global key fallback can be disabled with
+  `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"`, and readiness refuses
+  it in production-like environments;
+- optional HMAC-SHA256 request signing with a timestamp window and a nonce
+  store (`INGEST_SIGNATURE_MODE`), plus request-body size limits;
+- user accounts, sessions, and roles are stored in MySQL; browser cookies are
+  `httpOnly`, `sameSite=lax`, and `secure` in production;
+- `admin` and `user` roles gate the admin pages, and per-location scopes
+  (`viewer`/`operator` per site) gate which tank and reading data an operator
+  can read once `AUTH_ENFORCE_SITE_SCOPES` is enabled;
+- passwords use Argon2id, legacy hashes are flagged for upgrade, and admin
+  sign-in can require an e-mail OTP;
+- public access requests stay pending until an administrator reviews them;
+- e-mail verification, password reset, and password change use single-use
+  hashed tokens;
+- public forms can be protected by Cloudflare Turnstile through
+  `AUTH_CAPTCHA_PROVIDER="turnstile"`;
+- rate limiting covers sign-in, access requests, password reset, verification
+  resend, helpdesk, and ingest (durable MySQL buckets with an in-process
+  fallback);
+- the security audit log records sign-in, OTP, password reset, e-mail
+  verification, role changes, account activation/deactivation, location scope
+  changes, device key rotation, hardware registry changes, and session actions;
+- account security pages let a user change the password, review active
+  sessions, revoke other sessions, and bind Telegram;
+- device requests generate a device key and an encrypted firmware package
+  after approval, downloaded only through a limited, expiring token;
+- new devices stay inactive until the first valid ping with a matching key;
+- admin cleanup of device/test data never deletes user/admin accounts, firmware
+  templates, or hardware profiles.
 
-Yang belum ada:
+Not in place yet:
 
-- proteksi request tambahan di perimeter/CDN pada deployment final;
-- rotasi key device dari UI admin;
-- manajemen registry site/tangki/device yang menulis database dari UI;
-- database production dengan backup;
-- HTTPS produksi;
-- monitoring server.
-- prosedur recovery akun dan database yang sudah diuji berkala;
-- hardening perimeter deployment final.
-- approval/reject device request lewat Telegram.
+- perimeter/CDN request protection (WAF, bot rules, IP allowlists) on the final
+  deployment;
+- Telegram approve/reject for device requests (Telegram currently handles
+  binding and notifications);
+- firmware code signing or verified TLS trust anchors in the field template
+  (see `docs/decision-log.md`);
+- physical sensor calibration and safety approval per location.
 
-## Pelaporan Masalah Keamanan
+## Reporting a Security Issue
 
-Jika menemukan masalah keamanan:
+If you find a security issue:
 
-1. Jangan membuka issue publik yang berisi secret atau cara eksploitasi detail.
-2. Hubungi pemelihara secara privat.
-3. Sertakan langkah reproduksi tanpa membagikan credential asli.
-4. Jika ada file sensitif terlanjur masuk Git, hentikan push tambahan dan lakukan pembersihan history dengan hati-hati.
+1. Do not open a public issue containing secrets or exploitation details.
+2. Contact the maintainers privately.
+3. Include reproduction steps without sharing real credentials.
+4. If a sensitive file already reached Git, stop pushing and clean the history
+   carefully with the maintainers.
 
-## Checklist Sebelum Deployment
+## Pre-Deployment Checklist
 
-Sebelum deployment nyata:
+Before a real deployment:
 
-- ganti key contoh;
-- simpan secret di environment;
-- matikan fallback global device key;
-- jalankan semua migration database monitoring dan auth;
-- buat admin awal lewat `pnpm auth:create-admin`;
-- isi `AUTH_SECRET` minimal 32 karakter;
-- aktifkan SMTP untuk OTP admin, verifikasi email, dan reset password;
-- aktifkan Turnstile untuk form publik dan pastikan site key serta secret key berasal dari widget yang sama;
-- set `AUTH_COOKIE_SECURE="true"` pada domain HTTPS;
-- aktifkan HTTPS;
-- batasi akses halaman admin hanya untuk role admin;
-- pastikan endpoint ingest berjalan pada mode MySQL sehingga rate limit aplikasi aktif;
-- pastikan environment final memiliki TLS, timeout, payload limit, dan logging pada perimeter yang disepakati;
-- gunakan database dengan backup;
-- uji restore backup database;
-- review audit log keamanan secara berkala;
-- validasi payload device;
-- review konfigurasi server.
+- replace every example key;
+- keep secrets in the environment, never in the repository;
+- disable the global device key fallback;
+- run all monitoring and auth database migrations, then
+  `pnpm db:migrations:check` (0 pending, 0 drifted);
+- create the first administrator with `pnpm auth:create-admin`;
+- set `AUTH_SECRET` to at least 32 characters;
+- configure SMTP for admin OTP, e-mail verification, and password reset;
+- enable Turnstile for public forms and make sure the site key and secret key
+  come from the same widget;
+- set `AUTH_COOKIE_SECURE="true"` on an HTTPS domain;
+- enforce HTTPS;
+- keep admin pages restricted to the `admin` role;
+- run ingest in MySQL mode so the durable rate limiter is active;
+- configure TLS, timeouts, payload limits, and logging at the agreed perimeter;
+- use a database with backups, encrypt them with
+  `MYSQL_BACKUP_ENCRYPTION_KEY`, and test a restore
+  (`docs/disaster-recovery-runbook.md`);
+- review the security audit log regularly;
+- validate device payloads;
+- review the server configuration;
+- work through `docs/production-go-live-checklist.md`.
 
-## Branch yang Didukung
+## Supported Branch
 
-Untuk fase saat ini, perbaikan keamanan diarahkan ke branch `main`.
+For this phase, security fixes target the `main` branch.

@@ -1,27 +1,29 @@
 ---
-name: Permintaan fitur
-about: Usulkan fitur atau perbaikan alur
+name: Feature request
+about: Propose a feature or a workflow improvement
 title: "feat: "
 labels: enhancement
 assignees: ""
 ---
 
-## Tujuan
+## Goal
 
-Jelaskan kebutuhan atau masalah yang ingin diselesaikan.
+Explain the need or the problem you want to solve.
 
-## Usulan Solusi
+## Proposed Solution
 
-Jelaskan gambaran fitur yang diinginkan.
+Describe the feature you have in mind.
 
-## Dampak Pengguna
+## User Impact
 
-Siapa yang terbantu dan bagaimana alurnya menjadi lebih baik?
+Who benefits and how does the workflow improve?
 
-## Batasan
+## Constraints
 
-Tuliskan hal yang belum pasti, misalnya data, device, API, atau deployment.
+Write down anything that is still uncertain, for example data, devices, API, or
+deployment concerns.
 
-## Catatan Keamanan
+## Security Notes
 
-Pastikan usulan tidak membutuhkan credential, data real, atau informasi internal di issue publik.
+Make sure the proposal does not require credentials, real data, or internal
+information in a public issue.

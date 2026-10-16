@@ -4,6 +4,7 @@ import { requireApiUser } from "@/features/auth/lib/auth-guards";
 import { changePasswordForSession } from "@/features/auth/lib/auth-service";
 import { parseChangePasswordPayload } from "@/features/auth/lib/auth-validation";
 import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { requireSameOrigin } from "@/features/auth/lib/request-origin";
 import {
   getSafeErrorMessage,
   getSafeErrorStatus,
@@ -13,6 +14,12 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  const originBlock = requireSameOrigin(request);
+
+  if (originBlock) {
+    return originBlock;
+  }
+
   const auth = await requireApiUser(request);
 
   if (!auth.ok) {

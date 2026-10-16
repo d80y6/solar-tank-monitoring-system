@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getRequestSessionUser } from "@/features/auth/lib/auth-session";
 import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { requireSameOrigin } from "@/features/auth/lib/request-origin";
 import {
   addUserHelpdeskMessage,
   getOrCreateHelpdeskSession,
@@ -66,6 +67,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const originBlock = requireSameOrigin(request);
+
+  if (originBlock) {
+    return originBlock;
+  }
+
   try {
     const rateLimit = await checkRateLimit({
       key: `helpdesk-message:${getClientKey(request)}`,

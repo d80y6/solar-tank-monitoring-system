@@ -4,7 +4,7 @@ export const mockTanks: Tank[] = [
   {
     id: "tank-tph-main",
     siteId: "site-tph",
-    name: "Tangki utama",
+    name: "Main tank",
     shape: "horizontal-cylinder",
     capacityLiter: 5000,
     diameterCm: 150,
@@ -18,7 +18,7 @@ export const mockTanks: Tank[] = [
   {
     id: "tank-psn-main",
     siteId: "site-psn",
-    name: "Tangki utama",
+    name: "Main tank",
     shape: "rectangular",
     capacityLiter: 540,
     lengthCm: 150,
@@ -33,7 +33,7 @@ export const mockTanks: Tank[] = [
   {
     id: "tank-nja-main",
     siteId: "site-nja",
-    name: "Tangki utama",
+    name: "Main tank",
     shape: "horizontal-cylinder",
     capacityLiter: 5000,
     diameterCm: 150,
@@ -47,7 +47,7 @@ export const mockTanks: Tank[] = [
   {
     id: "tank-jto-main",
     siteId: "site-jto",
-    name: "Tangki utama",
+    name: "Main tank",
     shape: "horizontal-cylinder",
     capacityLiter: 5000,
     diameterCm: 150,
@@ -61,7 +61,7 @@ export const mockTanks: Tank[] = [
   {
     id: "tank-skp-main",
     siteId: "site-skp",
-    name: "Tangki utama",
+    name: "Main tank",
     shape: "horizontal-cylinder",
     capacityLiter: 5000,
     diameterCm: 150,

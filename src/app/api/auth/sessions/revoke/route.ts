@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { requireApiUser } from "@/features/auth/lib/auth-guards";
+import { requireSameOrigin } from "@/features/auth/lib/request-origin";
 import { revokeCurrentUserSessionById } from "@/features/auth/lib/auth-service";
 import {
   getSafeErrorMessage,
@@ -11,6 +12,12 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  const originBlock = requireSameOrigin(request);
+
+  if (originBlock) {
+    return originBlock;
+  }
+
   const auth = await requireApiUser(request);
 
   if (!auth.ok) {
