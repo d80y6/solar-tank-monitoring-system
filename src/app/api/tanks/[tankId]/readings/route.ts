@@ -1,4 +1,5 @@
 import { requireApiUser } from "@/features/auth/lib/auth-guards";
+import { canUserAccessTank } from "@/features/monitoring/lib/scoped-monitoring-data";
 import { buildTankReadings } from "@/features/monitoring/lib/tank-detail-view-model";
 import { listMonitoringReadingsForTank } from "@/features/monitoring/lib/monitoring-storage";
 import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
@@ -18,6 +19,17 @@ export async function GET(
   }
 
   const { tankId } = await params;
+
+  if (!(await canUserAccessTank(auth.user, tankId))) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Access to this tank is not available for this account.",
+      },
+      { status: 403 },
+    );
+  }
+
   const url = new URL(request.url);
   const range = url.searchParams.get("range") ?? "24h";
   const now = new Date();

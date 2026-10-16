@@ -175,6 +175,11 @@ Success response:
     "rows": []
   },
   "meta": {
+    "access": {
+      "enforced": false,
+      "scope": "enforcement-disabled",
+      "siteCount": null
+    },
     "storage": {
       "configuredDriver": "mysql",
       "activeDriver": "mysql",
@@ -194,6 +199,14 @@ Success response:
 Note:
 
 ```text
+The meta.access field reports the per-location restriction state for the
+calling account: enforced is true when AUTH_ENFORCE_SITE_SCOPES is on and the
+account is not an administrator, scope is admin, enforcement-disabled, scoped,
+or no-scope-assigned, and siteCount is the number of locations the account may
+read (null when unrestricted). When a scope is enforced, data only contains the
+assigned locations; a scoped account without assignments receives an empty
+dataset and reason no-scope-assigned.
+
 The data field contains the dashboard contents. The meta.storage field helps you see whether readings are being read from MySQL or local memory. If MySQL mode is active but the reading table is still empty, the API still uses MySQL and returns an empty reading list; the dashboard shows STOs from the registry with a no data yet status. The meta.registry field helps you see whether site/tank/device references are read from local memory or MySQL. On MySQL, the overview compares the live snapshot with the latest history candidates and picks the newest receivedAt so status stays consistent during deployment transition.
 ```
 
@@ -440,7 +453,7 @@ The `configStatus` value helps you see whether the payload configuration matches
 |---|---|
 | `400` | Body is not valid JSON or the payload does not match |
 | `401` | Key is empty or wrong |
-| `403` | Device is not active |
+| `403` | Device is not active, or the signed-in account is not allowed to read the requested tank |
 | `404` | Device or tank not found |
 | `503` | Active storage not ready, especially MySQL cannot be connected |
 

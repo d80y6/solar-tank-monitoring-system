@@ -174,7 +174,47 @@ wave is expected to leave `pnpm check` green and to add tests for new logic.
 - production guardrails that refuse unsafe configuration at boot;
 - request-body limits and stricter production defaults.
 
-## 4. Explicitly Out of Scope
+## 4. Implementation Status
+
+Updated as each wave landed. "Verified" means the commands below were run in
+this checkout and passed; a wave is only closed when `pnpm check` is green.
+
+| Wave | Scope | State | Evidence |
+|---|---|---|---|
+| 1 | Observability (O1–O4, H1) | Implemented | `src/lib/{logger,metrics,error-tracker,build-info,request-context,memory-rate-limit,api-observability}.ts`, `GET /api/metrics`, unit tests |
+| 2 | Alerting and scheduled ops (A1–A4) | Implemented | migration 010, `src/features/ops/**`, `/api/cron/ops`, `/dashboard/admin/alerts`, Vercel cron entry |
+| 3 | Device security (D1–D2) | Implemented | migration 011, `ingest-signature.ts`, `mysql-device-key-repository.ts`, `/dashboard/admin/devices` |
+| 4 | Backup and disaster recovery (B1–B4) | Implemented | `scripts/lib/backup-crypto.mjs`, `scripts/{backup,restore,verify}-mysql.mjs`, `schema_migrations` ledger, `pnpm db:migrations:check`, `docs/disaster-recovery-runbook.md` |
+| 5 | Access control (C1) | Implemented | migration 012, `src/features/auth/lib/site-scope.ts`, `/dashboard/admin/access-scopes`, scoped dashboard/API/export |
+| 6 | Administration and operability (P1–P4) | Planned | — |
+| 7 | Assurance (H2, H3, S2) | Planned | — |
+
+Verification after Wave 5:
+
+```text
+pnpm typecheck   -> OK
+pnpm lint        -> OK
+pnpm test        -> OK (39 files, 238 tests)
+pnpm build       -> OK
+pnpm check       -> OK (typecheck -> lint -> test -> build)
+```
+
+Notes that stay true after Wave 5:
+
+- **Rate limiting backend.** `checkRateLimit` uses the durable MySQL bucket
+  when the operational database is active and falls back to the in-process
+  limiter (`src/lib/memory-rate-limit.ts`) when it is not, or when the
+  database call fails. The fallback is per-instance and reset by a redeploy,
+  which is why the durable limiter stays the default in production.
+- **Firmware trust boundary.** The ESP8266 template still ships without TLS
+  certificate validation; that is a documented deployment decision, not a
+  code gap (see `docs/safety-and-limitations.md`).
+- **Location scopes are opt-in.** With `AUTH_ENFORCE_SITE_SCOPES` unset every
+  signed-in account still reads every location; assignments can be prepared
+  first, and enforcement should be switched on only after every non-admin
+  account has at least one scope.
+
+## 5. Explicitly Out of Scope
 
 These remain out of scope after this work, and the documentation keeps
 saying so:
@@ -184,7 +224,7 @@ saying so:
 - one-click firmware compile/upload from the browser;
 - a mobile application.
 
-## 5. Claim Discipline
+## 6. Claim Discipline
 
 This review does not change the project's claim limits. Production
 readiness here means **the software is operable, observed, recoverable, and

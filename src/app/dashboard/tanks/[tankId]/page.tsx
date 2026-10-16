@@ -1,4 +1,5 @@
 import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
+import { canUserAccessTank } from "@/features/monitoring/lib/scoped-monitoring-data";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -1059,6 +1060,10 @@ export default async function TankDetailPage({
 
   await connection();
   const admin = await requirePageAdmin();
+
+  if (!(await canUserAccessTank(admin, tankId))) {
+    notFound();
+  }
 
   const now = new Date();
   const [latestReadingsResult, tankHistoryReadings, referenceData] =

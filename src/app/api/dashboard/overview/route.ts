@@ -1,7 +1,9 @@
 import { requireApiUser } from "@/features/auth/lib/auth-guards";
-import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
 import { buildDashboardOverview } from "@/features/monitoring/lib/dashboard-view-model";
-import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/lib/monitoring-storage";
+import {
+  getScopedLatestReadings,
+  getScopedMonitoringReference,
+} from "@/features/monitoring/lib/scoped-monitoring-data";
 import type { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -16,8 +18,8 @@ export async function GET(request: NextRequest) {
 
   const [monitoringReadingsResult, monitoringReferenceResult] =
     await Promise.all([
-      listLatestMonitoringReadingsByTankWithSource(),
-      getMonitoringReferenceDataWithSource(),
+      getScopedLatestReadings(auth.user),
+      getScopedMonitoringReference(auth.user),
     ]);
   const overview = buildDashboardOverview({
     now: new Date(),
@@ -31,8 +33,13 @@ export async function GET(request: NextRequest) {
     ok: true,
     data: overview,
     meta: {
-      storage: monitoringReadingsResult.source,
+      access: {
+        enforced: monitoringReferenceResult.access.enforced,
+        scope: monitoringReferenceResult.access.reason,
+        siteCount: monitoringReferenceResult.access.allowedSiteIds?.length ?? null,
+      },
       registry: monitoringReferenceResult.source,
+      storage: monitoringReadingsResult.source,
     },
   });
 }

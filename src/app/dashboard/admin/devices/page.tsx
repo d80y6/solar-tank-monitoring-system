@@ -74,6 +74,7 @@ export default async function AdminDevicesPage() {
           { href: "/dashboard", label: "Tank Management" },
           { href: "/dashboard/admin/users", label: "User Management" },
           { href: "/dashboard/admin/alerts", label: "Alert Centre" },
+          { href: "/dashboard/admin/access-scopes", label: "Location Access" },
           { current: true, label: "Device Registry" },
         ]}
         user={admin}

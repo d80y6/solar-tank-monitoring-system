@@ -96,6 +96,7 @@ export default async function AdminAlertsPage() {
           { href: "/dashboard/admin/users", label: "User Management" },
           { href: "/dashboard/admin/audit", label: "Security Audit" },
           { href: "/dashboard/admin/devices", label: "Device Registry" },
+          { href: "/dashboard/admin/access-scopes", label: "Location Access" },
           { current: true, label: "Alert Centre" },
         ]}
         user={admin}

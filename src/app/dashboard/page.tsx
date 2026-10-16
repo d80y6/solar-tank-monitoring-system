@@ -1,10 +1,13 @@
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
 import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { describeSiteAccess } from "@/features/auth/lib/site-scope";
 import { SimpleDashboardView } from "@/features/monitoring/components/simple-dashboard-view";
 import { buildDashboardOverview } from "@/features/monitoring/lib/dashboard-view-model";
-import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
-import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/lib/monitoring-storage";
+import {
+  getScopedLatestReadings,
+  getScopedMonitoringReference,
+} from "@/features/monitoring/lib/scoped-monitoring-data";
 import {
   createSimpleDashboardSites,
   type SimpleDashboardSite,
@@ -33,9 +36,12 @@ export default async function SimpleDashboardPage() {
   const now = new Date();
   const [monitoringReadingsResult, monitoringReferenceResult] =
     await Promise.all([
-      listLatestMonitoringReadingsByTankWithSource(),
-      getMonitoringReferenceDataWithSource(),
+      getScopedLatestReadings(user),
+      getScopedMonitoringReference(user),
     ]);
+  const siteAccessMessage = monitoringReferenceResult.access.enforced
+    ? describeSiteAccess(monitoringReferenceResult.access)
+    : null;
 
   const dashboardOverview = buildDashboardOverview({
     now,
@@ -82,6 +88,10 @@ export default async function SimpleDashboardPage() {
                   href: "/dashboard/admin/devices",
                   label: "Device Registry",
                 },
+                {
+                  href: "/dashboard/admin/access-scopes",
+                  label: "Location Access",
+                },
               ]
             : []),
         ]}
@@ -89,6 +99,14 @@ export default async function SimpleDashboardPage() {
       />
 
       <div className="mx-auto flex w-full max-w-[1540px] min-w-0 flex-col px-4 py-5 sm:px-6 lg:px-8">
+        {siteAccessMessage ? (
+          <p className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-900">
+            {siteAccessMessage}
+            {monitoringReferenceResult.access.reason === "no-scope-assigned"
+              ? " Ask an administrator to assign the locations you operate."
+              : ""}
+          </p>
+        ) : null}
         <section className="mb-4 flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-sm font-semibold uppercase text-zinc-500">

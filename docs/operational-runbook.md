@@ -125,6 +125,24 @@ set to a positive value; the default keeps history forever.
 - Revoke all sessions from the user management page whenever credentials are
   suspected to be compromised.
 
+### Per-location access (per-STO)
+
+Accounts can be limited to the locations they operate:
+
+1. Open `/dashboard/admin/access-scopes`.
+2. Select the account, tick its locations, and save. The scope role is
+   `viewer` or `operator`.
+3. Scope assignment is recorded but **not enforced** until
+   `AUTH_ENFORCE_SITE_SCOPES=true` is set in the environment. This two-step
+   flow lets you prepare assignments without locking anyone out.
+4. With enforcement on, a non-admin account only sees its assigned locations
+   in the dashboard, the tank detail pages, the JSON APIs, and the CSV export.
+   Administrators always see everything.
+5. An account with enforcement on and no assignment sees nothing and is told
+   to contact an administrator — that is intentional.
+
+Review the assignments quarterly, together with the account list.
+
 ## 6. Device Lifecycle
 
 ```text
