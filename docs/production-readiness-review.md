@@ -186,29 +186,41 @@ this checkout and passed; a wave is only closed when `pnpm check` is green.
 | 3 | Device security (D1–D2) | Implemented | migration 011, `ingest-signature.ts`, `mysql-device-key-repository.ts`, `/dashboard/admin/devices` |
 | 4 | Backup and disaster recovery (B1–B4) | Implemented | `scripts/lib/backup-crypto.mjs`, `scripts/{backup,restore,verify}-mysql.mjs`, `schema_migrations` ledger, `pnpm db:migrations:check`, `docs/disaster-recovery-runbook.md` |
 | 5 | Access control (C1) | Implemented | migration 012, `src/features/auth/lib/site-scope.ts`, `/dashboard/admin/access-scopes`, scoped dashboard/API/export |
-| 6 | Administration and operability (P1–P4) | Planned | — |
-| 7 | Assurance (H2, H3, S2) | Planned | — |
+| 6 | Administration and operability (P1–P4) | Implemented | firmware/hardware CRUD, `GET /api/admin/audit/export`, `client-error-reporter.ts`, `docs/{upgrade-and-rollback,incident-response,production-go-live-checklist}.md` |
+| 7 | Assurance (H2, H3, S2) | Implemented | `instrumentation.ts` + `src/lib/production-guardrails.ts`, `src/lib/request-body.ts` on every JSON POST, `src/features/monitoring/tests/mysql-integration.test.ts` + `mysql-integration` job in `.github/workflows/ci.yml` |
 
-Verification after Wave 5:
+Verification after Wave 7:
 
 ```text
 pnpm typecheck   -> OK
 pnpm lint        -> OK
-pnpm test        -> OK (39 files, 238 tests)
+pnpm test        -> OK (44 files, 293 tests; 10 MySQL integration tests run in CI)
 pnpm build       -> OK
 pnpm check       -> OK (typecheck -> lint -> test -> build)
 ```
 
-Notes that stay true after Wave 5:
+The MySQL integration suite is skipped locally (`RUN_MYSQL_INTEGRATION_TESTS`
+unset) and enabled in the `mysql-integration` CI job, which provisions MySQL
+8.4, applies every migration and the demo seed, checks the ledger, and runs the
+tests against the real server.
+
+Notes that stay true after Wave 7:
 
 - **Rate limiting backend.** `checkRateLimit` uses the durable MySQL bucket
   when the operational database is active and falls back to the in-process
   limiter (`src/lib/memory-rate-limit.ts`) when it is not, or when the
   database call fails. The fallback is per-instance and reset by a redeploy,
   which is why the durable limiter stays the default in production.
-- **Firmware trust boundary.** The ESP8266 template still ships without TLS
-  certificate validation; that is a documented deployment decision, not a
-  code gap (see `docs/safety-and-limitations.md`).
+- **Firmware trust boundary.** The ESP8266 template validates TLS when the
+  package supplies `SOLARTANK_TLS_CA_CERT` or `SOLARTANK_TLS_CERT_FINGERPRINT`,
+  and signs each POST with HMAC-SHA256 when `SOLARTANK_ENABLE_REQUEST_SIGNING`
+  is 1 (both are generated from deployment variables). Without pinned TLS
+  material the session is unvalidated and the firmware says so on the serial
+  console every boot; that residual case is a deployment decision, not a code
+  gap (see `docs/safety-and-limitations.md` and `docs/decision-log.md`).
+- **Signing rollout.** `INGEST_SIGNATURE_MODE` stays `off` only while field
+  devices are being flashed; the go-live checklist requires `required`, or a
+  dated migration plan in the sign-off table.
 - **Location scopes are opt-in.** With `AUTH_ENFORCE_SITE_SCOPES` unset every
   signed-in account still reads every location; assignments can be prepared
   first, and enforcement should be switched on only after every non-admin

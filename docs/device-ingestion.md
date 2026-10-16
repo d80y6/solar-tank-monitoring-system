@@ -56,6 +56,38 @@ Available demo keys:
 
 The `local-development-key` fallback can still be used for early practice if `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` is not disabled. For a mode closer to the pilot, use per-device keys and set the global fallback to `false`.
 
+### Request signature (optional, recommended)
+
+In addition to the device key a device may sign the exact request body, which
+protects against replay and tampering even if the body is captured in transit.
+
+```http
+X-Request-Timestamp: 1790000000
+X-Request-Nonce: 8f14e45fceea167a5a36dedd4bea2543
+X-Request-Signature: <hex>
+```
+
+The signature is `HMAC-SHA256(deviceKey, "<unixSeconds>.<nonce>.<rawBody>")`, hex
+encoded. The nonce must be unique per request; a repeated `(device, nonce)` pair
+is rejected with `409`. The accepted clock skew defaults to 300 seconds
+(`INGEST_SIGNATURE_TOLERANCE_SECONDS`, allowed range 30–3600).
+
+`INGEST_SIGNATURE_MODE` controls enforcement:
+
+| Mode | Behaviour |
+|---|---|
+| `off` (default) | Signature headers are ignored. Bootstrap only. |
+| `optional` | A signature that is present must be valid; a missing one is accepted and recorded. |
+| `required` | Every request must carry a valid, fresh signature. |
+
+Generated firmware signs automatically (`SOLARTANK_ENABLE_REQUEST_SIGNING=1`),
+so the sequence for a live fleet is: set `optional`, reflash all devices, confirm
+successful signed ingest, then set `required`. The production go-live checklist
+requires `required` or a dated migration plan.
+
+Nonce records live in `monitoring_ingest_nonces` and are pruned by the
+housekeeping task (`OPS_INGEST_NONCE_RETENTION_MINUTES`, default 120).
+
 ## Supported Payloads
 
 CAT-like payload:
@@ -224,11 +256,20 @@ Before real devices are used, these must be locked:
 
 Do not put production keys in code.
 
-For production later:
+In place today:
 
-- do not use the global fallback;
-- store per-device key hashes in the database;
-- use HTTPS;
-- add rate limiting;
-- record an audit log;
-- rotate keys if a device is lost or a key leaks.
+- per-device key hashes in the database, with an optional development fallback;
+- HTTPS with certificate validation and request signing in generated firmware;
+- per-device and per-IP rate limiting on the ingest endpoint;
+- audit records for key rotation and package issuance;
+- key rotation from the device registry page, with a grace window so field
+  devices keep reporting until they are reflashed;
+- ingest events recorded for acceptances and rejections, with a rejection-spike
+  alert.
+
+Operational rules:
+
+- rotate the key immediately if a device is lost or a key leaks;
+- keep `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` disabled in production;
+- treat a device key as a password: it appears once in the generated package and
+  must never be sent over an unencrypted channel.

@@ -97,12 +97,20 @@ Available:
 - queries fetch the latest data first;
 - pilot registry apply script from a local file.
 
+Available now:
+
+- device key rotation with a grace window for the previous key;
+- encrypted backup, verification, and a documented restore procedure;
+- real database integration tests (skipped locally, run against MySQL 8.4 in CI);
+- boot guardrails that refuse unsafe production configuration.
+
 Not finished:
 
-- device key rotation;
-- encrypted backup and restore drills;
-- real database integration tests;
-- periodic audits so sample data stays active only in local development mode.
+- restore drills must still be executed by an operator against a scratch
+  database and recorded in `docs/disaster-recovery-runbook.md` § 6;
+- periodic audits so sample data stays active only in local development mode —
+  the go-live checklist makes this a pre-promotion review item rather than a
+  scheduled job.
 
 ## Phase 8 - Auth and Roles
 
@@ -116,10 +124,16 @@ Available:
 - access requests pending admin review;
 - admin OTP, password reset, email verification, session management, and auth audit log.
 
-Still to refine:
+Available now:
 
-- production SMTP;
-- production Turnstile;
+- per-location access scopes with opt-in enforcement;
+- hardware profile and firmware template CRUD;
+- audit-log filtering, pagination, and CSV export.
+
+Still to refine (operational, not code):
+
+- production SMTP credentials and deliverability testing;
+- production Turnstile keys;
 - more detailed operational roles if truly needed;
 - account recovery procedures;
 - periodic audit review.
@@ -140,6 +154,12 @@ Available:
 - device key and firmware ZIP package generation;
 - firmware download links with expiry and download limits;
 - device activation after first valid ping.
+
+Available now:
+
+- firmware templates sign telemetry (HMAC-SHA256) and can pin the server
+  certificate, both configured from deployment variables;
+- staging verification for the payload configuration review.
 
 Next targets:
 
@@ -167,12 +187,21 @@ Available:
 - current operational truth document.
 - registry of 3 sites, 3 tanks, and 3 devices as of the 14 July 2026 verification.
 
+Available now:
+
+- encrypted backups with verification and a restore script;
+- `docs/upgrade-and-rollback.md`: the release procedure, migration rules, and
+  rollback steps that leave data untouched;
+- monitoring endpoints for health, readiness, and Prometheus metrics, with the
+  alert rules that watch them;
+- `docs/production-go-live-checklist.md`: the sign-off gate for 5 devices/STOs;
+- `docs/incident-response.md`: severities, roles, and playbooks.
+
 Next targets:
 
-- test MySQL backup and restore to a staging/local database;
-- application update procedure that does not delete data;
-- basic monitoring for health, readiness, disk, CPU, RAM, and error logs;
-- go-live checklist for 5 devices/STOs.
+- execute the first restore drill on the production size database and record it;
+- connect a long-term log service to the structured JSON logs;
+- establish the production approval path with the platform owner.
 
 ## Roadmap Principles
 

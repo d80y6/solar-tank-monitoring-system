@@ -183,3 +183,40 @@ Reasons:
 - older pilot locations use the initial values `TREG 5` and `TIF 3` so database changes do not erase existing data.
 
 Note: the current choice list follows the approved pilot needs. Adding new regional/territory values must use official organizational data, not developer guesses.
+
+## 2026-10-17 - Validate TLS and Sign Every Device Request
+
+Decision:
+
+```text
+Generated firmware validates the server certificate (pinned CA or certificate
+fingerprint) and signs each telemetry POST with HMAC-SHA256 over
+"<unixSeconds>.<nonce>.<rawBody>" using the device key. TLS material and the
+signing switch are deployment variables, not per-device edits.
+```
+
+Reasons:
+
+- the ESP8266 has enough flash and RAM for BearSSL with a small trust anchor, so
+  unvalidated TLS is a choice rather than a hardware limit;
+- pinning at build time is easier to operate than a device-side trust store;
+- binding the timestamp and nonce into the signature gives replay protection
+  that a key-only signature cannot;
+- the same device key already authenticates the device, so no new secret type or
+  provisioning step is introduced;
+- an unsigned request is still accepted while `INGEST_SIGNATURE_MODE` is `off`,
+  which keeps the existing fleet reporting until it is reflashed.
+
+Consequences:
+
+- `SOLARTANK_TLS_CA_CERT` (preferred) or `SOLARTANK_TLS_CERT_FINGERPRINT` must be
+  set in the deployment, otherwise the firmware logs a warning on every boot and
+  sends telemetry over an unvalidated session;
+- devices need a synchronized clock for signing, so NTP must be reachable from
+  the site network; when it is not, the request is sent unsigned and the serial
+  console says so;
+- switching `INGEST_SIGNATURE_MODE` to `required` is a field-coordination task:
+  every device must be reflashed first, and the go-live checklist requires either
+  `required` or a dated migration plan;
+- a fingerprint pin means renewing the server certificate requires a firmware
+  update, which is why a CA pin is the preferred option.

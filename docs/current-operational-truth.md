@@ -101,15 +101,22 @@ missing is the operational step, not the code.
   need tuning against live pilot data.
 - Per-location access restriction *(software ready)* — scopes and the
   enforcement switch exist; they must be assigned and enabled deliberately.
-- Telegram device approve/reject. Telegram is currently for binding and notifications, not primary approval.
-- RTU/Modbus/OPNIMUS integration. This is a later phase after the initial rollout stabilizes.
-- Final firmware TLS validation. The current ESP8266 template still needs a security decision before production.
-- One-click firmware compile/upload for field users.
+- Final firmware TLS validation — **decided and implemented**: generated
+  firmware validates TLS against a pinned CA or certificate fingerprint and
+  signs every request with HMAC-SHA256 (`SOLARTANK_TLS_CA_CERT`,
+  `SOLARTANK_TLS_CERT_FINGERPRINT`, `SOLARTANK_ENABLE_REQUEST_SIGNING`); see
+  `docs/decision-log.md`. What remains is operational: flash the field devices
+  and then switch `INGEST_SIGNATURE_MODE` to `required`.
+- One-click firmware compile/upload for field users — the package, upload
+  steps, and generated configuration exist; compiling still happens in the
+  Arduino IDE.
 - More detailed operational roles beyond `admin` and `user` — per-location
   scope roles (`viewer`/`operator`) exist; any further role separation is still
   open.
-- CRUD UI for hardware profiles and firmware templates.
-- Documented real tank/device calibration.
+- Explicitly out of scope for the current rollout: Telegram device
+  approve/reject and RTU/Modbus/OPNIMUS integration stay future work.
+- Documented real tank/device calibration — sensor accuracy must still be
+  validated per tank in the field.
 
 ## Current New Device Flow
 
