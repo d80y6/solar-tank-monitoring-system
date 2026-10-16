@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import type { RowDataPacket } from "mysql2/promise";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 
 import { hmacSha256Hex } from "@/features/auth/lib/auth-crypto";
 import { reportError } from "@/lib/error-tracker";
@@ -195,4 +195,101 @@ export async function listRecentMonitoringIngestEvents({
     requestId: row.request_id,
     responseStatus: row.response_status,
   }));
+}
+
+const inMemoryNonces = new Map<string, number>();
+const MAX_IN_MEMORY_NONCES = 5_000;
+
+/**
+ * Records a telemetry nonce so the same signed payload cannot be accepted
+ * twice.
+ *
+ * Returns `true` when the nonce is new (accept) and `false` when it was
+ * already used (replay). The durable store is MySQL; memory storage keeps an
+ * in-process bounded cache so development and preview deployments still get
+ * replay protection.
+ */
+export async function recordIngestNonce({
+  deviceId,
+  nonce,
+  requestTimestamp,
+  now = new Date(),
+  retentionMinutes = 60,
+}: {
+  deviceId: string;
+  nonce: string;
+  requestTimestamp: Date;
+  now?: Date;
+  retentionMinutes?: number;
+}): Promise<boolean> {
+  const nonceHash = `hmac-sha256:${hmacSha256Hex(`${deviceId}:${nonce}`)}`;
+
+  if (getMonitoringStorageDriver() !== "mysql") {
+    const existing = inMemoryNonces.get(nonceHash);
+
+    if (
+      existing !== undefined &&
+      now.getTime() - existing < retentionMinutes * 60_000
+    ) {
+      return false;
+    }
+
+    if (inMemoryNonces.size >= MAX_IN_MEMORY_NONCES) {
+      for (const [key, seenAt] of inMemoryNonces) {
+        if (now.getTime() - seenAt > retentionMinutes * 60_000) {
+          inMemoryNonces.delete(key);
+        }
+      }
+    }
+
+    inMemoryNonces.set(nonceHash, now.getTime());
+
+    return true;
+  }
+
+  try {
+    const pool = getMysqlPool();
+    const [result] = await pool.execute<ResultSetHeader>(
+      `INSERT IGNORE INTO monitoring_ingest_nonces
+         (device_id, nonce_hash, request_timestamp, created_at)
+       VALUES (?, ?, ?, ?)`,
+      [deviceId, nonceHash, requestTimestamp, now],
+    );
+
+    return result.affectedRows > 0;
+  } catch (error) {
+    // If the nonce store is unavailable, prefer availability of telemetry
+    // over blocking the device, but record the degradation loudly.
+    reportError({
+      scope: "ingest.nonce-store-failed",
+      error,
+      level: "warn",
+      fields: { deviceId },
+    });
+
+    return true;
+  }
+}
+
+export async function deleteIngestNoncesOlderThanInMysql({
+  olderThanMinutes,
+  now = new Date(),
+  limit = 20_000,
+}: {
+  olderThanMinutes: number;
+  now?: Date;
+  limit?: number;
+}): Promise<number> {
+  const pool = getMysqlPool();
+  const safeLimit = Math.min(Math.max(Math.trunc(limit), 100), 100_000);
+  const safeMinutes = Math.max(Math.trunc(olderThanMinutes), 1);
+
+  const [result] = await pool.execute<ResultSetHeader>(
+    `DELETE FROM monitoring_ingest_nonces
+      WHERE created_at < DATE_SUB(?, INTERVAL ? MINUTE)
+      LIMIT ${safeLimit}`,
+    [now, safeMinutes],
+  );
+
+  return result.affectedRows;
 }

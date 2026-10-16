@@ -34,6 +34,43 @@ MYSQL_BACKUP_OUTPUT_DIR="C:\Users\SolarTank\Google Drive\SolarTank Backups\mysql
 
 Make sure that folder is not inside the repository so `.sql` files are not detected by git.
 
+## Encryption
+
+Since migration/script version 11 era of this repository, backups are
+encrypted with AES-256-GCM when `MYSQL_BACKUP_ENCRYPTION_KEY` is set:
+
+```env
+MYSQL_BACKUP_ENCRYPTION_KEY="<32-byte base64url key>"
+MYSQL_BACKUP_COMPRESS="true"
+```
+
+Generate the key once and store it in the operations password manager. Losing
+the key makes every encrypted backup unrecoverable, and the key is never
+stored in the repository or the database.
+
+Artifacts per backup:
+
+```text
+solar_tank_mysql_YYYYMMDDTHHMMSSZ.sql.gz.enc        encrypted dump
+solar_tank_mysql_YYYYMMDDTHHMMSSZ.sql.gz.enc.json   manifest with checksum
+```
+
+Verify a backup (checksum, decryption, payload parse):
+
+```powershell
+pnpm db:verify:backup
+pnpm db:verify:backup backups/mysql/solar_tank_mysql_YYYYMMDDTHHMMSSZ.sql.gz.enc
+```
+
+Restore a backup into an explicit target (never defaults to the operational
+database):
+
+```powershell
+pnpm db:restore:mysql --file <backup> --confirm <database>
+```
+
+Full procedure, drill log, and recovery order: `docs/disaster-recovery-runbook.md`.
+
 ## Creating a Manual Backup
 
 Make sure the MySQL client is available and the `mysqldump` command can be called from the terminal.

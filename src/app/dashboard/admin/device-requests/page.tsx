@@ -132,6 +132,7 @@ export default async function AdminDeviceRequestsPage({
           { current: true, label: "Review requests" },
           { href: "/dashboard/admin/users", label: "User Management" },
           { href: "/dashboard/admin/alerts", label: "Alert Centre" },
+          { href: "/dashboard/admin/devices", label: "Device Registry" },
         ]}
         user={admin}
       />

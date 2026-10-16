@@ -8,10 +8,14 @@ const SHA256_HEX_LENGTH = 64;
 const DISABLED_ENV_VALUES = new Set(["0", "false", "no", "off"]);
 
 type VerifyDeviceKeyInput = {
-  device: Pick<Device, "apiKeyHash">;
+  device: Pick<Device, "apiKeyHash"> &
+    Partial<
+      Pick<Device, "previousApiKeyHash" | "previousKeyValidUntil">
+    >;
   suppliedDeviceKey: string;
   fallbackDeviceKey?: string;
   allowGlobalFallback?: boolean;
+  now?: Date;
 };
 
 function cleanDeviceKey(value: string): string {
@@ -91,11 +95,44 @@ export function isGlobalDeviceKeyFallbackAllowed(
   return !DISABLED_ENV_VALUES.has(cleanValue);
 }
 
+/**
+ * Returns true while a previous key is still accepted after a rotation.
+ *
+ * The grace window is what makes rotation operationally possible: the device
+ * in the field keeps working until it is re-flashed with the new package,
+ * and the old key stops being accepted the moment the window closes.
+ */
+export function isPreviousDeviceKeyWithinGrace({
+  device,
+  now = new Date(),
+}: {
+  device: Pick<Device, "previousApiKeyHash"> &
+    Partial<Pick<Device, "previousKeyValidUntil">>;
+  now?: Date;
+}): boolean {
+  if (!device.previousApiKeyHash) {
+    return false;
+  }
+
+  const validUntil = device.previousKeyValidUntil
+    ? Date.parse(device.previousKeyValidUntil)
+    : Number.NaN;
+
+  if (!Number.isFinite(validUntil)) {
+    // No grace window recorded: a stored previous hash without an expiry is
+    // treated as expired rather than as a permanent second key.
+    return false;
+  }
+
+  return now.getTime() < validUntil;
+}
+
 export function verifyDeviceKey({
   device,
   suppliedDeviceKey,
   fallbackDeviceKey,
   allowGlobalFallback = true,
+  now = new Date(),
 }: VerifyDeviceKeyInput): boolean {
   const cleanSuppliedKey = cleanDeviceKey(suppliedDeviceKey);
 
@@ -104,6 +141,13 @@ export function verifyDeviceKey({
   }
 
   if (verifyDeviceKeyHash(cleanSuppliedKey, device.apiKeyHash)) {
+    return true;
+  }
+
+  if (
+    isPreviousDeviceKeyWithinGrace({ device, now }) &&
+    verifyDeviceKeyHash(cleanSuppliedKey, device.previousApiKeyHash)
+  ) {
     return true;
   }
 

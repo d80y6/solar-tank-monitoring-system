@@ -7,7 +7,10 @@ import {
   getLocalDeviceKey,
   ingestTelemetry,
 } from "@/features/monitoring/lib/ingest-telemetry";
-import { recordMonitoringIngestEvent } from "@/features/monitoring/lib/mysql-ingest-event-repository";
+import {
+  recordMonitoringIngestEvent,
+} from "@/features/monitoring/lib/mysql-ingest-event-repository";
+import { touchMonitoringDeviceLastSeenInMysql } from "@/features/monitoring/lib/mysql-device-key-repository";
 import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
 import { getRequestIpAddress, withApiObservability } from "@/lib/api-observability";
 import { reportError } from "@/lib/error-tracker";
@@ -106,7 +109,10 @@ async function checkIngestRateLimit(
 
 async function readJsonBody(
   request: NextRequest,
-): Promise<{ ok: true; payload: unknown } | { ok: false; response: Response }> {
+): Promise<
+  | { ok: true; payload: unknown; rawBody: string }
+  | { ok: false; response: Response }
+> {
   const maxBytes = getMaxIngestBodyBytes();
   const declaredLength = Number(request.headers.get("content-length"));
 
@@ -148,7 +154,7 @@ async function readJsonBody(
   }
 
   try {
-    return { ok: true, payload: JSON.parse(rawBody) };
+    return { ok: true, payload: JSON.parse(rawBody), rawBody };
   } catch {
     return {
       ok: false,
@@ -184,6 +190,8 @@ export const POST = withApiObservability(
 
     try {
       result = await ingestTelemetry({
+        headers: request.headers,
+        rawBody: bodyResult.rawBody,
         deviceIdentifier: request.headers.get("x-device-id"),
         deviceKey:
           request.headers.get("x-api-key") ?? request.headers.get("x-device-key"),
@@ -261,6 +269,17 @@ export const POST = withApiObservability(
         labels: { outcome: "activated", storage: result.data.storage },
       });
     }
+
+    void touchMonitoringDeviceLastSeenInMysql({
+      deviceId: result.data.deviceInternalId,
+      seenAt: new Date(result.data.receivedAt),
+    }).catch((error) => {
+      reportError({
+        scope: "ingest.last-seen-write-failed",
+        error,
+        level: "warn",
+      });
+    });
 
     void recordMonitoringIngestEvent({
       deviceId: result.data.deviceInternalId,

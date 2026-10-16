@@ -120,6 +120,13 @@ export async function runOperationalHousekeeping({
       values: [now, config.retention.rateLimitHours],
     },
     {
+      key: "monitoring_ingest_nonces_old",
+      sql: `DELETE FROM monitoring_ingest_nonces
+             WHERE created_at < DATE_SUB(?, INTERVAL ? MINUTE)
+             LIMIT 20000`,
+      values: [now, config.retention.ingestNonceMinutes],
+    },
+    {
       key: "monitoring_ingest_events_old",
       sql: `DELETE FROM monitoring_ingest_events
              WHERE created_at < DATE_SUB(?, INTERVAL ? DAY)

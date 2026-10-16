@@ -3,6 +3,7 @@ import {
   createDeviceKey,
   hashDeviceKey,
   isGlobalDeviceKeyFallbackAllowed,
+  isPreviousDeviceKeyWithinGrace,
   verifyDeviceKey,
   verifyDeviceKeyHash,
 } from "../lib/device-key";
@@ -59,5 +60,82 @@ describe("device key security", () => {
     expect(isGlobalDeviceKeyFallbackAllowed("true")).toBe(true);
     expect(isGlobalDeviceKeyFallbackAllowed("false")).toBe(false);
     expect(isGlobalDeviceKeyFallbackAllowed("0")).toBe(false);
+  });
+});
+
+describe("device key rotation grace window", () => {
+  const now = new Date("2026-10-16T12:00:00.000Z");
+  const currentKey = createDeviceKey();
+  const previousKey = createDeviceKey();
+
+  const device = {
+    apiKeyHash: hashDeviceKey(currentKey),
+    previousApiKeyHash: hashDeviceKey(previousKey),
+    previousKeyValidUntil: "2026-10-16T18:00:00.000Z",
+  };
+
+  it("accepts the current key at any time", () => {
+    expect(
+      verifyDeviceKey({
+        device,
+        now,
+        suppliedDeviceKey: currentKey,
+      }),
+    ).toBe(true);
+  });
+
+  it("accepts the previous key while the grace window is open", () => {
+    expect(
+      verifyDeviceKey({
+        device,
+        now,
+        suppliedDeviceKey: previousKey,
+      }),
+    ).toBe(true);
+  });
+
+  it("rejects the previous key once the grace window closes", () => {
+    expect(
+      verifyDeviceKey({
+        device,
+        now: new Date("2026-10-16T18:00:01.000Z"),
+        suppliedDeviceKey: previousKey,
+      }),
+    ).toBe(false);
+  });
+
+  it("treats a previous hash without an expiry as expired", () => {
+    expect(
+      verifyDeviceKey({
+        device: {
+          apiKeyHash: hashDeviceKey(currentKey),
+          previousApiKeyHash: hashDeviceKey(previousKey),
+        },
+        now,
+        suppliedDeviceKey: previousKey,
+      }),
+    ).toBe(false);
+  });
+
+  it("exposes the grace-window decision helper", () => {
+    expect(
+      isPreviousDeviceKeyWithinGrace({ device, now }),
+    ).toBe(true);
+    expect(
+      isPreviousDeviceKeyWithinGrace({
+        device,
+        now: new Date("2026-10-17T00:00:00.000Z"),
+      }),
+    ).toBe(false);
+  });
+
+  it("never accepts an unrelated key", () => {
+    expect(
+      verifyDeviceKey({
+        device,
+        now,
+        suppliedDeviceKey: createDeviceKey(),
+      }),
+    ).toBe(false);
   });
 });

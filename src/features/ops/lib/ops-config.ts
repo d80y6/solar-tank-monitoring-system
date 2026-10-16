@@ -15,6 +15,7 @@ const DEFAULTS = {
   retention: {
     auditEventDays: 400,
     ingestEventDays: 120,
+    ingestNonceMinutes: 120,
     jobRunDays: 60,
     alertDays: 400,
     rateLimitHours: 24,
@@ -76,6 +77,7 @@ export type OpsConfig = {
     alertDays: number;
     auditEventDays: number;
     ingestEventDays: number;
+    ingestNonceMinutes: number;
     jobRunDays: number;
     rateLimitHours: number;
     readingDays: number;
@@ -155,6 +157,12 @@ export function getOpsConfig(
         max: 3_650,
         min: 7,
         value: env.OPS_INGEST_EVENT_RETENTION_DAYS,
+      }),
+      ingestNonceMinutes: readNumber({
+        fallback: DEFAULTS.retention.ingestNonceMinutes,
+        max: 10_080,
+        min: 5,
+        value: env.OPS_INGEST_NONCE_RETENTION_MINUTES,
       }),
       jobRunDays: readNumber({
         fallback: DEFAULTS.retention.jobRunDays,

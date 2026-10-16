@@ -43,6 +43,7 @@ export default async function AdminAuditPage() {
           { href: "/dashboard", label: "Tank Management" },
           { href: "/dashboard/admin/users", label: "User Management" },
           { href: "/dashboard/admin/alerts", label: "Alert Centre" },
+          { href: "/dashboard/admin/devices", label: "Device Registry" },
           { current: true, label: "Security Audit" },
         ]}
         user={admin}

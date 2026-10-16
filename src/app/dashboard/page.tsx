@@ -78,6 +78,10 @@ export default async function SimpleDashboardPage() {
                   href: "/dashboard/admin/alerts",
                   label: "Alert Centre",
                 },
+                {
+                  href: "/dashboard/admin/devices",
+                  label: "Device Registry",
+                },
               ]
             : []),
         ]}
