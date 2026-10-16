@@ -1,5 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
+
+import { reportClientError } from "@/lib/client-error-reporter";
+
 type DashboardErrorProps = {
   error: Error & { digest?: string };
   unstable_retry: () => void;
@@ -9,6 +13,14 @@ export default function DashboardError({
   error,
   unstable_retry,
 }: DashboardErrorProps) {
+  useEffect(() => {
+    reportClientError({
+      digest: error.digest,
+      error,
+      source: "dashboard.error-boundary",
+    });
+  }, [error]);
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] px-4 py-8 text-zinc-950 sm:px-6 lg:px-8">
       <section className="mx-auto w-full max-w-3xl rounded-lg border border-red-100 bg-white p-6 shadow-sm">

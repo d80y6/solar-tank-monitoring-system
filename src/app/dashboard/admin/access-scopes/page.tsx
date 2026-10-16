@@ -47,6 +47,7 @@ export default async function AdminAccessScopesPage() {
           { href: "/dashboard/admin/users", label: "User Management" },
           { href: "/dashboard/admin/alerts", label: "Alert Centre" },
           { href: "/dashboard/admin/devices", label: "Device Registry" },
+          { href: "/dashboard/admin/hardware-registry", label: "Hardware Registry" },
           { current: true, label: "Location Access" },
         ]}
         user={admin}

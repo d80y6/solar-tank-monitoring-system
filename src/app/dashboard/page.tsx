@@ -92,6 +92,10 @@ export default async function SimpleDashboardPage() {
                   href: "/dashboard/admin/access-scopes",
                   label: "Location Access",
                 },
+                {
+                  href: "/dashboard/admin/hardware-registry",
+                  label: "Hardware Registry",
+                },
               ]
             : []),
         ]}

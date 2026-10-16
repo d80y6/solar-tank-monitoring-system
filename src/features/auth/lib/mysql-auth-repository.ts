@@ -16,6 +16,10 @@ import type {
 } from "../types";
 import { isAuthRole, isAuthUserStatus } from "../types";
 import {
+  buildAuditQueryFilters,
+  type AuthAuditEventQuery,
+} from "./audit-query";
+import {
   createAuthId,
   hashPassword,
   hashRequestFingerprint,
@@ -1646,13 +1650,75 @@ export async function recordAuthAuditEvent({
   );
 }
 
-export async function listAuthAuditEvents(): Promise<AuthAuditEvent[]> {
+export type AuthAuditEventPage = {
+  events: AuthAuditEvent[];
+  total: number;
+  limit: number;
+  offset: number;
+  eventTypes: string[];
+};
+
+const AUDIT_QUERY_MAX_LIMIT = 200;
+const AUDIT_QUERY_DEFAULT_LIMIT = 50;
+
+export async function listAuthAuditEvents(
+  query: AuthAuditEventQuery = {},
+): Promise<AuthAuditEventPage> {
+  const pool = getMysqlPool();
+  const limit = Math.min(
+    AUDIT_QUERY_MAX_LIMIT,
+    Math.max(1, Math.trunc(query.limit ?? AUDIT_QUERY_DEFAULT_LIMIT)),
+  );
+  const offset = Math.max(0, Math.trunc(query.offset ?? 0));
+  const { clauses, params } = buildAuditQueryFilters(query);
+  const whereSql = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
+  const [rows] = await pool.execute<AuthAuditEventRow[]>(
+    `SELECT id, actor_user_id, event_type, target_user_id, metadata_json, created_at
+       FROM auth_audit_events
+       ${whereSql}
+      ORDER BY created_at DESC
+      LIMIT ${limit} OFFSET ${offset}`,
+    params,
+  );
+  const [countRows] = await pool.execute<Array<RowDataPacket & { total: number }>>(
+    `SELECT COUNT(*) AS total FROM auth_audit_events ${whereSql}`,
+    params,
+  );
+  const [typeRows] = await pool.execute<
+    Array<RowDataPacket & { event_type: string }>
+  >(
+    `SELECT DISTINCT event_type
+       FROM auth_audit_events
+      ORDER BY event_type ASC
+      LIMIT 200`,
+  );
+
+  return {
+    events: rows.map(rowToAuditEvent),
+    eventTypes: typeRows.map((row) => row.event_type),
+    limit,
+    offset,
+    total: Number(countRows[0]?.total ?? 0),
+  };
+}
+
+/**
+ * Rows for the CSV export. The caller applies its own (higher) row cap so an
+ * export cannot accidentally stream an unbounded table.
+ */
+export async function listAuthAuditEventsForExport(
+  query: AuthAuditEventQuery & { maxRows: number },
+): Promise<AuthAuditEvent[]> {
+  const { clauses, params } = buildAuditQueryFilters(query);
+  const whereSql = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
   const pool = getMysqlPool();
   const [rows] = await pool.execute<AuthAuditEventRow[]>(
     `SELECT id, actor_user_id, event_type, target_user_id, metadata_json, created_at
        FROM auth_audit_events
+       ${whereSql}
       ORDER BY created_at DESC
-      LIMIT 100`,
+      LIMIT ${Math.max(1, Math.min(Math.trunc(query.maxRows), 20_000))}`,
+    params,
   );
 
   return rows.map(rowToAuditEvent);

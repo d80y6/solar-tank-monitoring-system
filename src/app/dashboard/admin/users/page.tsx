@@ -783,6 +783,7 @@ export default async function AdminUsersPage({
           { href: "/dashboard/admin/alerts", label: "Alert Centre" },
           { href: "/dashboard/admin/devices", label: "Device Registry" },
           { href: "/dashboard/admin/access-scopes", label: "Location Access" },
+          { href: "/dashboard/admin/hardware-registry", label: "Hardware Registry" },
           { href: "/dashboard/admin/audit", label: "Security audit" },
         ]}
         user={admin}
