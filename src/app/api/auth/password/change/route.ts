@@ -9,6 +9,7 @@ import {
   getSafeErrorMessage,
   getSafeErrorStatus,
 } from "@/lib/safe-error-message";
+import { readJsonBodyOrReject } from "@/lib/request-body";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -46,9 +47,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const { body: passwordBody, response: bodyBlock } =
+      await readJsonBodyOrReject(request);
+
+    if (bodyBlock) {
+      return bodyBlock;
+    }
+
     await changePasswordForSession({
       user: auth.user,
-      payload: parseChangePasswordPayload(await request.json()),
+      payload: parseChangePasswordPayload(passwordBody),
       request,
     });
 

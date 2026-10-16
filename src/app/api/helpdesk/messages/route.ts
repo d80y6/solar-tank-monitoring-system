@@ -10,6 +10,7 @@ import {
 } from "@/features/helpdesk/lib/helpdesk-repository";
 import { notifyAdminsHelpdeskMessageCreated } from "@/features/helpdesk/lib/helpdesk-notifications";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
+import { readJsonBodyOrReject } from "@/lib/request-body";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -90,7 +91,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const payload = await request.json().catch(() => ({}));
+    const { body: payloadValue, response: bodyBlock } =
+      await readJsonBodyOrReject(request);
+
+    if (bodyBlock) {
+      return bodyBlock;
+    }
+
+    const payload = (payloadValue ?? {}) as Record<string, unknown>;
     const user = await getRequestSessionUser(request);
     const result = await addUserHelpdeskMessage({
       body: normalizeHelpdeskMessage(getStringPayloadValue(payload, "message")),

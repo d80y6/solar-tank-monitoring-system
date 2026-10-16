@@ -9,6 +9,7 @@ import {
   getSafeErrorMessage,
   getSafeErrorStatus,
 } from "@/lib/safe-error-message";
+import { readJsonBodyOrReject } from "@/lib/request-body";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -29,7 +30,14 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const payload = parseResendVerificationPayload(await request.json());
+    const { body: payloadRaw, response: payloadBlock } =
+      await readJsonBodyOrReject(request);
+
+    if (payloadBlock) {
+      return payloadBlock;
+    }
+
+    const payload = parseResendVerificationPayload(payloadRaw);
     const ip = getClientIp(request) ?? "unknown-ip";
     const rateLimit = await checkRateLimit({
       key: `resend-email-verification:${ip}:${payload.identity}`,

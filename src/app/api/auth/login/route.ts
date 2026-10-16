@@ -8,6 +8,7 @@ import {
   getSafeErrorMessage,
   getSafeErrorStatus,
 } from "@/lib/safe-error-message";
+import { readJsonBodyOrReject } from "@/lib/request-body";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -23,7 +24,14 @@ function getClientKey(request: NextRequest, identity: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = parseLoginPayload(await request.json());
+    const { body: payloadRaw, response: payloadBlock } =
+      await readJsonBodyOrReject(request);
+
+    if (payloadBlock) {
+      return payloadBlock;
+    }
+
+    const payload = parseLoginPayload(payloadRaw);
     const rateLimit = await checkRateLimit({
       key: getClientKey(request, payload.identity),
       limit: 8,

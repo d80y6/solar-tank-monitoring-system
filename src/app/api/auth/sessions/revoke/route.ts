@@ -7,6 +7,7 @@ import {
   getSafeErrorMessage,
   getSafeErrorStatus,
 } from "@/lib/safe-error-message";
+import { readJsonBodyOrReject } from "@/lib/request-body";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -25,7 +26,14 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const { body: bodyValue, response: bodyBlock } =
+      await readJsonBodyOrReject(request);
+
+    if (bodyBlock) {
+      return bodyBlock;
+    }
+
+    const body = (bodyValue ?? {}) as Record<string, unknown>;
     const sessionId = String(body.sessionId ?? "").trim();
 
     if (!sessionId) {
