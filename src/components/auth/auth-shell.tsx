@@ -17,8 +17,8 @@ type AuthShellProps = {
 };
 
 const DEFAULT_CONTEXT_NOTE = {
-  title: "Akses operasional",
-  description: "Data operasional tersedia bagi akun yang telah diberi izin.",
+  title: "Operational access",
+  description: "Operational data is available to authorized accounts.",
 };
 
 function MonitoringVisual({
@@ -34,7 +34,7 @@ function MonitoringVisual({
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
-                Tangki utama
+                Main tank
               </p>
               <p className="mt-2 text-lg font-semibold">STO TPH</p>
             </div>
@@ -57,7 +57,7 @@ function MonitoringVisual({
               />
               <div className="relative mx-auto flex h-36 max-w-[15rem] items-center justify-center">
                 <svg
-                  aria-label="Ilustrasi tangki bahan bakar terisi 78 persen"
+                  aria-label="Illustration of a fuel tank filled to 78 percent"
                   className="h-full w-full"
                   role="img"
                   viewBox="0 0 280 150"
@@ -121,9 +121,9 @@ function MonitoringVisual({
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-1">
               {[
-                ["Volume", "3.900 L", "text-blue-600"],
-                ["Runtime", "18 jam", "text-zinc-950"],
-                ["Update", "10 dtk", "text-zinc-950"],
+                ["Volume", "3,900 L", "text-blue-600"],
+                ["Runtime", "18 hrs", "text-zinc-950"],
+                ["Updated", "10 sec", "text-zinc-950"],
               ].map(([label, value, tone]) => (
                 <div
                   className="rounded-lg border border-zinc-200 bg-white p-3.5"
@@ -142,7 +142,7 @@ function MonitoringVisual({
 
           <div className="mt-5 flex items-center gap-2 rounded-lg bg-zinc-950 px-4 py-3 text-xs font-medium text-white">
             <span className="size-2 rounded-full bg-cyan-400" />
-            Perangkat
+            Device
             <span className="mx-1 text-zinc-500">→</span>
             <span className="size-2 rounded-full bg-red-500" />
             API
@@ -154,7 +154,7 @@ function MonitoringVisual({
 
         {/* Supporting floating cards */}
         <div className="absolute -bottom-4 -left-6 hidden w-40 rotate-[-4deg] rounded-lg border border-zinc-200 bg-white p-4 shadow-xl shadow-zinc-200/80 sm:block">
-          <p className="text-xs font-semibold text-zinc-500">Status data</p>
+          <p className="text-xs font-semibold text-zinc-500">Data status</p>
           <div className="mt-3 flex items-end gap-2">
             {[42, 58, 50, 76, 68, 86].map((height, index) => (
               <span
@@ -211,7 +211,7 @@ export default function AuthShell({
         <div className="flex min-w-0 flex-col px-5 py-6 sm:px-10 sm:py-8 lg:px-14 xl:px-20">
           <header className="flex items-center justify-between gap-4">
             <Link
-              aria-label="Kembali ke beranda FTM"
+              aria-label="Back to the FTM home page"
               className="flex items-center gap-3"
               href="/"
             >
@@ -227,7 +227,7 @@ export default function AuthShell({
               href="/"
             >
               <ArrowLeft aria-hidden="true" className="size-4" />
-              <span className="hidden sm:inline">Beranda</span>
+              <span className="hidden sm:inline">Home</span>
             </Link>
           </header>
 
@@ -272,14 +272,14 @@ export default function AuthShell({
 
           <div className="relative z-10 max-w-xl">
             <h2 className="text-[clamp(2rem,3vw,3rem)] font-medium leading-[1.08] tracking-normal">
-              Manajemen tangki,
+              Tank management,
               <span className="block text-red-600">
-                lebih jelas dalam satu layar.
+                clearer in a single screen.
               </span>
             </h2>
             <p className="mt-5 max-w-lg text-sm leading-7 text-zinc-600 sm:text-base">
-              Pantau volume bahan bakar, estimasi runtime genset, dan kesehatan data
-              perangkat untuk membantu tindak lanjut operasional.
+              Monitor fuel volume, estimate generator runtime, and track
+              device data health to support operational follow-up.
             </p>
           </div>
 

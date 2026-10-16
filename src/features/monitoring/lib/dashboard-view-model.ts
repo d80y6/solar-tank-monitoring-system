@@ -123,27 +123,27 @@ function formatAgeLabel(receivedAt: string, now: Date): string {
   const receivedTime = new Date(receivedAt).getTime();
 
   if (!Number.isFinite(receivedTime)) {
-    return "waktu tidak valid";
+    return "invalid time";
   }
 
   const ageSec = Math.max(0, Math.floor((now.getTime() - receivedTime) / 1000));
 
   if (ageSec < 60) {
-    return `${ageSec} dtk lalu`;
+    return `${ageSec} sec ago`;
   }
 
   const ageMin = Math.floor(ageSec / 60);
 
   if (ageMin < 60) {
-    return `${ageMin} mnt lalu`;
+    return `${ageMin} min ago`;
   }
 
   const ageHour = Math.floor(ageMin / 60);
   const restMin = ageMin % 60;
 
   return restMin > 0
-    ? `${ageHour} jam ${restMin} mnt lalu`
-    : `${ageHour} jam lalu`;
+    ? `${ageHour} hrs ${restMin} min ago`
+    : `${ageHour} hrs ago`;
 }
 
 function getReceivedTime(receivedAt: string): number {
@@ -153,10 +153,10 @@ function getReceivedTime(receivedAt: string): number {
 
 function formatIntervalLabel(seconds: number): string {
   if (seconds < 60) {
-    return `${Math.round(seconds)} dtk`;
+    return `${Math.round(seconds)} sec`;
   }
 
-  return `${Math.round(seconds / 60)} mnt`;
+  return `${Math.round(seconds / 60)} min`;
 }
 
 function toDashboardStatus(
@@ -189,26 +189,26 @@ function buildStatusNote(row: {
   configReasons: string[];
 }): string {
   if (!row.hasReading) {
-    return "Belum ada pembacaan dari perangkat. Lokasi perlu dicek setelah perangkat aktif.";
+    return "No reading from the device yet. Check the location once the device is active.";
   }
 
   if (row.configNeedsReview) {
-    return `${row.configSummary}. ${row.configReasons[0] ?? "Perlu cek teknisi/admin sebelum config dianggap resmi."}`;
+    return `${row.configSummary}. ${row.configReasons[0] ?? "Technician/admin check needed before the config is considered official."}`;
   }
 
   if (row.status === "offline") {
-    return "Perangkat belum mengirim data dalam rentang yang diharapkan.";
+    return "The device has not sent data within the expected window.";
   }
 
   if (row.status === "critical") {
-    return `Level atau runtime masuk prioritas kritis. Runtime estimasi ${row.runtimeHour} jam.`;
+    return `Level or runtime is a critical priority. Estimated runtime ${row.runtimeHour} hrs.`;
   }
 
   if (row.status === "warning") {
-    return `Perlu pantauan berkala. Isi ${row.fillPercent}% dan status perangkat ${row.deviceStatus}.`;
+    return `Needs periodic monitoring. Level ${row.fillPercent}% and device status ${row.deviceStatus}.`;
   }
 
-  return "Data terbaru stabil dan runtime masih berada di zona aman.";
+  return "Latest data is stable and runtime is still in the safe zone.";
 }
 
 function getPriorityRank(status: DashboardSiteStatus): number {
@@ -316,7 +316,7 @@ export function buildDashboardOverview({
       lastReceivedAt: reading?.receivedAt ?? "",
       updateLabel: reading
         ? formatAgeLabel(reading.receivedAt, now)
-        : "belum ada data",
+        : "No data yet",
       deviceId: device.code,
       signal:
         typeof reading?.rssiDbm === "number" ? `${reading.rssiDbm} dBm` : "-",
@@ -387,8 +387,8 @@ export function buildDashboardOverview({
     averageIntervalLabel: formatIntervalLabel(averageIntervalSec),
     syncLabel:
       latestRow.lastReceivedAt === ""
-        ? "Belum ada data"
-        : `Sinkron ${latestRow.updateLabel}`,
+        ? "No data yet"
+        : `Synced ${latestRow.updateLabel}`,
   };
 
   return {
@@ -404,12 +404,12 @@ export function buildDashboardOverview({
         tone: "text-emerald-700 bg-emerald-50",
       },
       {
-        label: "Terlambat",
+        label: "Delayed",
         value: String(delayedDevices),
         tone: "text-amber-700 bg-amber-50",
       },
       {
-        label: "Kritis",
+        label: "Critical",
         value: String(criticalTanks),
         tone: "text-red-700 bg-red-50",
       },
@@ -426,12 +426,12 @@ export function buildDashboardOverview({
         tone: "bg-emerald-500",
       },
       {
-        label: "Terlambat",
+        label: "Delayed",
         width: getPercentWidth(delayedDevices, totalRows),
         tone: "bg-amber-500",
       },
       {
-        label: "Kritis",
+        label: "Critical",
         width: getPercentWidth(criticalTanks, totalRows),
         tone: "bg-red-500",
       },

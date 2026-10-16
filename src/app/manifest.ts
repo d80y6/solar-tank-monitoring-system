@@ -4,8 +4,8 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "FTM - Fuel Tank Management",
     short_name: "FTM",
-    description: "Aplikasi manajemen telemetri tangki bahan bakar berbasis IoT.",
-    lang: "id",
+    description: "IoT-based fuel tank telemetry management app.",
+    lang: "en",
     dir: "ltr",
     start_url: "/",
     scope: "/",

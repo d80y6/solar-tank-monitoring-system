@@ -85,13 +85,13 @@ const statusMeta: Record<
     chip: "bg-emerald-50 text-emerald-700 ring-emerald-100",
   },
   warning: {
-    label: "Waspada",
+    label: "Warning",
     dot: "bg-amber-500",
     pin: "text-amber-500",
     chip: "bg-amber-50 text-amber-700 ring-amber-100",
   },
   critical: {
-    label: "Kritis",
+    label: "Critical",
     dot: "bg-red-600",
     pin: "text-red-600",
     chip: "bg-red-50 text-red-700 ring-red-100",
@@ -357,7 +357,7 @@ export function OperationalMap({
         onPointerUp={handlePointerEnd}
         onPointerCancel={handlePointerEnd}
         role="application"
-        aria-label="Peta koordinat STO"
+        aria-label="STO coordinate map"
       >
         {hasCoordinates ? (
           <div
@@ -413,7 +413,7 @@ export function OperationalMap({
                     left: position.left,
                     top: position.top,
                   }}
-                  aria-label={`Pilih ${site.name}, status ${meta.label}`}
+                  aria-label={`Select ${site.name}, status ${meta.label}`}
                 >
                   <MapPin
                     className={`size-8 drop-shadow-[0_8px_12px_rgba(0,0,0,0.28)] transition duration-200 group-hover:-translate-y-1 group-hover:scale-110 group-focus:-translate-y-1 group-focus:scale-110 ${meta.pin} ${
@@ -448,7 +448,7 @@ export function OperationalMap({
                     </div>
                     <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
                       <div className="rounded-md bg-zinc-50 p-2">
-                        <p className="text-zinc-400">Isi</p>
+                        <p className="text-zinc-400">Level</p>
                         <p className="mt-1 font-semibold text-zinc-950">
                           {site.fillPercent}%
                         </p>
@@ -456,7 +456,7 @@ export function OperationalMap({
                       <div className="rounded-md bg-zinc-50 p-2">
                         <p className="text-zinc-400">Runtime</p>
                         <p className="mt-1 font-semibold text-zinc-950">
-                          {site.runtimeHour} jam
+                          {site.runtimeHour} hrs
                         </p>
                       </div>
                       <div className="rounded-md bg-zinc-50 p-2">
@@ -482,11 +482,11 @@ export function OperationalMap({
                 aria-hidden="true"
               />
               <h3 className="mt-4 text-lg font-semibold text-zinc-950">
-                Koordinat belum tersedia
+                Coordinates unavailable
               </h3>
               <p className="mt-2 text-sm leading-6 text-zinc-500">
-                Isi latitude dan longitude di registry MySQL agar titik STO
-                tampil di peta.
+                Fill in latitude and longitude in the MySQL registry so the STO
+                pin appears on the map.
               </p>
             </div>
           </div>
@@ -507,19 +507,19 @@ export function OperationalMap({
                   type="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Cari STO atau perangkat"
+                  placeholder="Search STO or device"
                   className="h-10 w-full rounded-lg border border-transparent bg-zinc-50 pl-10 pr-3 text-sm outline-none transition placeholder:text-zinc-400 focus:border-red-200 focus:bg-white focus:ring-4 focus:ring-red-50"
                 />
               </div>
 
               <div
                 className="flex flex-wrap gap-1 rounded-lg bg-zinc-100 p-1"
-                aria-label="Filter status peta"
+                aria-label="Map status filter"
               >
                 {statusFilters.map((status) => {
                   const active = statusFilter === status;
                   const label =
-                    status === "all" ? "Semua" : statusMeta[status].label;
+                    status === "all" ? "All" : statusMeta[status].label;
 
                   return (
                     <button
@@ -550,7 +550,7 @@ export function OperationalMap({
             onClick={() => changeZoom(zoom + 1)}
             disabled={zoom >= MAX_ZOOM}
             className="grid size-10 place-items-center rounded-lg border border-zinc-200 bg-white/95 text-zinc-800 shadow-sm backdrop-blur transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-45"
-            aria-label="Perbesar peta"
+            aria-label="Zoom in"
           >
             <Plus className="size-4" aria-hidden="true" />
           </button>
@@ -559,7 +559,7 @@ export function OperationalMap({
             onClick={() => changeZoom(zoom - 1)}
             disabled={zoom <= MIN_ZOOM}
             className="grid size-10 place-items-center rounded-lg border border-zinc-200 bg-white/95 text-zinc-800 shadow-sm backdrop-blur transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-45"
-            aria-label="Perkecil peta"
+            aria-label="Zoom out"
           >
             <Minus className="size-4" aria-hidden="true" />
           </button>
@@ -567,15 +567,15 @@ export function OperationalMap({
             type="button"
             onClick={resetMap}
             className="grid size-10 place-items-center rounded-lg border border-zinc-200 bg-white/95 text-zinc-800 shadow-sm backdrop-blur transition hover:bg-white"
-            aria-label="Pusatkan ulang peta"
+            aria-label="Recenter map"
           >
             <Crosshair className="size-4" aria-hidden="true" />
           </button>
         </div>
 
         <div className="absolute bottom-14 left-3 z-30 max-w-[calc(100%-1.5rem)] rounded-full border border-zinc-200 bg-white/95 px-3 py-2 text-xs font-semibold text-zinc-700 shadow-sm backdrop-blur md:bottom-4 md:left-4">
-          {filteredSites.length} dari {sites.length} STO terlihat
-          {priorityCount > 0 ? `, ${priorityCount} perlu perhatian` : ""}
+          Showing {filteredSites.length} of {sites.length} STOs
+          {priorityCount > 0 ? `, ${priorityCount} need attention` : ""}
         </div>
 
         <div className="absolute bottom-3 right-3 z-30 rounded-full border border-zinc-200 bg-white/95 px-3 py-2 text-[0.68rem] font-medium text-zinc-500 shadow-sm backdrop-blur md:bottom-4 md:right-4">

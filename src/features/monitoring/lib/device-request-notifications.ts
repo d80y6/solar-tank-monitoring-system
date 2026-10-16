@@ -20,19 +20,19 @@ export async function notifyAdminsDeviceRequestCreated(
 ): Promise<AdminTelegramNotifyResult> {
   const adminUrl = buildAdminRequestUrl(request.id);
   const text = [
-    "Pengajuan perangkat baru FTM",
+    "New FTM device request",
     "",
-    `Kode pengajuan: ${request.requestCode}`,
+    `Request code: ${request.requestCode}`,
     `STO: ${request.siteName}`,
     `Regional: ${request.regionalLabel}`,
-    `Wilayah: ${request.wilayahLabel}`,
+    `Territory: ${request.wilayahLabel}`,
     `Area: ${request.areaLabel}`,
     `Device: ${request.deviceCode}`,
-    `Tangki: ${request.capacityLiter} L`,
-    `Koordinat: ${formatOptionalCoordinate(request.latitude)}, ${formatOptionalCoordinate(request.longitude)}`,
-    `Pengaju: ${request.requesterEmail}`,
+    `Tank: ${request.capacityLiter} L`,
+    `Coordinates: ${formatOptionalCoordinate(request.latitude)}, ${formatOptionalCoordinate(request.longitude)}`,
+    `Requester: ${request.requesterEmail}`,
     "",
-    "Admin perlu meninjau data lewat halaman web sebelum paket firmware dibuat.",
+    "Admin needs to review the data via the web page before the firmware package is created.",
     adminUrl,
   ].join("\n");
 

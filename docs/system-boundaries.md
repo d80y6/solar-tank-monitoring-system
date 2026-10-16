@@ -1,131 +1,131 @@
-# Batas Sistem
+# System Boundaries
 
-Dokumen ini menjelaskan hal yang masuk dan tidak masuk ke repositori.
+This document explains what is in and out of scope for the repository.
 
-## Masuk Scope Saat Ini
+## In Current Scope
 
-Yang masuk:
+Included:
 
 - landing page;
-- dashboard operasional, peta, filter lokasi, dan detail tangki;
-- data contoh public-safe khusus development;
-- API baca dan API ingest;
-- normalisasi payload;
-- simulator terminal;
-- memory store development;
-- snapshot live dan rollup 5 menit MySQL;
-- registry MySQL untuk site, tangki, device, dan hash key;
-- template registry pilot yang public-safe;
-- script validasi/apply registry pilot lokal;
-- script smoke test payload real-format;
-- validasi key per device untuk data contoh development;
-- auth database untuk login, session, OTP admin, reset password, email verification, Telegram binding, audit auth, dan rate limit;
-- pengajuan perangkat baru dari user;
-- review pengajuan perangkat dari admin lewat web;
-- pembuatan device key dan paket firmware ZIP setelah approval;
+- operational dashboard, map, location filters, and tank details;
+- public-safe sample data for development only;
+- read APIs and the ingest API;
+- payload normalization;
+- terminal simulator;
+- development memory store;
+- MySQL live snapshot and 5-minute rollups;
+- MySQL registry for sites, tanks, devices, and key hashes;
+- public-safe pilot registry template;
+- local pilot registry validation/apply scripts;
+- real-format payload smoke test script;
+- per-device key validation for development sample data;
+- auth database for sign-in, sessions, admin OTP, password reset, email verification, Telegram binding, auth audit, and rate limiting;
+- new device requests from users;
+- admin review of device requests through the web;
+- device key and firmware ZIP package generation after approval;
 - first valid ping activation;
-- cleanup data monitoring/device/uji oleh admin tanpa menghapus akun;
-- export CSV, reset reading, backup MySQL, Telegram, dan helpdesk;
-- unit test;
-- dokumentasi Bahasa Indonesia.
+- monitoring/device/test data cleanup by admins without deleting accounts;
+- CSV export, reading reset, MySQL backup, Telegram, and helpdesk;
+- unit tests;
+- English documentation.
 
-## Belum Masuk Scope Saat Ini
+## Not Yet in Current Scope
 
-Yang belum masuk:
+Not yet included:
 
-- hardening production penuh, termasuk restore drill dan SOP recovery;
-- role operasional yang lebih rinci di luar `admin` dan `user`;
-- firmware final yang sudah hardening TLS dan one-click compile;
-- data real di Git;
-- alert operasional level kritis/offline;
-- approval/reject device lewat Telegram;
-- integrasi hardware yang sudah dikalibrasi final;
-- integrasi RTU/Modbus/OPNIMUS;
-- detail deployment production final;
+- full production hardening, including restore drills and recovery SOPs;
+- more detailed operational roles beyond `admin` and `user`;
+- final firmware with TLS hardening and one-click compile;
+- real data in Git;
+- critical-level/offline operational alerts;
+- device approve/reject through Telegram;
+- final-calibrated hardware integration;
+- RTU/Modbus/OPNIMUS integration;
+- final production deployment details;
 - mobile app.
 
-## Tidak Boleh Masuk Repo Publik
+## Never Allowed in the Public Repo
 
-Yang tidak boleh masuk:
+Must never be committed:
 
-- catatan kerja privat dan konteks yang belum dipublikasikan;
-- credential;
-- API key asli;
-- password;
-- IP internal;
-- domain internal yang tidak ditujukan untuk akses publik;
-- konfigurasi jaringan privat;
-- payload real yang sensitif;
-- file registry lokal berisi koordinat/hash asli;
-- file backup;
-- informasi sensitif lokasi.
+- private working notes and unpublished context;
+- credentials;
+- real API keys;
+- passwords;
+- internal IPs;
+- internal domains not intended for public access;
+- private network configuration;
+- sensitive real payloads;
+- local registry files containing real coordinates/hashes;
+- backup files;
+- sensitive location information.
 
-## Batas Klaim
+## Claim Limits
 
-Klaim yang aman:
-
-```text
-FTM adalah pilot operasional internal yang aktif dengan perangkat, akun,
-deployment Vercel, dan database MySQL nyata dalam cakupan terbatas.
-```
-
-Klaim yang belum boleh:
+Safe claims:
 
 ```text
-Sistem sudah production-ready.
-Sistem sudah diterapkan secara nasional.
-Seluruh perangkat selalu online.
-Sensor sudah aman untuk tangki nyata.
-Data real sudah final dan tervalidasi lapangan.
-FTM telah mendapat persetujuan formal sebagai sistem produksi Telkom Indonesia.
+FTM is an active internal operational pilot with real devices, accounts,
+a Vercel deployment, and a MySQL database within limited coverage.
 ```
 
-## Batas Brand dan Data Institusi
+Claims that are not allowed yet:
 
-Dokumentasi publik memakai istilah umum seperti:
+```text
+The system is production-ready.
+The system has been deployed nationally.
+All devices are always online.
+Sensors are safe for real tanks.
+Real data is final and field-validated.
+FTM has obtained formal approval as a Telkom Indonesia production system.
+```
 
-- lokasi operasional;
+## Brand and Institutional Data Limits
+
+Public documentation uses general terms such as:
+
+- operational location;
 - site;
 - STO;
-- perangkat;
-- tangki;
-- dashboard monitoring.
+- device;
+- tank;
+- monitoring dashboard.
 
-Jangan menaruh detail institusi, jaringan, atau data internal yang belum disetujui.
+Do not add institutional, network, or internal details that have not been approved.
 
-## Batas Memory Store
+## Memory Store Limits
 
-Memory store hanya untuk development.
+The memory store is for development only.
 
-Artinya:
+That means:
 
-- data hilang saat server restart;
-- tidak cocok untuk audit;
-- tidak cocok untuk multi-server;
-- tidak cocok untuk production.
+- data is lost when the server restarts;
+- not suitable for audit;
+- not suitable for multi-server setups;
+- not suitable for production.
 
-Storage final harus memakai database.
+The final storage must use a database.
 
-## Batas MySQL Saat Ini
+## Current MySQL Limits
 
-MySQL sudah dipakai pada pilot, tetapi keberadaan database aktif belum berarti
-seluruh sistem siap production.
+MySQL is used in the pilot, but the existence of an active database does
+not mean the whole system is production-ready.
 
-Yang sudah masuk:
+Included:
 
-- migration tabel monitoring dan auth;
-- seed demo;
-- snapshot live dan history agregat 5 menit;
-- query dashboard, detail, dan CSV;
-- registry site, tangki, device, dan hash key;
-- script apply registry pilot dari file lokal yang tidak di-commit.
-- tabel auth, session, OTP, audit, dan rate limit;
-- tabel pengajuan perangkat, firmware package, hardware profile, firmware template, event provisioning, dan event ingest.
+- monitoring and auth table migrations;
+- demo seeds;
+- live snapshot and 5-minute history aggregates;
+- dashboard, detail, and CSV queries;
+- site, tank, device, and key hash registry;
+- local pilot registry apply script that is not committed.
+- auth, session, OTP, audit, and rate limit tables;
+- device request, firmware package, hardware profile, firmware template, provisioning event, and ingest event tables.
 
-Yang belum final:
+Not final yet:
 
-- rotasi key device dari UI admin;
-- backup terenkripsi dan restore drill;
-- role operasional lebih rinci;
-- SOP pemisahan data contoh dan data real untuk operasional harian.
-- monitoring server dan alerting.
+- device key rotation from the admin UI;
+- encrypted backups and restore drills;
+- more detailed operational roles;
+- SOP for separating sample data and real data in daily operations.
+- server monitoring and alerting.

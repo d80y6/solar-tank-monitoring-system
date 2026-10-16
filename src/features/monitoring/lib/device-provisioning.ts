@@ -170,7 +170,7 @@ function assertValidCoordinate({
     return {
       ok: false,
       status: 400,
-      error: `${label} wajib dikirim dan harus berada di rentang ${min} sampai ${max}.`,
+      error: `${label} is required and must be between ${min} and ${max}.`,
     };
   }
 
@@ -257,7 +257,7 @@ function buildProvisionedTank({
       ok: false,
       status: 400,
       error:
-        "Provisioning device baru wajib membawa tank_shape rectangular atau horizontal-cylinder.",
+        "New device provisioning requires tank_shape rectangular or horizontal-cylinder.",
     };
   }
 
@@ -266,7 +266,7 @@ function buildProvisionedTank({
       ok: false,
       status: 400,
       error:
-        "Provisioning device baru wajib membawa capacity_liter dan sensor_mount_height_cm valid.",
+        "New device provisioning requires a valid capacity_liter and sensor_mount_height_cm.",
     };
   }
 
@@ -275,7 +275,7 @@ function buildProvisionedTank({
       ok: false,
       status: 400,
       error:
-        "Tangki rectangular wajib membawa length_cm, width_cm, dan height_cm.",
+        "Rectangular tanks require length_cm, width_cm, and height_cm.",
     };
   }
 
@@ -284,7 +284,7 @@ function buildProvisionedTank({
       ok: false,
       status: 400,
       error:
-        "Tangki silinder wajib membawa length_cm dan diameter_cm atau radius_cm.",
+        "Cylinder tanks require length_cm and diameter_cm or radius_cm.",
     };
   }
 
@@ -293,7 +293,7 @@ function buildProvisionedTank({
     siteId,
     name:
       pickString(payload, ["tank_name", "tank.name", "raw.tank_name"]) ??
-      "Tangki utama",
+      "Main tank",
     shape,
     capacityLiter: Math.round(capacityLiter * 100) / 100,
     ...(shape === "horizontal-cylinder" ? { diameterCm } : {}),
@@ -595,7 +595,7 @@ export async function provisionMonitoringDevice({
       ok: false,
       status: 403,
       error:
-        "Device belum terdaftar. Aktifkan auto provisioning sebelum menerima device baru.",
+        "Device is not registered. Enable auto provisioning before accepting new devices.",
     };
   }
 
@@ -608,7 +608,7 @@ export async function provisionMonitoringDevice({
     return {
       ok: false,
       status: 401,
-      error: "Provisioning key tidak valid untuk mendaftarkan device baru.",
+      error: "Provisioning key is invalid for registering a new device.",
     };
   }
 
@@ -629,7 +629,7 @@ export async function provisionMonitoringDevice({
       return {
         ok: false,
         status: 500,
-        error: "Gagal membuat registry site/tangki/device dari payload.",
+        error: "Failed to create site/tank/device registry from payload.",
       };
     }
   }

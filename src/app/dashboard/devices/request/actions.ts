@@ -46,7 +46,7 @@ function getRequiredFormValue(formData: FormData, key: string): string {
   const value = getOptionalFormValue(formData, key);
 
   if (!value) {
-    throw new Error("Form pengajuan perangkat belum lengkap.");
+    throw new Error("Device request form is incomplete.");
   }
 
   return value;
@@ -62,7 +62,7 @@ function parseNumberField(formData: FormData, key: string): number | undefined {
   const parsed = Number(value.replace(",", "."));
 
   if (!Number.isFinite(parsed)) {
-    throw new Error(`Nilai ${key} harus berupa angka.`);
+    throw new Error(`${key} must be a number.`);
   }
 
   return parsed;
@@ -75,7 +75,7 @@ function parseTankShape(formData: FormData): TankShape {
     return value;
   }
 
-  throw new Error("Tipe tangki tidak valid.");
+  throw new Error("Tank type is invalid.");
 }
 
 function parseDeviceSensorType(formData: FormData): DeviceSensorType {
@@ -85,7 +85,7 @@ function parseDeviceSensorType(formData: FormData): DeviceSensorType {
     return value;
   }
 
-  throw new Error("Mode sensor tidak valid.");
+  throw new Error("Sensor mode is invalid.");
 }
 
 function parseLoadUnit(formData: FormData): LoadPowerUnit {
@@ -95,7 +95,7 @@ function parseLoadUnit(formData: FormData): LoadPowerUnit {
     return value;
   }
 
-  throw new Error("Satuan beban tidak valid.");
+  throw new Error("Load unit is invalid.");
 }
 
 function buildDeviceRequestDraft(formData: FormData): DeviceRequestDraft {
@@ -136,7 +136,7 @@ function getResultState(
   return {
     status: "success",
     message:
-      "Pengajuan perangkat tersimpan. Kode perangkat dibuat otomatis dan admin akan memeriksa data sebelum paket firmware dibuat.",
+      "Device request saved. The device code is created automatically and an admin will review the data before the firmware package is created.",
     requestCode: result.request.requestCode,
     issues: result.warnings,
   };
@@ -162,16 +162,16 @@ function getErrorState(error: unknown): DeviceRequestFormState {
     return {
       status: "error",
       message:
-        "Pengajuan belum bisa diproses karena struktur database belum lengkap. Administrator perlu menjalankan migration field operasional perangkat terbaru.",
+        "Request could not be processed because the database schema is incomplete. The administrator needs to run the latest device operational field migrations.",
     };
   }
 
   return {
     status: "error",
     message: getSafeErrorMessage(error, {
-      fallbackMessage: "Pengajuan perangkat belum bisa diproses.",
+      fallbackMessage: "Device request could not be processed yet.",
       internalMessage:
-        "Pengajuan perangkat belum bisa diproses karena layanan database belum siap. Hubungi administrator.",
+        "Device request could not be processed because the database service is not ready. Contact the administrator.",
     }),
   };
 }
@@ -185,7 +185,7 @@ export async function createDeviceRequestAction(
   try {
     if (getMonitoringStorageDriver() !== "mysql") {
       throw new Error(
-        "Pengajuan perangkat memerlukan database MySQL agar bisa ditinjau admin.",
+        "Device requests require a MySQL database for admin review.",
       );
     }
 

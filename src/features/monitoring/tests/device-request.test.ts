@@ -27,7 +27,7 @@ const firmwareTemplate: MonitoringFirmwareTemplate = {
 const rectangularProfile: MonitoringHardwareProfile = {
   id: "hardware-profile-nodemcu-hcsr04-rectangular-v1",
   code: "nodemcu-hcsr04-rectangular-v1",
-  name: "NodeMCU ESP8266 + HC-SR04 untuk tangki balok",
+  name: "NodeMCU ESP8266 + HC-SR04 for rectangular tank",
   boardFamily: "esp8266",
   boardLabel: "NodeMCU 1.0 ESP-12E",
   sensorType: "HC-SR04",
@@ -126,7 +126,7 @@ describe("device request foundation", () => {
     const validation = validateDeviceRequestDraft(
       {
         ...baseDraft,
-        regionalLabel: "Regional tidak dikenal",
+        regionalLabel: "Unknown regional",
         wilayahLabel: "",
       },
       {
@@ -250,15 +250,15 @@ describe("device request foundation", () => {
     expect(result.request.firmwareTemplateId).toBe(firmwareTemplate.id);
   });
 
-  it("keeps simple Indonesian labels for request status", () => {
+  it("keeps concise labels for request status", () => {
     expect(getDeviceRequestStatusLabel("pending_admin_review")).toBe(
-      "Menunggu admin",
+      "Waiting for admin",
     );
     expect(getDeviceRequestStatusLabel("approved_waiting_package")).toBe(
-      "Disetujui, menunggu paket firmware",
+      "Approved, waiting for firmware package",
     );
     expect(getDeviceRequestStatusLabel("waiting_first_valid_ping")).toBe(
-      "Menunggu perangkat online",
+      "Waiting for device online",
     );
   });
 

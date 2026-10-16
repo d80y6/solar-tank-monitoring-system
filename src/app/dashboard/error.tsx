@@ -13,27 +13,27 @@ export default function DashboardError({
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] px-4 py-8 text-zinc-950 sm:px-6 lg:px-8">
       <section className="mx-auto w-full max-w-3xl rounded-lg border border-red-100 bg-white p-6 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
-          Dashboard belum siap
+          Dashboard is not ready
         </p>
         <h1 className="mt-3 break-words text-2xl font-semibold tracking-normal sm:text-3xl">
-          Data operasional belum bisa dibaca
+          Operational data could not be read yet
         </h1>
         <p className="mt-3 break-words text-sm leading-6 text-zinc-600">
-          Aplikasi hidup, tetapi dashboard gagal mengambil data dari storage
-          aktif. Cek endpoint /api/ready, konfigurasi MYSQL_DATABASE_URL, status
-          database, dan koneksi jaringan. Jika baru mengubah .env.local,
-          hentikan lalu jalankan ulang pnpm dev karena env dibaca saat proses
-          server dimulai.
+          The app is running, but the dashboard failed to fetch data from the active
+          storage. Check the /api/ready endpoint, the MYSQL_DATABASE_URL
+          configuration, the database status, and the network connection. If you
+          just changed .env.local, stop and restart pnpm dev because env is read
+          when the server process starts.
         </p>
         <p className="mt-3 break-words text-sm leading-6 text-zinc-600">
-          Tombol coba lagi hanya mencoba render ulang setelah database, network,
-          atau konfigurasi server sudah benar. Tombol ini tidak bisa menyalakan
-          database dan tidak bisa memuat ulang perubahan .env.local.
+          The retry button only re-renders after the database, network, or server
+          configuration is correct. It cannot power on the database and cannot
+          reload .env.local changes.
         </p>
 
         {error.digest ? (
           <p className="mt-4 rounded-lg bg-zinc-50 px-4 py-3 text-xs font-medium text-zinc-500">
-            Referensi error: {error.digest}
+            Error reference: {error.digest}
           </p>
         ) : null}
 
@@ -43,7 +43,7 @@ export default function DashboardError({
             onClick={() => unstable_retry()}
             className="rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
           >
-            Coba lagi
+            Try again
           </button>
           <a
             href="/api/ready"
@@ -51,7 +51,7 @@ export default function DashboardError({
             rel="noreferrer"
             className="rounded-lg border border-zinc-200 px-5 py-3 text-center text-sm font-semibold text-zinc-800 transition hover:border-zinc-300 hover:bg-zinc-50"
           >
-            Cek /api/ready
+            Check /api/ready
           </a>
         </div>
       </section>

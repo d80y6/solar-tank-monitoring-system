@@ -33,7 +33,7 @@ const HARDWARE_PROFILE: MonitoringHardwareProfile = {
   firmwareTemplateId: FIRMWARE_TEMPLATE.id,
   id: "hardware-profile-nodemcu-hcsr04-rectangular-v1",
   isActive: true,
-  name: "NodeMCU ESP8266 + HC-SR04 untuk tangki balok",
+  name: "NodeMCU ESP8266 + HC-SR04 for rectangular tank",
   reportIntervalMs: 20000,
   sensorType: "HC-SR04",
   supportedTankShape: "rectangular",
@@ -51,7 +51,7 @@ const DEVICE_REQUEST: MonitoringDeviceRequest = {
   createdAt: "2026-07-05T00:00:00.000Z",
   criticalLevelPercent: 15,
   deviceCode: "device-tph-main",
-  deviceLabel: "NodeMCU utama STO TPH",
+  deviceLabel: "NodeMCU main STO TPH",
   deviceSensorType: "fuel",
   dieselEngineCapacityKva: 40,
   firmwareTemplateId: FIRMWARE_TEMPLATE.id,
@@ -138,7 +138,7 @@ describe("firmware package helpers", () => {
       "solar_tank_firmware.ino",
       "device_config.h",
       "hardware_profile.h",
-      "README_LANGKAH_UPLOAD.md",
+      "README_UPLOAD_STEPS.md",
       "manifest.json",
     ]);
     expect(bundle.files.every((file) => file.content.length > 0)).toBe(true);
@@ -164,7 +164,7 @@ describe("firmware package helpers", () => {
     ).toContain("POST OK");
     expect(
       bundle.files
-        .find((file) => file.path === "README_LANGKAH_UPLOAD.md")
+        .find((file) => file.path === "README_UPLOAD_STEPS.md")
         ?.content.toString("utf8"),
     ).toContain("SOLARTANK_WIFI_SSID");
   });

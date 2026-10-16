@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { ok: false, error: "Terlalu banyak permintaan helpdesk." },
+        { ok: false, error: "Too many helpdesk requests." },
         {
           status: 429,
           headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
@@ -58,9 +58,9 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         error: getSafeErrorMessage(error, {
-          fallbackMessage: "Sesi helpdesk belum bisa dibuka.",
+          fallbackMessage: "Helpdesk session could not be opened yet.",
           internalMessage:
-            "Sesi helpdesk belum bisa dibuka karena layanan database belum siap.",
+            "Helpdesk session could not be opened because the database service is not ready.",
         }),
       },
       { status: 500 },

@@ -1,190 +1,185 @@
 # Decision Log
 
-Dokumen ini mencatat keputusan teknis penting agar alasan perubahan tetap bisa dilacak.
+This document records important technical decisions so the reasons for changes remain traceable.
 
-## 2026-06-24 - Gunakan Next.js App Router
+## 2026-06-24 - Use Next.js App Router
 
-Keputusan:
-
-```text
-Frontend dan API versi awal dibuat dalam satu aplikasi Next.js.
-```
-
-Alasan:
-
-- mudah dijalankan lokal;
-- cocok untuk iterasi cepat;
-- API route cukup untuk MVP;
-- deployment development lebih sederhana.
-
-Catatan:
-
-Jika kebutuhan backend bertambah besar, service backend dapat dipisah nanti.
-
-## 2026-06-25 - Pisahkan Domain Logic dari UI
-
-Keputusan:
+Decision:
 
 ```text
-Perhitungan volume, runtime, status, dan normalisasi payload ditempatkan di src/features/monitoring/lib.
+The initial frontend and API are built in a single Next.js application.
 ```
 
-Alasan:
+Reasons:
 
-- angka operasional harus bisa dites;
-- UI tidak boleh menjadi tempat rumus utama;
-- logic bisa dipakai API dan UI.
+- easy to run locally;
+- suitable for fast iteration;
+- API routes are enough for the MVP;
+- simpler development deployment.
 
-## 2026-06-25 - Gunakan Data Contoh Public-safe
+Note:
 
-Keputusan:
+If backend needs grow, backend services can be split later.
+
+## 2026-06-25 - Separate Domain Logic from UI
+
+Decision:
 
 ```text
-Semua data awal memakai data contoh.
+Volume, runtime, status calculations, and payload normalization live in src/features/monitoring/lib.
 ```
 
-Alasan:
+Reasons:
 
-- aman untuk repo publik;
-- tidak membuka data internal;
-- cukup untuk membangun UI dan API.
+- operational numbers must be testable;
+- the UI must not be the home of core formulas;
+- the logic can be shared by the API and UI.
 
-## 2026-06-26 - Tambah API Ingest dan Memory Store
+## 2026-06-25 - Use Public-safe Sample Data
 
-Keputusan:
+Decision:
 
 ```text
-POST /api/ingest menerima payload device dan menyimpan reading ke memory store.
+All initial data uses sample data.
 ```
 
-Alasan:
+Reasons:
 
-- membuktikan alur data tanpa database;
-- memudahkan uji simulator;
-- mengurangi blocker dari hardware.
+- safe for a public repo;
+- does not expose internal data;
+- sufficient to build the UI and API.
 
-Batasan:
+## 2026-06-26 - Add Ingest API and Memory Store
 
-Data hilang saat dev server restart.
-
-## 2026-06-26 - Tambah Simulator Terminal
-
-Keputusan:
+Decision:
 
 ```text
-Simulator dibuat sebagai scripts/simulate-device.mjs tanpa dependency tambahan.
+POST /api/ingest accepts device payloads and stores readings to the memory store.
 ```
 
-Alasan:
+Reasons:
 
-- mudah dijalankan;
-- tidak perlu build step;
-- ringan;
-- cocok untuk pembelajaran terminal.
+- proves the data flow without a database;
+- makes simulator testing easy;
+- reduces hardware blockers.
 
-## 2026-06-26 - Hapus Placeholder Berlebih
+Limit:
 
-Keputusan:
+Data is lost when the dev server restarts.
+
+## 2026-06-26 - Add Terminal Simulator
+
+Decision:
 
 ```text
-Folder kosong berbasis .gitkeep dibersihkan dari struktur Git.
+The simulator is built as scripts/simulate-device.mjs without extra dependencies.
 ```
 
-Alasan:
+Reasons:
 
-- repo lebih mudah dibaca;
-- struktur mencerminkan file nyata;
-- roadmap tetap dicatat di dokumentasi, bukan folder kosong.
+- easy to run;
+- no build step;
+- lightweight;
+- suitable for terminal learning.
 
-## 2026-06-26 - Pisahkan Storage Memory dan MySQL
+## 2026-06-26 - Remove Excess Placeholders
 
-Keputusan:
+Decision:
 
 ```text
-telemetry-store.ts dipertahankan untuk mode development lokal, sedangkan query MySQL dipindah ke mysql-reading-repository.ts dan dipilih lewat monitoring-storage.ts. Saat mode MySQL aktif, tabel reading kosong tidak lagi diisi dari data contoh agar dashboard pilot/production tidak menampilkan data simulasi sebagai data lapangan.
+Empty .gitkeep-based folders are cleaned from the Git structure.
 ```
 
-Alasan:
+Reasons:
 
-- file tidak terlalu gemuk;
-- mode development tetap sederhana;
-- query database lebih mudah diaudit;
-- mode storage bisa diganti lewat env tanpa mengubah page.
+- repo is easier to read;
+- the structure reflects real files;
+- the roadmap stays recorded in documentation, not empty folders.
 
-Catatan:
+## 2026-06-26 - Separate Memory and MySQL Storage
 
-Query MySQL awal mengambil reading terbaru global lalu dibalik untuk grafik. Setelah data real makin banyak, overview memakai query reading terbaru per tangki, sedangkan history detail memakai query khusus tank agar tidak terpotong oleh data tank lain.
-
-## 2026-06-26 - Tambah Key Per Device
-
-Keputusan:
+Decision:
 
 ```text
-API ingest menerima key per device yang divalidasi terhadap hash, dengan fallback global hanya untuk development.
+telemetry-store.ts is kept for local development mode, while MySQL queries moved to mysql-reading-repository.ts and are selected through monitoring-storage.ts. When MySQL mode is active, an empty reading table is no longer filled from sample data so the pilot/production dashboard does not show simulation data as field data.
 ```
 
-Alasan:
+Reasons:
 
-- lebih dekat ke kebutuhan perangkat nyata;
-- tidak semua device bergantung pada satu key global;
-- fallback lokal tetap membantu latihan awal.
+- files stay lean;
+- development mode remains simple;
+- database queries are easier to audit;
+- storage mode can be switched via env without changing pages.
 
-Catatan:
+Note:
 
-Untuk mode yang lebih dekat pilot atau production, `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` harus diset `false`.
+The initial MySQL query fetched the latest global readings then reversed them for charts. As real data grows, the overview uses the latest-reading-per-tank query while detail history uses a tank-specific query so it is not cut off by other tanks' data.
 
-## 2026-06-26 - Gunakan Client Component Kecil untuk Real-time UI
+## 2026-06-26 - Use Per-Device Key
 
-Keputusan:
+Decision:
 
 ```text
-Dashboard dan detail tetap Server Component, sedangkan refresh control dan jam real-time dibuat sebagai Client Component kecil.
+The ingest API accepts a per-device key validated against a hash, with a global fallback only for development.
 ```
 
-Alasan:
+Reasons:
 
-- menjaga JavaScript client tetap ringan;
-- data tetap dibaca di server;
-- interaksi browser seperti timer dan visibility state tetap berjalan benar.
+- closer to real device needs;
+- not all devices depend on one global key;
+- the local fallback still helps early practice.
 
-## 2026-07-11 - Pisahkan Snapshot Live dan History Rollup 5 Menit
+Note:
 
-Keputusan:
+For modes closer to pilot or production, `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` must be set to `false`.
+
+## 2026-06-26 - Use Small Client Components for Real-time UI
+
+Decision:
 
 ```text
-Telemetry MySQL setiap ±20 detik memperbarui satu snapshot terbaru per device,
-sedangkan history hanya menambah satu bucket agregat setiap 5 menit.
+Dashboard and detail stay Server Components, while the refresh control and real-time clock are built as small Client Components.
 ```
 
-Alasan:
+Reasons:
 
-- dashboard tetap menampilkan data terbaru tanpa menunggu bucket selesai;
-- pertumbuhan row history berkurang sekitar 15 kali dibanding raw 20 detik;
-- mean tetap didampingi min, max, dan sample count agar lonjakan singkat tidak hilang;
-- kedua upsert berada dalam satu transaksi supaya snapshot dan history tidak berbeda diam-diam;
-- raw history lama tidak dihapus otomatis agar migrasi tidak merusak data audit.
+- keeps client JavaScript light;
+- data is still read on the server;
+- browser interactions such as timers and visibility state still work correctly.
 
-Catatan kompatibilitas:
+## 2026-07-11 - Separate Live Snapshot and 5-Minute History Rollup
 
-Overview dan detail membandingkan snapshot dengan history terbaru berdasarkan
-`receivedAt`. Ini mencegah status berbeda ketika database sudah dimigrasi tetapi
-deployment lama masih menulis raw selama rollout.
-
-## 2026-07-14 - Gunakan Urutan Regional, Wilayah, Area, dan STO
-
-Keputusan:
+Decision:
 
 ```text
-Setiap STO dikelompokkan sebagai Regional -> Wilayah -> Area -> STO.
+Telemetry MySQL every ±20 seconds updates one latest snapshot per device, while history only adds one aggregate bucket every 5 minutes.
 ```
 
-Alasan:
+Reasons:
 
-- daftar tetap mudah dicari ketika jumlah STO bertambah lintas area;
-- istilah lokasi konsisten antara pengajuan perangkat, dashboard, peta, paket firmware, dan registry pilot;
-- perangkat tidak perlu mengirim nama lokasi pada setiap reading karena server mengambilnya dari registry;
-- lokasi pilot lama memakai nilai awal `TREG 5` dan `TIF 3` agar perubahan database tidak membuat data yang sudah ada hilang.
+- the dashboard keeps showing the latest data without waiting for the bucket to complete;
+- history row growth drops roughly 15x compared to 20-second raw;
+- the mean is still accompanied by min, max, and sample count so short spikes are not lost;
+- both upserts sit in one transaction so snapshot and history do not silently differ;
+- old raw history is not auto-deleted so migrations do not damage audit data.
 
-Catatan: daftar pilihan saat ini mengikuti kebutuhan pilot yang sudah disetujui.
-Penambahan Regional/Wilayah baru harus memakai data organisasi resmi, bukan
-perkiraan pengembang.
+Compatibility note:
+
+Overview and detail compare the snapshot with the latest history by `receivedAt`. This prevents differing status when the database is already migrated but an old deployment still writes raw during rollout.
+
+## 2026-07-14 - Use Regional, Territory, Area, and STO Order
+
+Decision:
+
+```text
+Every STO is grouped as Regional -> Territory -> Area -> STO.
+```
+
+Reasons:
+
+- the list stays easy to search as STO counts grow across areas;
+- location terms stay consistent between device requests, dashboard, map, firmware packages, and the pilot registry;
+- devices do not need to send location names on every reading because the server takes them from the registry;
+- older pilot locations use the initial values `TREG 5` and `TIF 3` so database changes do not erase existing data.
+
+Note: the current choice list follows the approved pilot needs. Adding new regional/territory values must use official organizational data, not developer guesses.

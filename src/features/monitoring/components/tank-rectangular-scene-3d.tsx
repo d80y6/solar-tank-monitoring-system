@@ -82,7 +82,7 @@ function TankFallbackVisual({
   return (
     <div
       className="absolute inset-0 overflow-hidden bg-slate-50"
-      aria-label={`Visual tangki fallback dengan isi ${safeFillPercent}%`}
+      aria-label={`Fallback tank visual with ${safeFillPercent}% fill`}
     >
       <div className="absolute inset-x-6 top-6 bottom-7 flex items-center justify-center">
         <div
@@ -512,7 +512,7 @@ export function TankRectangularScene3D({
         <canvas
           ref={canvasRef}
           className="h-full w-full cursor-grab touch-none active:cursor-grabbing"
-          aria-label={`Visual 3D tangki balok dengan isi ${fillPercent}%`}
+          aria-label={`3D visual of a rectangular tank with ${fillPercent}% fill`}
         />
       )}
       {showMeasurementBadges ? (
@@ -521,7 +521,7 @@ export function TankRectangularScene3D({
             H {fuelHeightCm} cm
           </div>
           <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-            Ruang kosong {sensorDistanceCm} cm
+            Empty space {sensorDistanceCm} cm
           </div>
         </>
       ) : null}
@@ -859,7 +859,7 @@ export function TankHorizontalCylinderScene3D({
         <canvas
           ref={canvasRef}
           className="h-full w-full cursor-grab touch-none active:cursor-grabbing"
-          aria-label={`Visual 3D tangki silinder horizontal dengan isi ${displayFillPercent}%`}
+          aria-label={`3D visual of a horizontal cylinder tank with ${displayFillPercent}% fill`}
         />
       )}
       {showMeasurementBadges ? (
@@ -868,7 +868,7 @@ export function TankHorizontalCylinderScene3D({
             H {fuelHeightCm} cm
           </div>
           <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-            Isi {displayFillPercent}%
+            Level {displayFillPercent}%
           </div>
         </>
       ) : null}

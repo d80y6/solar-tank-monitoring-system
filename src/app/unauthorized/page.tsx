@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { ShieldAlert } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Akses Tidak Tersedia | FTM",
+  title: "Access Unavailable | FTM",
   description:
-    "Halaman pemberitahuan ketika akun tidak memiliki izin untuk membuka area FTM tertentu.",
+    "Notice page shown when the account does not have permission to open a specific FTM area.",
 };
 
 export default function UnauthorizedPage() {
@@ -15,16 +15,16 @@ export default function UnauthorizedPage() {
         <span className="mx-auto grid size-12 place-items-center rounded-lg bg-red-50 text-red-600 ring-1 ring-red-100">
           <ShieldAlert className="size-6" aria-hidden="true" />
         </span>
-        <h1 className="mt-5 text-2xl font-semibold">Akses tidak tersedia</h1>
+        <h1 className="mt-5 text-2xl font-semibold">Access unavailable</h1>
         <p className="mt-3 text-sm leading-6 text-zinc-500">
-          Peran akun Anda belum memiliki izin untuk membuka halaman ini.
-          Hubungi administrator jika membutuhkan akses tambahan.
+          Your account role does not yet have permission to open this page.
+          Contact an administrator if you need additional access.
         </p>
         <Link
           href="/dashboard"
           className="mt-6 inline-flex h-11 items-center justify-center rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
         >
-          Kembali ke dashboard
+          Back to dashboard
         </Link>
       </section>
     </main>

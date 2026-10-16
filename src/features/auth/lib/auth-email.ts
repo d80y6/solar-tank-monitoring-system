@@ -56,7 +56,7 @@ function buildHtmlEmail({
   const safeCode = code ? escapeHtml(code) : null;
 
   return `<!doctype html>
-<html lang="id">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -85,7 +85,7 @@ function buildHtmlEmail({
                 ${
                   safeActionUrl && safeActionLabel
                     ? `<p style="margin:22px 0;"><a href="${safeActionUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:12px 18px;border-radius:10px;">${safeActionLabel}</a></p>
-                       <p style="margin:0 0 18px;font-size:12px;line-height:1.6;color:#64748b;word-break:break-all;">Jika tombol tidak bisa dibuka, salin link ini:<br>${safeActionUrl}</p>`
+                       <p style="margin:0 0 18px;font-size:12px;line-height:1.6;color:#64748b;word-break:break-all;">If the button does not open, copy this link:<br>${safeActionUrl}</p>`
                     : ""
                 }
                 <p style="margin:18px 0 0;font-size:13px;line-height:1.6;color:#64748b;">${safeWarning}</p>
@@ -93,7 +93,7 @@ function buildHtmlEmail({
             </tr>
             <tr>
               <td style="padding:16px 24px;background:#f8fafc;border-top:1px solid #eef2f7;font-size:12px;line-height:1.6;color:#64748b;">
-                Email ini dikirim otomatis oleh FTM. Jangan balas email ini.
+                This email was sent automatically by FTM. Do not reply to this email.
               </td>
             </tr>
           </table>
@@ -132,7 +132,7 @@ async function sendAuthEmail({
     "",
     isProductionLikeEnvironment()
       ? ""
-      : "Ini pesan dari environment non-production.",
+      : "This message is from a non-production environment.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -146,7 +146,7 @@ async function sendAuthEmail({
     return {
       delivered: false,
       delivery: "none",
-      reason: "SMTP belum dikonfigurasi.",
+      reason: "SMTP is not configured.",
     };
   }
 
@@ -191,20 +191,20 @@ export async function sendAdminLoginOtp({
   return sendAuthEmail({
     code,
     email,
-    subject: "Kode masuk admin FTM",
+    subject: "FTM admin sign-in code",
     htmlIntro:
-      "Gunakan kode berikut untuk menyelesaikan proses masuk admin. Kode ini berlaku singkat dan hanya bisa dipakai satu kali.",
+      "Use the following code to complete the admin sign-in process. This code is short-lived and can only be used once.",
     lines: [
-      "Kode masuk admin FTM:",
+      "FTM admin sign-in code:",
       "",
       code,
       "",
-      "Kode berlaku singkat dan hanya bisa digunakan satu kali.",
+      "The code is short-lived and can only be used once.",
     ],
     devLogLabel: "DEV-OTP",
     kind: "otp",
     warning:
-      "Jika Anda tidak sedang masuk sebagai admin, abaikan email ini dan segera ganti kata sandi.",
+      "If you are not signing in as admin, ignore this email and change your password immediately.",
   });
 }
 
@@ -216,24 +216,24 @@ export async function sendPasswordResetEmail({
   resetUrl: string;
 }): Promise<EmailDeliveryResult> {
   return sendAuthEmail({
-    actionLabel: "Buat password baru",
+    actionLabel: "Create new password",
     actionUrl: resetUrl,
     email,
-    subject: "Reset kata sandi FTM",
+    subject: "FTM password reset",
     htmlIntro:
-      "Kami menerima permintaan reset kata sandi untuk akun FTM Anda. Klik tombol berikut untuk membuat kata sandi baru.",
+      "We received a password reset request for your FTM account. Click the button below to create a new password.",
     lines: [
-      "Permintaan reset kata sandi FTM diterima.",
+      "FTM password reset request received.",
       "",
-      "Buka link berikut untuk membuat kata sandi baru:",
+      "Open the link below to create a new password:",
       resetUrl,
       "",
-      "Jika Anda tidak meminta reset, abaikan pesan ini.",
+      "If you did not request a reset, ignore this message.",
     ],
     devLogLabel: "DEV-PASSWORD-RESET",
     kind: "action",
     warning:
-      "Jika Anda tidak meminta reset kata sandi, abaikan email ini. Link akan kedaluwarsa otomatis.",
+      "If you did not request a password reset, ignore this email. The link will expire automatically.",
   });
 }
 
@@ -248,20 +248,20 @@ export async function sendEmailVerificationEmail({
     actionLabel: "Verifikasi email",
     actionUrl: verificationUrl,
     email,
-    subject: "Verifikasi email FTM",
+    subject: "FTM email verification",
     htmlIntro:
-      "Verifikasi email diperlukan sebelum akun FTM bisa disetujui administrator. Klik tombol berikut untuk melanjutkan.",
+      "Email verification is required before your FTM account can be approved by an administrator. Click the button below to continue.",
     lines: [
-      "Verifikasi email akun FTM diperlukan sebelum akun disetujui.",
+      "FTM account email verification is required before the account can be approved.",
       "",
-      "Buka link berikut untuk verifikasi email:",
+      "Open the link below to verify your email:",
       verificationUrl,
       "",
-      "Jika Anda tidak merasa membuat akun, abaikan pesan ini.",
+      "If you do not remember creating an account, ignore this message.",
     ],
     devLogLabel: "DEV-EMAIL-VERIFY",
     kind: "action",
     warning:
-      "Jika Anda tidak merasa membuat akun FTM, abaikan email ini.",
+      "If you do not remember creating an FTM account, ignore this email.",
   });
 }

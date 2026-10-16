@@ -25,7 +25,7 @@ import {
 } from "../lib/auth-validation";
 
 describe("auth crypto", () => {
-  it("memverifikasi password hanya untuk input yang benar", async () => {
+  it("verifies password only for correct input", async () => {
     const hash = await hashPassword("password-operator-kuat");
 
     expect(hash).toMatch(/^\$argon2id\$/);
@@ -33,25 +33,25 @@ describe("auth crypto", () => {
     await expect(verifyPassword("password-operator-kuat", hash)).resolves.toBe(
       true,
     );
-    await expect(verifyPassword("password-salah", hash)).resolves.toBe(false);
+    await expect(verifyPassword("password-wrong", hash)).resolves.toBe(false);
   });
 
-  it("tetap bisa membaca hash PBKDF2 lama dan menandainya untuk upgrade", async () => {
+  it("still reads legacy PBKDF2 hashes and flags them for upgrade", async () => {
     const legacyHash = await createLegacyPbkdf2PasswordHashForTest(
-      "password-lama-kuat",
+      "password-legacy-strong",
     );
 
     expect(legacyHash).toMatch(/^pbkdf2-sha256\$/);
     expect(passwordNeedsRehash(legacyHash)).toBe(true);
-    await expect(verifyPassword("password-lama-kuat", legacyHash)).resolves.toBe(
+    await expect(verifyPassword("password-legacy-strong", legacyHash)).resolves.toBe(
       true,
     );
-    await expect(verifyPassword("password-salah", legacyHash)).resolves.toBe(
+    await expect(verifyPassword("password-wrong", legacyHash)).resolves.toBe(
       false,
     );
   });
 
-  it("memverifikasi OTP hanya untuk kode yang benar", () => {
+  it("verifies OTP only for correct codes", () => {
     const code = createOtpCode();
     const hash = hashOtpCode(code);
 
@@ -62,7 +62,7 @@ describe("auth crypto", () => {
     );
   });
 
-  it("mengikat token aksi admin ke sesi yang benar", () => {
+  it("binds admin action token to the correct session", () => {
     const token = createAdminActionCsrfToken("sess_admin_utama");
 
     expect(
@@ -85,7 +85,7 @@ describe("auth crypto", () => {
     ).toBe(false);
   });
 
-  it("menghasilkan hash token sekali pakai tanpa menyimpan token mentah", () => {
+  it("produces one-time token hash without storing the raw token", () => {
     const token = createRandomToken();
     const hash = hashOneTimeToken(token);
 
@@ -96,32 +96,32 @@ describe("auth crypto", () => {
 });
 
 describe("auth validation", () => {
-  it("menormalisasi payload login", () => {
+  it("normalizes login payload", () => {
     expect(
       parseLoginPayload({
-        identity: " ADMIN@CONTOH.CO.ID ",
+        identity: " ADMIN@EXAMPLE.CO.ID ",
         password: "secret",
       }),
     ).toEqual({
-      identity: "admin@contoh.co.id",
+      identity: "admin@example.co.id",
       password: "secret",
     });
   });
 
-  it("menolak pengajuan akses dengan password lemah", () => {
+  it("rejects access request with weak password", () => {
     expect(() =>
       parseRegisterAccessPayload({
         fullName: "Operator",
         username: "operator",
         email: "operator@example.com",
         phone: "081234567890",
-        password: "pendek",
-        confirmPassword: "pendek",
+        password: "short",
+        confirmPassword: "short",
       }),
-    ).toThrow("minimal 10 karakter");
+    ).toThrow("Password must be at least 10 characters.");
   });
 
-  it("menormalisasi nomor seluler Indonesia ke format +62", () => {
+  it("normalizes Indonesian mobile numbers to +62 format", () => {
     expect(normalizeIndonesianMobilePhone("0812 3456 7890")).toBe(
       "+6281234567890",
     );
@@ -136,17 +136,17 @@ describe("auth validation", () => {
     );
   });
 
-  it("menolak nomor telepon yang tidak bisa disimpan konsisten", () => {
-    expect(() => normalizeIndonesianMobilePhone("")).toThrow("wajib diisi");
-    expect(() => normalizeIndonesianMobilePhone("nomor saya")).toThrow(
-      "wajib memakai angka",
+  it("rejects phone numbers that cannot be stored consistently", () => {
+    expect(() => normalizeIndonesianMobilePhone("")).toThrow("Phone number is required.");
+    expect(() => normalizeIndonesianMobilePhone("my phone number")).toThrow(
+      "Phone number must use digits",
     );
     expect(() => normalizeIndonesianMobilePhone("+621234")).toThrow(
-      "nomor seluler Indonesia",
+      "valid Indonesian mobile number",
     );
   });
 
-  it("menyimpan payload register dengan nomor telepon yang sudah dinormalisasi", () => {
+  it("stores register payload with normalized phone number", () => {
     expect(
       parseRegisterAccessPayload({
         fullName: "Operator Monitoring",
@@ -163,28 +163,28 @@ describe("auth validation", () => {
     });
   });
 
-  it("menolak password terlalu panjang sebelum proses hash", () => {
+  it("rejects too-long password before hashing", () => {
     expect(() =>
       parseLoginPayload({
         identity: "operator",
         password: "x".repeat(257),
       }),
-    ).toThrow("terlalu panjang");
+    ).toThrow("Password is too long.");
   });
 
-  it("memvalidasi payload lupa password secara generik", () => {
+  it("validates forgot-password payload generically", () => {
     expect(
       parseForgotPasswordPayload({
-        identity: " OPERATOR@CONTOH.CO.ID ",
+        identity: " OPERATOR@EXAMPLE.CO.ID ",
         captchaToken: " token ",
       }),
     ).toEqual({
-      identity: "operator@contoh.co.id",
+      identity: "operator@example.co.id",
       captchaToken: "token",
     });
   });
 
-  it("memvalidasi reset password dengan token dan password kuat", () => {
+  it("validates reset password with token and strong password", () => {
     expect(
       parseResetPasswordPayload({
         token: "reset-token",
@@ -199,19 +199,19 @@ describe("auth validation", () => {
     expect(() =>
       parseResetPasswordPayload({
         token: "reset-token",
-        password: "passwordtanpaangka",
-        confirmPassword: "passwordtanpaangka",
+        password: "passwordwithoutnumbers",
+        confirmPassword: "passwordwithoutnumbers",
       }),
-    ).toThrow("huruf dan angka");
+    ).toThrow("Password must contain letters and numbers.");
   });
 
-  it("menolak change password jika password baru sama dengan lama", () => {
+  it("rejects change password when new password equals the old one", () => {
     expect(() =>
       parseChangePasswordPayload({
         currentPassword: "Password12345",
         password: "Password12345",
         confirmPassword: "Password12345",
       }),
-    ).toThrow("harus berbeda");
+    ).toThrow("New password must differ from the old password.");
   });
 });

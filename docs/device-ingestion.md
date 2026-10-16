@@ -1,26 +1,27 @@
-# Ingest Data Device
+# Device Data Ingestion
 
-Dokumen ini menjelaskan cara data dari device atau simulator masuk ke aplikasi.
+This document explains how data from a device or simulator enters the application.
 
-## Konsep Dasar
+## Basic Concepts
 
-Device tidak mengirim liter secara ajaib. Biasanya sensor membaca jarak.
+A device does not send liters magically. Usually the sensor reads a distance.
 
-Alur data:
+Data flow:
 
 ```text
-jarak sensor
-  -> tinggi bahan bakar
-  -> volume liter
-  -> persen isi
+sensor distance
+  -> fuel height
+  -> volume in liters
+  -> fill percent
   -> runtime
   -> status
 ```
 
-Pada mode development, simulator bisa langsung mengirim `raw.volume` dan
-`raw.percent` agar alur API mudah diuji. Untuk pilot, device atau smoke test
-dapat mengirim payload real-format yang membawa config tangki seperti bentuk,
-kapasitas, dimensi, dan konsumsi per jam.
+In development mode, the simulator can send `raw.volume` and
+`raw.percent` directly to make the API flow easy to test. For the
+pilot, a device or smoke test can send a real-format payload that
+carries tank configuration such as shape, capacity, dimensions, and
+hourly consumption.
 
 ## Endpoint
 
@@ -28,9 +29,9 @@ kapasitas, dimensi, dan konsumsi per jam.
 POST /api/ingest
 ```
 
-## Header
+## Headers
 
-Header wajib:
+Required headers:
 
 ```http
 Content-Type: application/json
@@ -38,26 +39,26 @@ X-Device-Id: demo-tph-01
 X-Api-Key: demo-tph-key
 ```
 
-Alternatif:
+Alternative:
 
 ```http
 X-Device-Key: demo-tph-key
 ```
 
-Key demo yang tersedia:
+Available demo keys:
 
-| Device | Key demo |
+| Device | Demo key |
 |---|---|
 | `demo-tph-01` | `demo-tph-key` |
 | `demo-nja-01` | `demo-nja-key` |
 | `demo-jto-01` | `demo-jto-key` |
 | `demo-skp-01` | `demo-skp-key` |
 
-Fallback `local-development-key` masih bisa dipakai untuk latihan awal jika `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` tidak dimatikan. Untuk mode yang lebih dekat pilot, gunakan key per device dan set fallback global ke `false`.
+The `local-development-key` fallback can still be used for early practice if `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` is not disabled. For a mode closer to the pilot, use per-device keys and set the global fallback to `false`.
 
-## Payload yang Didukung
+## Supported Payloads
 
-Payload CAT-like:
+CAT-like payload:
 
 ```json
 {
@@ -74,27 +75,27 @@ Payload CAT-like:
 }
 ```
 
-Penjelasan:
+Explanation:
 
-| Field | Arti |
+| Field | Meaning |
 |---|---|
-| `device` | kode device |
-| `ts` | timestamp dari device, boleh `0` untuk fallback waktu server |
-| `distance` | tinggi ruang kosong: jarak sensor di atas tangki ke permukaan cairan |
-| `voltage` | tegangan device |
-| `raw.H_cm` | tinggi cairan |
-| `raw.volume` | volume liter |
-| `raw.percent` | persen isi |
-| `raw.wifi_rssi` | sinyal WiFi |
+| `device` | device code |
+| `ts` | timestamp from the device, may be `0` for server time fallback |
+| `distance` | empty space height: sensor distance above the tank to the liquid surface |
+| `voltage` | device voltage |
+| `raw.H_cm` | liquid height |
+| `raw.volume` | volume in liters |
+| `raw.percent` | fill percent |
+| `raw.wifi_rssi` | WiFi signal |
 
-Catatan timestamp:
+Timestamp notes:
 
-- Kirim `measuredAt`/`ts_iso` dalam format ISO UTC jika firmware sudah punya waktu yang benar.
-- Jika hanya punya Unix timestamp, kirim `ts` dalam detik atau milidetik.
-- Jika waktu device belum dipercaya, kirim `ts: 0`; server akan memakai waktu terima.
-- Dashboard menampilkan jam operasional dalam WIB, tetapi data API tetap disimpan sebagai UTC agar konsisten antara lokal, Vercel, dan server kantor.
+- Send `measuredAt`/`ts_iso` in ISO UTC format once the firmware has correct time.
+- If only a Unix timestamp is available, send `ts` in seconds or milliseconds.
+- If the device time is not trusted yet, send `ts: 0`; the server uses the receive time.
+- The dashboard displays operational time in WIB, but API data is still stored as UTC to stay consistent across local, Vercel, and office servers.
 
-Payload real-format untuk pilot:
+Real-format payload for the pilot:
 
 ```json
 {
@@ -122,123 +123,112 @@ Payload real-format untuk pilot:
 }
 ```
 
-API tetap memakai registry sebagai identitas resmi site/tangki/device. Config dari payload dibaca sebagai snapshot. Jika snapshot payload berbeda jauh dari registry, response ingest membawa `needsReview=true` dan dashboard/detail menampilkan status review.
+The API still uses the registry as the official site/tank/device identity. Configuration from the payload is read as a snapshot. If the payload snapshot differs significantly from the registry, the ingest response carries `needsReview=true` and the dashboard/detail shows a review status.
 
-Regional, Wilayah, dan Area tidak perlu dikirim berulang kali setiap 20 detik.
-Ketiganya disimpan pada registry lokasi, lalu server menggabungkannya dengan
-reading berdasarkan device yang mengirim. Cara ini membuat payload perangkat
-lebih kecil dan mencegah nama lokasi berubah hanya karena salah isi firmware.
+Regional, territory, and area do not need to be sent repeatedly every 20 seconds. They are stored in the location registry, then the server combines them with readings based on the sending device. This keeps device payloads smaller and prevents location names from changing just because of a firmware typo.
 
-Untuk fase pilot peta, posisi marker peta dashboard tetap berasal dari `latitude` dan
-`longitude` pada registry site. Payload device boleh membawa `lat`/`lng` jika
-suatu saat tersedia, tetapi nilai itu belum dipakai untuk memindahkan titik STO.
-Alasannya, perangkat saat ini tidak memakai modul GPS dan lokasi STO harus
-diisi manual berdasarkan data yang sudah disetujui.
+For the map pilot phase, dashboard map marker positions still come from `latitude` and `longitude` in the site registry. Device payloads may carry `lat`/`lng` if available someday, but those values are not yet used to move STO points. The reason is that current devices do not use a GPS module and STO location must be entered manually from approved data.
 
-## Validasi yang Dilakukan
+## Performed Validation
 
-API mengecek:
+The API checks:
 
-- header `X-Device-Id` ada;
-- key ada;
-- payload berupa JSON object;
-- device terdaftar;
-- device aktif;
-- key cocok dengan hash key device atau fallback development yang masih diizinkan;
-- device di payload tidak bertentangan dengan header;
-- tangki untuk device ditemukan.
-- config payload tidak dipakai diam-diam tanpa review jika berbeda jauh dari registry.
+- the `X-Device-Id` header exists;
+- the key exists;
+- the payload is a JSON object;
+- the device is registered;
+- the device is active;
+- the key matches the device key hash or an allowed development fallback;
+- the device in the payload does not conflict with the header;
+- the tank for the device is found.
+- payload configuration is not silently used without review when it differs significantly from the registry.
 
-Jika semua lolos, payload dinormalisasi dan disimpan ke storage aktif. Default
-development memakai memory store. Pada mode MySQL, satu transaksi meng-upsert
-snapshot terbaru per device untuk dashboard live dan bucket agregat 5 menit
-untuk history. Row agregat menyimpan mean, min, max, dan jumlah sampel; raw
-payload lengkap tidak ditumpuk pada setiap row history baru.
+If all checks pass, the payload is normalized and stored to active storage. The development default uses the memory store. In MySQL mode, one transaction UPSERTs the latest snapshot per device for the live dashboard and the 5-minute aggregate bucket for history. Aggregate rows store mean, min, max, and sample count; the full raw payload is not stacked on every new history row.
 
 ## Simulator
 
-Jalankan dev server:
+Run the dev server:
 
 ```powershell
 pnpm dev
 ```
 
-Kirim satu data:
+Send one reading:
 
 ```powershell
 pnpm simulate:device --once
 ```
 
-Kirim kondisi kritis:
+Send a critical condition:
 
 ```powershell
 pnpm simulate:device --critical --once
 ```
 
-Kirim device tertentu:
+Send for a specific device:
 
 ```powershell
 pnpm simulate:device --device demo-nja-01 --once
 ```
 
-## Smoke Test Pilot
+## Pilot Smoke Test
 
-Untuk menguji payload real-format tanpa menunggu device fisik:
+To test the real-format payload without waiting for a physical device:
 
 ```powershell
 $env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
 $env:PILOT_DEVICE_ID="pilot-tph-01"
-$env:PILOT_DEVICE_KEY="key-asli-device"
+$env:PILOT_DEVICE_KEY="real-device-key"
 pnpm pilot:smoke
 ```
 
-Jika ingin melihat payload tanpa mengirim:
+To view the payload without sending:
 
 ```powershell
 pnpm pilot:smoke -- --dry-run
 ```
 
-Jika smoke test gagal:
+If the smoke test fails:
 
-| Status | Arti |
+| Status | Meaning |
 |---|---|
-| `401` | key salah atau hash di registry tidak cocok |
-| `404` | device belum ada di registry aktif |
-| `503` | storage MySQL belum siap |
-| `needsReview=true` | payload masuk, tetapi config payload berbeda dari registry |
+| `401` | wrong key or the registry hash does not match |
+| `404` | device not yet in the active registry |
+| `503` | MySQL storage not ready |
+| `needsReview=true` | payload accepted, but the payload configuration differs from the registry |
 
-## Device Contoh yang Tersedia
+## Available Sample Devices
 
-| Device | Tangki |
+| Device | Tank |
 |---|---|
 | `demo-tph-01` | `tank-tph-main` |
 | `demo-nja-01` | `tank-nja-main` |
 | `demo-jto-01` | `tank-jto-main` |
 | `demo-skp-01` | `tank-skp-main` |
 
-## Hal yang Belum Final
+## Not Final Yet
 
-Sebelum perangkat nyata dipakai, perlu dikunci:
+Before real devices are used, these must be locked:
 
-- interval kirim device;
-- format payload firmware;
-- key per device;
-- dimensi tangki;
-- posisi sensor;
-- metode kalibrasi;
-- apakah hitung volume dilakukan di device atau server;
-- jaringan dan target deployment.
-- cara rotasi key jika device diganti atau key bocor.
+- device send interval;
+- firmware payload format;
+- per-device key;
+- tank dimensions;
+- sensor position;
+- calibration method;
+- whether volume calculation happens on the device or server;
+- network and deployment target.
+- how to rotate keys if a device is replaced or a key leaks.
 
-## Catatan Keamanan
+## Security Notes
 
-Jangan menaruh key production di kode.
+Do not put production keys in code.
 
-Untuk production nanti:
+For production later:
 
-- jangan gunakan fallback global;
-- simpan hash key per device di database;
-- gunakan HTTPS;
-- beri rate limit;
-- catat audit log;
-- rotasi key jika device hilang atau bocor.
+- do not use the global fallback;
+- store per-device key hashes in the database;
+- use HTTPS;
+- add rate limiting;
+- record an audit log;
+- rotate keys if a device is lost or a key leaks.

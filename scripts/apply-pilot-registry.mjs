@@ -49,12 +49,12 @@ Pemakaian:
 
 Opsi:
   --file <path>            Default: config/pilot-registry.local.json
-  --dry-run                Validasi file tanpa menulis ke database
-  --allow-placeholder      Hanya untuk latihan template, jangan untuk pilot real
+  --dry-run                Validate the file without writing to the database
+  --allow-placeholder      Only for template practice, not for a real pilot
   --min-sites <angka>      Default: 5
   --help                   Tampilkan bantuan
 
-File registry real harus lokal dan tidak boleh di-commit.
+The real registry file must be local and must not be committed.
 `);
 }
 
@@ -99,7 +99,7 @@ function parseArgs(argv) {
       const value = Number(argv[index + 1]);
 
       if (!Number.isInteger(value) || value < 1) {
-        throw new Error("--min-sites harus berupa angka bulat positif.");
+        throw new Error("--min-sites must be a positive integer.");
       }
 
       options.minSites = value;
@@ -107,7 +107,7 @@ function parseArgs(argv) {
       continue;
     }
 
-    throw new Error(`Argumen tidak dikenal: ${arg}`);
+    throw new Error(`Unknown argument: ${arg}`);
   }
 
   return options;
@@ -117,7 +117,7 @@ function getMysqlDatabaseUrl() {
   const databaseUrl = process.env.MYSQL_DATABASE_URL?.trim();
 
   if (!databaseUrl) {
-    throw new Error("MYSQL_DATABASE_URL wajib diisi sebelum apply registry.");
+    throw new Error("MYSQL_DATABASE_URL is required before applying the registry.");
   }
 
   return databaseUrl;
@@ -137,13 +137,13 @@ function getMysqlSslConfig() {
 
 function ensureString(value, label, { pattern } = {}) {
   if (typeof value !== "string" || !value.trim()) {
-    throw new Error(`${label} wajib berupa teks.`);
+    throw new Error(`${label} must be text.`);
   }
 
   const cleanValue = value.trim();
 
   if (pattern && !pattern.test(cleanValue)) {
-    throw new Error(`${label} tidak sesuai format yang diharapkan.`);
+    throw new Error(`${label} does not match the expected format.`);
   }
 
   return cleanValue;
@@ -153,11 +153,11 @@ function ensureNumber(value, label, { min = -Infinity, max = Infinity } = {}) {
   const number = Number(value);
 
   if (!Number.isFinite(number)) {
-    throw new Error(`${label} wajib berupa angka.`);
+    throw new Error(`${label} must be a number.`);
   }
 
   if (number < min || number > max) {
-    throw new Error(`${label} harus berada di rentang ${min} sampai ${max}.`);
+    throw new Error(`${label} must be in the range ${min} to ${max}.`);
   }
 
   return number;
@@ -180,7 +180,7 @@ function normalizeLocationLabel(value, label, options, fallback) {
   );
 
   if (!match) {
-    throw new Error(`${label} tidak dikenali. Pilih salah satu: ${options.join(", ")}.`);
+    throw new Error(`${label} is not recognized. Choose one of: ${options.join(", ")}.`);
   }
 
   return match;
@@ -194,7 +194,7 @@ function assertNoForbiddenKeys(value, pathLabel = "registry") {
   for (const [key, nestedValue] of Object.entries(value)) {
     if (FORBIDDEN_KEYS.has(key)) {
       throw new Error(
-        `${pathLabel}.${key} tidak boleh ada. Simpan key asli di tempat aman, bukan file registry.`,
+        `${pathLabel}.${key} must not be present. Store the raw key in a safe place, not in the registry file.`,
       );
     }
 
@@ -232,7 +232,7 @@ function normalizeTank(site, tank, allowPlaceholder) {
 
   if (shape !== "rectangular" && shape !== "horizontal-cylinder") {
     throw new Error(
-      `tank ${siteCode}.shape harus rectangular atau horizontal-cylinder.`,
+      `tank ${siteCode}.shape must be rectangular or horizontal-cylinder.`,
     );
   }
 
@@ -280,14 +280,14 @@ function normalizeTank(site, tank, allowPlaceholder) {
 
   if (normalized.criticalLevelPercent >= normalized.lowLevelPercent) {
     throw new Error(
-      `tank ${siteCode}.criticalLevelPercent harus lebih kecil dari lowLevelPercent.`,
+      `tank ${siteCode}.criticalLevelPercent must be smaller than lowLevelPercent.`,
     );
   }
 
   if (shape === "rectangular") {
     if (!normalized.lengthCm || !normalized.widthCm || !normalized.heightCm) {
       throw new Error(
-        `tank ${siteCode} rectangular wajib punya lengthCm, widthCm, dan heightCm.`,
+        `tank ${siteCode} rectangular must have lengthCm, widthCm, and heightCm.`,
       );
     }
   }
@@ -295,13 +295,13 @@ function normalizeTank(site, tank, allowPlaceholder) {
   if (shape === "horizontal-cylinder") {
     if (!normalized.lengthCm || !normalized.diameterCm) {
       throw new Error(
-        `tank ${siteCode} horizontal-cylinder wajib punya lengthCm dan diameterCm.`,
+        `tank ${siteCode} horizontal-cylinder must have lengthCm and diameterCm.`,
       );
     }
   }
 
   if (!allowPlaceholder && normalized.capacityLiter <= 0) {
-    throw new Error(`tank ${siteCode}.capacityLiter tidak valid.`);
+    throw new Error(`tank ${siteCode}.capacityLiter is invalid.`);
   }
 
   return normalized;
@@ -342,12 +342,12 @@ function normalizeRegistry(registry, options) {
   assertNoForbiddenKeys(registry);
 
   if (!Array.isArray(registry?.sites)) {
-    throw new Error("registry.sites wajib berupa array.");
+    throw new Error("registry.sites must be an array.");
   }
 
   if (registry.sites.length < options.minSites) {
     throw new Error(
-      `Registry pilot wajib berisi minimal ${options.minSites} site aktif.`,
+      `The pilot registry must contain at least ${options.minSites} active sites.`,
     );
   }
 
@@ -390,7 +390,7 @@ function normalizeRegistry(registry, options) {
 
     if (!options.allowPlaceholder && site.coordinateStatus !== "approved") {
       throw new Error(
-        `site ${site.code}.coordinateStatus harus "approved" untuk apply data real.`,
+        `site ${site.code}.coordinateStatus must be "approved" to apply real data.`,
       );
     }
 
@@ -600,7 +600,7 @@ function printSummary(registry, options, absolutePath) {
   }
 
   if (options.dryRun) {
-    globalThis.console.log("[pilot-registry] dry-run: tidak menulis database.");
+    globalThis.console.log("[pilot-registry] dry-run: not writing to the database.");
   }
 }
 
@@ -623,7 +623,7 @@ async function main() {
 
   try {
     await upsertRegistry(connection, registry);
-    globalThis.console.log("[pilot-registry] selesai apply registry pilot.");
+    globalThis.console.log("[pilot-registry] finished applying pilot registry.");
   } finally {
     await connection.end();
   }

@@ -136,20 +136,20 @@ function activationFailureToIngestFailure(
       return {
         ok: false,
         status: 401,
-        error: "Device key tidak valid.",
+        error: "Device key is invalid.",
       };
     case "not-ready":
       return {
         ok: false,
         status: 403,
         error:
-          "Perangkat belum siap aktif. Pastikan paket firmware sudah didownload dari link resmi.",
+          "Device is not ready to activate. Make sure the firmware package was downloaded from the official link.",
       };
     case "revoked":
       return {
         ok: false,
         status: 403,
-        error: "Paket firmware atau akses perangkat sudah tidak berlaku.",
+        error: "Firmware package or device access is no longer valid.",
       };
   }
 }
@@ -171,7 +171,7 @@ export async function ingestTelemetry({
     return {
       ok: false,
       status: 400,
-      error: "Header X-Device-Id wajib diisi.",
+      error: "Header X-Device-Id is required.",
     };
   }
 
@@ -181,7 +181,7 @@ export async function ingestTelemetry({
     return {
       ok: false,
       status: 401,
-      error: "Header X-Api-Key atau X-Device-Key wajib diisi.",
+      error: "Header X-Api-Key or X-Device-Key is required.",
     };
   }
 
@@ -189,7 +189,7 @@ export async function ingestTelemetry({
     return {
       ok: false,
       status: 400,
-      error: "Payload harus berupa object JSON.",
+      error: "Payload must be a JSON object.",
     };
   }
 
@@ -231,7 +231,7 @@ export async function ingestTelemetry({
           ok: false,
           status: 500,
           error:
-            "Registry site/tangki/device belum bisa dibaca dari storage aktif.",
+            "Site/tank/device registry could not be read from the active storage.",
         };
       }
     } else {
@@ -239,7 +239,7 @@ export async function ingestTelemetry({
         ok: false,
         status: 500,
         error:
-          "Registry site/tangki/device belum bisa dibaca dari storage aktif.",
+          "Site/tank/device registry could not be read from the active storage.",
       };
     }
   }
@@ -283,7 +283,7 @@ export async function ingestTelemetry({
       return {
         ok: false,
         status: 400,
-        error: "Identitas device di payload tidak sesuai dengan header.",
+        error: "Device identity in payload does not match the header.",
       };
     }
 
@@ -306,7 +306,7 @@ export async function ingestTelemetry({
         return {
           ok: false,
           status: 404,
-          error: "Device tidak terdaftar di data operasional.",
+          error: "Device is not registered in operational data.",
         };
       }
 
@@ -322,7 +322,7 @@ export async function ingestTelemetry({
     return {
       ok: false,
       status: 403,
-      error: "Device tidak aktif.",
+      error: "Device is inactive.",
     };
   }
 
@@ -337,7 +337,7 @@ export async function ingestTelemetry({
     return {
       ok: false,
       status: 401,
-      error: "Device key tidak valid.",
+      error: "Device key is invalid.",
     };
   }
 
@@ -350,7 +350,7 @@ export async function ingestTelemetry({
     return {
       ok: false,
       status: 400,
-      error: "Identitas device di payload tidak sesuai dengan header.",
+      error: "Device identity in payload does not match the header.",
     };
   }
 
@@ -384,7 +384,7 @@ export async function ingestTelemetry({
     return {
       ok: false,
       status: 404,
-      error: "Konfigurasi tangki untuk device tidak ditemukan.",
+      error: "Tank configuration for the device was not found.",
     };
   }
 
@@ -433,7 +433,7 @@ export async function ingestTelemetry({
     return {
       ok: false,
       status: 500,
-      error: "Gagal menyimpan data telemetry ke storage aktif.",
+      error: "Failed to save telemetry data to the active storage.",
     };
   }
 }

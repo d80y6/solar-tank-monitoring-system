@@ -19,7 +19,7 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   if (!verifyTelegramWebhookSecret(request.headers)) {
     return NextResponse.json(
-      { ok: false, error: "Webhook Telegram tidak valid." },
+      { ok: false, error: "Invalid Telegram webhook." },
       { status: 401 },
     );
   }
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       await sendTelegramMessage({
         chatId: message.chatId,
         messageThreadId: message.messageThreadId,
-        text: "Topic Telegram belum bisa dibaca. Coba lagi sebentar lagi.",
+        text: "Telegram topic could not be read yet. Try again shortly.",
       }).catch(() => undefined);
       return true;
     },
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       await sendTelegramMessage({
         chatId: message.chatId,
         messageThreadId: message.messageThreadId,
-        text: "Command helpdesk belum bisa diproses. Coba lagi sebentar lagi.",
+        text: "Helpdesk command could not be processed yet. Try again shortly.",
       }).catch(() => undefined);
       return true;
     },
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
   ).catch(async () => {
     await sendTelegramMessage({
       chatId: message.chatId,
-      text: "Command Telegram belum bisa diproses. Coba lagi sebentar lagi.",
+      text: "Telegram command could not be processed yet. Try again shortly.",
     }).catch(() => undefined);
     return true;
   });
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
   if (!token) {
     await sendTelegramMessage({
       chatId: message.chatId,
-      text: "Buka link binding dari halaman Keamanan Akun FTM.",
+      text: "Open the binding link from the FTM Account Security page.",
     }).catch(() => undefined);
     return NextResponse.json({ ok: true });
   }
@@ -97,9 +97,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const errorMessage =
       error instanceof Error &&
-      error.message === "Telegram ini sudah terhubung ke akun FTM lain."
+      error.message === "This Telegram is already connected to another FTM account."
         ? error.message
-        : "Token binding FTM tidak valid atau sudah kedaluwarsa.";
+        : "FTM binding token is invalid or has expired.";
 
     await sendTelegramMessage({
       chatId: message.chatId,

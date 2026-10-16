@@ -18,7 +18,7 @@ export function buildMonitoringRollupWindow({
   const receivedTime = Date.parse(receivedAt);
 
   if (!Number.isFinite(receivedTime)) {
-    throw new Error("Timestamp reading tidak valid untuk bucket agregasi.");
+    throw new Error("Reading timestamp is invalid for the aggregation bucket.");
   }
 
   const bucketStartTime =

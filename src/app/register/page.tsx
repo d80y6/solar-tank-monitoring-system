@@ -6,9 +6,9 @@ import { redirect } from "next/navigation";
 import SignUpForm from "./sign-up-form";
 
 export const metadata: Metadata = {
-  title: "Ajukan Akses | FTM",
+  title: "Request Access | FTM",
   description:
-    "Tampilan pengajuan akses FTM untuk operator lapangan dan reviewer operasional.",
+    "The FTM access request view for field operators and operational reviewers.",
 };
 
 export default async function RegisterPage() {
@@ -22,24 +22,24 @@ export default async function RegisterPage() {
     <AuthShell
       contentWidth="wide"
       contextNote={{
-        title: "Pengajuan akses",
+        title: "Access request",
         description:
-          "Akun baru masuk sebagai pengajuan dan harus disetujui administrator sebelum bisa membuka dashboard.",
+          "New accounts are submitted as requests and must be approved by an administrator before the dashboard can be opened.",
       }}
-      description="Lengkapi identitas kerja untuk mengajukan akses sistem manajemen tangki."
+      description="Complete your work identity to request access to the tank management system."
       footerPrompt={
         <>
-          Sudah memiliki akun?{" "}
+          Already have an account?{" "}
           <Link
             className="font-semibold text-blue-600 transition hover:text-blue-700"
             href="/login"
           >
-            Masuk di sini
+            Sign in here
           </Link>
           .
         </>
       }
-      heading="Ajukan akses pengguna"
+      heading="Request user access"
     >
       <SignUpForm />
     </AuthShell>

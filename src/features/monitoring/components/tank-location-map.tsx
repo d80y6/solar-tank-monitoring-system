@@ -46,14 +46,14 @@ const statusMeta: Record<
     badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
   },
   warning: {
-    label: "Waspada",
+    label: "Warning",
     dot: "bg-amber-500",
     pin: "text-amber-500",
     ring: "ring-amber-100",
     badge: "bg-amber-50 text-amber-700 ring-amber-100",
   },
   critical: {
-    label: "Kritis",
+    label: "Critical",
     dot: "bg-red-600",
     pin: "text-red-600",
     ring: "ring-red-100",
@@ -104,7 +104,7 @@ function LocationMarker({
       onPointerEnter={() => onPreview(site)}
       onMouseEnter={() => onPreview(site)}
       onFocus={() => onPreview(site)}
-      aria-label={`Buka detail ${site.name}, status ${meta.label}`}
+      aria-label={`Open details for ${site.name}, status ${meta.label}`}
     >
       <MapPin
         className={`size-8 drop-shadow-[0_8px_12px_rgba(0,0,0,0.26)] transition duration-200 group-hover:-translate-y-1 group-hover:scale-110 group-focus:-translate-y-1 group-focus:scale-110 ${meta.pin} ${
@@ -140,7 +140,7 @@ export function TankLocationMap({
     return (
       <div className="grid min-h-[28rem] place-items-center bg-zinc-50 p-6 text-center">
         <p className="max-w-sm text-sm leading-6 text-zinc-500">
-          Belum ada titik lokasi yang bisa ditampilkan.
+          No location pins available to display.
         </p>
       </div>
     );
@@ -228,7 +228,7 @@ export function TankLocationMap({
 
         <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
           <div className="rounded-md bg-zinc-50 p-2">
-            <p className="text-zinc-400">Isi</p>
+            <p className="text-zinc-400">Level</p>
             <p className="mt-1 font-semibold text-zinc-950">
               {activeSite.fillPercent}%
             </p>
@@ -236,7 +236,7 @@ export function TankLocationMap({
           <div className="rounded-md bg-zinc-50 p-2">
             <p className="text-zinc-400">Runtime</p>
             <p className="mt-1 font-semibold text-zinc-950">
-              {activeSite.runtimeHour} jam
+              {activeSite.runtimeHour} hrs
             </p>
           </div>
           <div className="rounded-md bg-zinc-50 p-2">
@@ -251,7 +251,7 @@ export function TankLocationMap({
           href={`/dashboard/tanks/${activeSite.tankId}`}
           className="mt-4 block rounded-lg bg-zinc-950 px-4 py-2.5 text-center text-xs font-semibold text-white transition hover:bg-red-600"
         >
-          Buka detail tangki
+          Open tank details
         </Link>
       </div>
 

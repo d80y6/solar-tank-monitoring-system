@@ -36,7 +36,7 @@ async function authorizeReadiness(request: NextRequest) {
   return Response.json(
     {
       ok: false,
-      error: "Readiness operasional hanya tersedia untuk admin.",
+      error: "Operational readiness is only available for admins.",
     },
     {
       status: 401,

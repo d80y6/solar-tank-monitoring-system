@@ -199,7 +199,7 @@ export async function loginWithPassword({
       userAgent,
       metadata: { identityHash: `sha256:${hmacSha256Hex(identity)}` },
     }).catch(() => undefined);
-    throw new Error("Login gagal. Periksa kembali data masuk Anda.");
+    throw new Error("Sign-in failed. Please check your credentials again.");
   }
 
   if (isLocked(user.lockedUntil)) {
@@ -209,7 +209,7 @@ export async function loginWithPassword({
       ip,
       userAgent,
     }).catch(() => undefined);
-    throw new Error("Akun terkunci sementara. Coba lagi beberapa saat.");
+    throw new Error("Account temporarily locked. Try again shortly.");
   }
 
   const passwordValid = await verifyPassword(password, user.passwordHash);
@@ -222,7 +222,7 @@ export async function loginWithPassword({
       ip,
       userAgent,
     }).catch(() => undefined);
-    throw new Error("Login gagal. Periksa kembali data masuk Anda.");
+    throw new Error("Sign-in failed. Please check your credentials again.");
   }
 
   if (user.status !== "active") {
@@ -233,7 +233,7 @@ export async function loginWithPassword({
       userAgent,
       metadata: { status: user.status },
     }).catch(() => undefined);
-    throw new Error("Akun belum aktif. Hubungi administrator.");
+    throw new Error("Account is not active. Contact the administrator.");
   }
 
   if (passwordNeedsRehash(user.passwordHash)) {
@@ -321,15 +321,15 @@ export async function verifyAdminOtpLogin({
     otp.used_at ||
     !otp.user_id
   ) {
-    throw new Error("Kode masuk tidak valid.");
+    throw new Error("Sign-in code is invalid.");
   }
 
   if (otp.expires_at.getTime() <= Date.now()) {
-    throw new Error("Kode masuk sudah kedaluwarsa.");
+    throw new Error("Sign-in code has expired.");
   }
 
   if (otp.attempt_count >= otp.max_attempts) {
-    throw new Error("Percobaan kode terlalu banyak.");
+    throw new Error("Too many code attempts.");
   }
 
   if (!verifyOtpHash(code, otp.code_hash)) {
@@ -340,13 +340,13 @@ export async function verifyAdminOtpLogin({
       ip,
       userAgent,
     }).catch(() => undefined);
-    throw new Error("Kode masuk tidak valid.");
+    throw new Error("Sign-in code is invalid.");
   }
 
   const user = await findAuthUserById(otp.user_id);
 
   if (!user || user.role !== "admin" || user.status !== "active") {
-    throw new Error("Akun admin tidak tersedia.");
+    throw new Error("Admin account is unavailable.");
   }
 
   await markOtpUsed(otp.id);
@@ -476,7 +476,7 @@ export async function requestPasswordReset({
   const userAgent = getRequestUserAgent(request);
 
   if (!isPasswordResetEnabled()) {
-    throw new Error("Reset kata sandi sedang dinonaktifkan.");
+    throw new Error("Password reset is currently disabled.");
   }
 
   const user = await findAuthUserByIdentity(identity);
@@ -540,11 +540,11 @@ export async function sendPasswordResetForUserId({
   const userAgent = getRequestUserAgent(request);
 
   if (!isPasswordResetEnabled()) {
-    throw new Error("Reset kata sandi sedang dinonaktifkan.");
+    throw new Error("Password reset is currently disabled.");
   }
 
   if (!user || user.status === "disabled" || user.status === "suspended") {
-    throw new Error("Akun tidak tersedia untuk reset kata sandi.");
+    throw new Error("Account is unavailable for password reset.");
   }
 
   const token = createRandomToken();
@@ -596,13 +596,13 @@ export async function resetPasswordWithToken({
   const userAgent = getRequestUserAgent(request);
 
   if (!token || !isTokenUsable(token)) {
-    throw new Error("Link reset sudah tidak valid atau kedaluwarsa.");
+    throw new Error("Reset link is invalid or has expired.");
   }
 
   const user = await findAuthUserById(token.user_id);
 
   if (!user || user.status === "disabled" || user.status === "suspended") {
-    throw new Error("Akun tidak tersedia untuk reset kata sandi.");
+    throw new Error("Account is unavailable for password reset.");
   }
 
   await updateAuthUserPasswordHash({
@@ -634,7 +634,7 @@ export async function changePasswordForSession({
   const userAgent = getRequestUserAgent(request);
 
   if (!userWithPassword || userWithPassword.id !== user.id) {
-    throw new Error("Akun tidak ditemukan.");
+    throw new Error("Account not found.");
   }
 
   const passwordValid = await verifyPassword(
@@ -650,7 +650,7 @@ export async function changePasswordForSession({
       ip,
       userAgent,
     }).catch(() => undefined);
-    throw new Error("Kata sandi saat ini tidak sesuai.");
+    throw new Error("Current password is incorrect.");
   }
 
   await updateAuthUserPasswordHash({
@@ -746,7 +746,7 @@ export async function verifyEmailToken({
   const record = await findEmailVerificationTokenRecord(hashOneTimeToken(token));
 
   if (!record || !isTokenUsable(record)) {
-    throw new Error("Link verifikasi email sudah tidak valid.");
+    throw new Error("Email verification link is invalid.");
   }
 
   await markAuthUserEmailVerified(record.user_id);
@@ -779,7 +779,7 @@ export async function revokeCurrentUserSessionById({
   sessionId: string;
 }): Promise<void> {
   if (sessionId === user.sessionId) {
-    throw new Error("Sesi aktif dicabut lewat tombol keluar.");
+    throw new Error("Active session was revoked via the sign-out button.");
   }
 
   await revokeAuthSessionForUser({
@@ -841,13 +841,13 @@ export async function completeTelegramBinding({
   });
 
   if (!binding) {
-    throw new Error("Token Telegram sudah tidak valid.");
+    throw new Error("Telegram token is invalid.");
   }
   await sendTelegramMessage({
     chatId,
     text:
-      "Akun Telegram Anda berhasil terhubung ke FTM. ✅\n\n" +
-      "Ketik /help untuk melihat bantuan dan fitur yang tersedia.",
+      "Your Telegram account is now connected to FTM. ✅\n\n" +
+      "Type /help to see available help and features.",
   }).catch(() => undefined);
   await recordAuthAuditEvent({
     eventType: "telegram_bound",

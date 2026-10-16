@@ -44,7 +44,7 @@ function SubmitButton() {
       disabled={pending}
       type="submit"
     >
-      {pending ? "Menyimpan..." : "Simpan"}
+      {pending ? "Saving..." : "Save"}
     </button>
   );
 }
@@ -62,7 +62,7 @@ function EditButton({
       onClick={onClick}
       type="button"
     >
-      {isEditing ? "Batal" : "Edit"}
+      {isEditing ? "Cancel" : "Edit"}
       {!isEditing ? <Pencil className="size-4" aria-hidden="true" /> : null}
     </button>
   );
@@ -132,7 +132,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           {/* Editable session-backed fields */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <FieldLabel htmlFor="firstName">Nama Depan</FieldLabel>
+              <FieldLabel htmlFor="firstName">First name</FieldLabel>
               <input
                 autoComplete="given-name"
                 className={inputClassName}
@@ -145,7 +145,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
               />
             </div>
             <div>
-              <FieldLabel htmlFor="lastName">Nama Belakang</FieldLabel>
+              <FieldLabel htmlFor="lastName">Last name</FieldLabel>
               <input
                 autoComplete="family-name"
                 className={inputClassName}
@@ -153,19 +153,19 @@ export function ProfileForm({ user }: ProfileFormProps) {
                 id="lastName"
                 maxLength={80}
                 name="lastName"
-                placeholder="Opsional"
+                placeholder="Optional"
                 type="text"
               />
             </div>
             <div>
-              <FieldLabel htmlFor="phone">Telepon</FieldLabel>
+              <FieldLabel htmlFor="phone">Phone</FieldLabel>
               <input
                 autoComplete="tel"
                 className={inputClassName}
                 defaultValue={user.phone ?? ""}
                 id="phone"
                 name="phone"
-                placeholder="Contoh: 081234567890"
+                placeholder="Example: 081234567890"
                 type="tel"
               />
             </div>
@@ -210,8 +210,8 @@ export function ProfileForm({ user }: ProfileFormProps) {
       ) : (
         <dl className="mt-7 grid gap-x-12 gap-y-7 sm:grid-cols-2">
           {/* Session-backed profile details */}
-          <InfoValue label="Nama Depan" value={initialName.firstName} />
-          <InfoValue label="Nama Belakang" value={initialName.lastName} />
+          <InfoValue label="First name" value={initialName.firstName} />
+          <InfoValue label="Last name" value={initialName.lastName} />
           <InfoValue label="Email Address" value={user.email} />
           <InfoValue label="Phone" value={user.phone ?? "-"} />
           <InfoValue label="Role" value={getRoleLabel(user.role)} />

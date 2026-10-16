@@ -419,7 +419,7 @@ function parseRequiredMysqlDateTimeAsUtc(value: Date | string): string {
   const isoValue = parseMysqlDateTimeAsUtc(value);
 
   if (!isoValue) {
-    throw new Error("Timestamp pengajuan device dari MySQL tidak valid.");
+    throw new Error("Device request timestamp from MySQL is invalid.");
   }
 
   return isoValue;
@@ -430,7 +430,7 @@ function formatMysqlDateTime(value: Date | string): string {
   const time = date.getTime();
 
   if (!Number.isFinite(time)) {
-    throw new Error("Timestamp pengajuan device tidak valid.");
+    throw new Error("Device request timestamp is invalid.");
   }
 
   return date.toISOString().slice(0, 23).replace("T", " ");
@@ -646,7 +646,7 @@ async function findHardwareProfileById({
   const row = rows[0];
 
   if (!row) {
-    throw new Error("Hardware profile pengajuan tidak ditemukan.");
+    throw new Error("Request hardware profile not found.");
   }
 
   return rowToHardwareProfile(row);
@@ -678,7 +678,7 @@ async function findFirmwareTemplateById({
   const row = rows[0];
 
   if (!row) {
-    throw new Error("Template firmware pengajuan tidak ditemukan.");
+    throw new Error("Request firmware template not found.");
   }
 
   return rowToFirmwareTemplate(row);
@@ -746,7 +746,7 @@ async function findPackageById({
   const row = rows[0];
 
   if (!row) {
-    throw new Error("Paket firmware tidak ditemukan setelah diperbarui.");
+    throw new Error("Firmware package not found after update.");
   }
 
   return rowToFirmwarePackage(row);
@@ -870,7 +870,7 @@ async function assertDeviceCodeIsAvailable({
 
   if (deviceRows.length > 0) {
     throw new Error(
-      "Kode perangkat sudah dipakai di registry aktif. Gunakan kode perangkat lain.",
+      "Device code is already used in the active registry. Use a different device code.",
     );
   }
 
@@ -891,7 +891,7 @@ async function assertDeviceCodeIsAvailable({
 
   if (existingRequest) {
     throw new Error(
-      `Kode perangkat masih dipakai oleh pengajuan ${existingRequest.request_code}. Selesaikan pengajuan itu dulu atau gunakan kode lain.`,
+      `Device code is still in use by request ${existingRequest.request_code}. Complete that request first or use a different code.`,
     );
   }
 }
@@ -959,7 +959,7 @@ export async function createDeviceRequestInMysql({
     return {
       ok: false,
       issues: buildResult.validation.errors,
-      message: "Data pengajuan device belum lengkap atau belum sesuai.",
+      message: "Device request data is incomplete or invalid.",
     };
   }
 
@@ -1105,7 +1105,7 @@ async function findDeviceRequestForUpdate({
   const row = rows[0];
 
   if (!row) {
-    throw new Error("Pengajuan device tidak ditemukan.");
+    throw new Error("Device request not found.");
   }
 
   return rowToDeviceRequest(row);
@@ -1130,7 +1130,7 @@ async function findDeviceRequestById({
   const row = rows[0];
 
   if (!row) {
-    throw new Error("Pengajuan device tidak ditemukan setelah diperbarui.");
+    throw new Error("Device request not found after update.");
   }
 
   return rowToDeviceRequest(row);
@@ -1264,7 +1264,7 @@ async function createInactiveRegistryForApprovedRequest({
     [
       tankId,
       siteId,
-      "Tangki utama",
+      "Main tank",
       request.tankShape,
       request.capacityLiter,
       request.diameterCm ?? null,
@@ -1406,7 +1406,7 @@ async function insertFirmwarePackage({
   const row = rows[0];
 
   if (!row) {
-    throw new Error("Paket firmware gagal dibaca setelah dibuat.");
+    throw new Error("Firmware package could not be read after creation.");
   }
 
   return rowToFirmwarePackage(row);
@@ -1432,7 +1432,7 @@ async function createPackageForRequest({
 
   if (!hardwareProfile.isActive || !firmwareTemplate.isActive) {
     throw new Error(
-      "Hardware profile atau template firmware belum aktif. Aktifkan dulu setelah dikonfirmasi.",
+      "Hardware profile or firmware template is not active. Activate it after confirmation first.",
     );
   }
 
@@ -1499,7 +1499,7 @@ export async function approveDeviceRequestInMysql({
     const request = await findDeviceRequestForUpdate({ connection, requestId });
 
     if (request.status !== "pending_admin_review") {
-      throw new Error("Pengajuan device ini sudah diproses sebelumnya.");
+      throw new Error("This device request has already been processed.");
     }
 
     const packageResult = await createPackageForRequest({
@@ -1628,7 +1628,7 @@ export async function refreshDevicePackageDownloadTokenInMysql({
       request.status !== "waiting_first_valid_ping"
     ) {
       throw new Error(
-        "Link firmware hanya bisa dikirim ulang untuk perangkat yang paketnya sudah dibuat dan belum aktif.",
+        "Firmware link can only be resent for devices whose package has been created and is not yet active.",
       );
     }
 
@@ -1638,7 +1638,7 @@ export async function refreshDevicePackageDownloadTokenInMysql({
     });
 
     if (!packageRow) {
-      throw new Error("Paket firmware belum tersedia untuk pengajuan ini.");
+      throw new Error("Firmware package is not available for this request yet.");
     }
 
     const devicePackage = rowToFirmwarePackage(packageRow);
@@ -1650,7 +1650,7 @@ export async function refreshDevicePackageDownloadTokenInMysql({
       devicePackage.packageStatus === "activated"
     ) {
       throw new Error(
-        "Paket firmware ini tidak bisa dikirim ulang. Buat ulang paket jika masih diperlukan.",
+        "This firmware package cannot be resent. Recreate the package if it is still needed.",
       );
     }
 
@@ -1748,13 +1748,13 @@ export async function reissueDevicePackageInMysql({
       request.status === "revoked"
     ) {
       throw new Error(
-        "Paket firmware hanya bisa dibuat ulang setelah pengajuan disetujui.",
+        "Firmware package can only be regenerated after the request is approved.",
       );
     }
 
     if (request.status === "active") {
       throw new Error(
-        "Perangkat yang sudah aktif tidak dibuat ulang otomatis dari sini. Cabut akses dulu jika key perlu diganti.",
+        "Active devices are not automatically regenerated from here. Revoke access first if the key needs to be replaced.",
       );
     }
 
@@ -1837,7 +1837,7 @@ export async function revokeDeviceProvisioningInMysql({
       request.status === "revoked"
     ) {
       throw new Error(
-        "Pengajuan ini belum memiliki akses perangkat aktif yang bisa dicabut.",
+        "This request does not have an active device access that can be revoked.",
       );
     }
 
@@ -2117,7 +2117,7 @@ export async function downloadDevicePackageByTokenFromMysql(
     return {
       ok: false,
       status: 400,
-      message: "Token download tidak valid.",
+      message: "Download token is invalid.",
     };
   }
 
@@ -2137,7 +2137,7 @@ export async function downloadDevicePackageByTokenFromMysql(
       return {
         ok: false,
         status: 404,
-        message: "Paket firmware tidak ditemukan.",
+        message: "Firmware package not found.",
       };
     }
 
@@ -2153,7 +2153,7 @@ export async function downloadDevicePackageByTokenFromMysql(
       return {
         ok: false,
         status: 410,
-        message: "Link download firmware sudah tidak berlaku.",
+        message: "Firmware download link is no longer valid.",
       };
     }
 
@@ -2177,7 +2177,7 @@ export async function downloadDevicePackageByTokenFromMysql(
       return {
         ok: false,
         status: 410,
-        message: "Link download firmware sudah kedaluwarsa.",
+        message: "Firmware download link has expired.",
       };
     }
 
@@ -2186,7 +2186,7 @@ export async function downloadDevicePackageByTokenFromMysql(
       return {
         ok: false,
         status: 429,
-        message: "Batas download paket firmware sudah habis.",
+        message: "Firmware package download limit reached.",
       };
     }
 
@@ -2218,7 +2218,7 @@ export async function downloadDevicePackageByTokenFromMysql(
         ok: false,
         status: 410,
         message:
-          "Paket firmware lama belum memiliki file ZIP. Admin perlu membuat pengajuan baru agar paket firmware bisa diunduh.",
+          "Legacy firmware package has no ZIP file. Admin needs to create a new request so the firmware package can be downloaded.",
       };
     }
 
@@ -2242,7 +2242,7 @@ export async function downloadDevicePackageByTokenFromMysql(
       return {
         ok: false,
         status: 500,
-        message: "Paket firmware belum bisa dibuka.",
+        message: "Firmware package could not be opened.",
       };
     }
 
@@ -2305,11 +2305,11 @@ export async function rejectDeviceRequestInMysql({
   const cleanReason = normalizeRejectionReason(rejectionReason);
 
   if (cleanReason.length < 8) {
-    throw new Error("Alasan penolakan wajib jelas, minimal 8 karakter.");
+    throw new Error("Rejection reason must be clear, at least 8 characters.");
   }
 
   if (cleanReason.length > 1000) {
-    throw new Error("Alasan penolakan maksimal 1000 karakter.");
+    throw new Error("Rejection reason is limited to 1000 characters.");
   }
 
   const pool = getMysqlPool();
@@ -2321,7 +2321,7 @@ export async function rejectDeviceRequestInMysql({
     const request = await findDeviceRequestForUpdate({ connection, requestId });
 
     if (request.status !== "pending_admin_review") {
-      throw new Error("Pengajuan device ini sudah diproses sebelumnya.");
+      throw new Error("This device request has already been processed.");
     }
 
     await connection.execute(

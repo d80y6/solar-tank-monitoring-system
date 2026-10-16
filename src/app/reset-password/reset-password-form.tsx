@@ -34,12 +34,12 @@ function PasswordInput({
           className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-11 pr-12 text-[0.95rem] text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
           id={id}
           name={name}
-          placeholder="Minimal 10 karakter, huruf dan angka"
+          placeholder="Minimum 10 characters, letters and numbers"
           required
           type={visible ? "text" : "password"}
         />
         <button
-          aria-label={visible ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
+          aria-label={visible ? "Hide password" : "Show password"}
           className="absolute inset-y-0 right-0 grid w-12 place-items-center text-zinc-400 transition hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600"
           onClick={() => setVisible((current) => !current)}
           type="button"
@@ -60,7 +60,7 @@ export default function ResetPasswordForm({ token }: { token: string }) {
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(
-    token ? null : "Link reset tidak lengkap.",
+    token ? null : "The reset link is incomplete.",
   );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -86,10 +86,10 @@ export default function ResetPasswordForm({ token }: { token: string }) {
         | null;
 
       if (!response.ok || !result?.ok) {
-        throw new Error(result?.error ?? "Reset kata sandi gagal.");
+        throw new Error(result?.error ?? "Password reset failed.");
       }
 
-      setMessage(result.data?.message ?? "Kata sandi berhasil diganti.");
+      setMessage(result.data?.message ?? "Password changed successfully.");
       setTimeout(() => {
         router.replace("/login");
       }, 1200);
@@ -97,7 +97,7 @@ export default function ResetPasswordForm({ token }: { token: string }) {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Reset kata sandi belum bisa diproses.",
+          : "The password reset could not be processed yet.",
       );
     } finally {
       setPending(false);
@@ -108,10 +108,10 @@ export default function ResetPasswordForm({ token }: { token: string }) {
     <form className="mt-7 space-y-4" noValidate onSubmit={handleSubmit}>
       <input name="token" type="hidden" value={token} />
 
-      <PasswordInput id="password" label="Password baru" name="password" />
+      <PasswordInput id="password" label="New password" name="password" />
       <PasswordInput
         id="confirmPassword"
-        label="Konfirmasi password baru"
+        label="Confirm new password"
         name="confirmPassword"
       />
 
@@ -132,7 +132,7 @@ export default function ResetPasswordForm({ token }: { token: string }) {
         disabled={pending || !token}
         type="submit"
       >
-        {pending ? "Menyimpan..." : "Simpan password baru"}
+        {pending ? "Saving..." : "Save new password"}
         <ArrowRight
           aria-hidden="true"
           className="size-4 transition group-hover:translate-x-0.5"

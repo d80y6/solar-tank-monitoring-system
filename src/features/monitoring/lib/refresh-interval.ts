@@ -26,11 +26,11 @@ export function formatMonitoringRefreshInterval(intervalMs: number): string {
   const totalSeconds = Math.round(normalizedIntervalMs / 1000);
 
   if (totalSeconds < 60) {
-    return `${totalSeconds} dtk`;
+    return `${totalSeconds} sec`;
   }
 
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
 
-  return seconds > 0 ? `${minutes} mnt ${seconds} dtk` : `${minutes} mnt`;
+  return seconds > 0 ? `${minutes} min ${seconds} sec` : `${minutes} min`;
 }

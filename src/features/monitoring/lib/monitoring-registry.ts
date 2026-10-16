@@ -66,7 +66,7 @@ function createRegistrySource(
     configuredDriver: "memory",
     activeDriver: "memory",
     isFallback: false,
-    label: "Registry memory lokal",
+    label: "Local memory registry",
   };
 }
 
@@ -77,7 +77,7 @@ function assertCompleteReferenceData(reference: MonitoringReferenceData): void {
     reference.devices.length === 0
   ) {
     throw new Error(
-      "Registry site/tangki/device MySQL belum lengkap. Jalankan migration dan seed reference data terlebih dahulu.",
+      "MySQL site/tank/device registry is incomplete. Run the migrations and reference data seeds first.",
     );
   }
 }

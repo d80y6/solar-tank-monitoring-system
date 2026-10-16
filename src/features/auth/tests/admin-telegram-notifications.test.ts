@@ -42,7 +42,7 @@ describe("admin telegram notifications", () => {
       accessRequestId: "req_demo",
       createdAt: new Date("2026-07-07T14:00:00.000Z"),
       payload: {
-        accessReason: "Butuh akses dashboard monitoring.",
+        accessReason: "Needs monitoring dashboard access.",
         email: "operator@example.com",
         fullName: "Operator STO",
         phone: "+6281234567890",
@@ -65,16 +65,16 @@ describe("admin telegram notifications", () => {
       1,
       expect.objectContaining({
         chatId: "111",
-        text: expect.stringContaining("Pengajuan akses baru FTM"),
+        text: expect.stringContaining("New FTM access request"),
       }),
     );
 
     const message = mocks.sendTelegramMessage.mock.calls[0]?.[0]
       .text as string;
 
-    expect(message).toContain("Nama: Operator STO");
+    expect(message).toContain("Name: Operator STO");
     expect(message).toContain("Email: operator@example.com");
-    expect(message).toContain("Kode pengajuan: req_demo");
+    expect(message).toContain("Request code: req_demo");
     expect(message).toContain(
       "https://solar.example/dashboard/admin/users?request=req_demo",
     );

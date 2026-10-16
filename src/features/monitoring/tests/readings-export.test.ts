@@ -23,7 +23,7 @@ const baseReading: Reading = {
 };
 
 describe("readings export", () => {
-  it("creates stable Indonesian csv output sorted by received time", () => {
+  it("creates stable csv output sorted by received time", () => {
     const csv = createTankReadingsCsv([
       {
         ...baseReading,
@@ -51,7 +51,7 @@ describe("readings export", () => {
           needsReview: false,
           runtimeSource: "backend",
           volumeSource: "backend",
-          warnings: ['nilai "uji", aman'],
+          warnings: ['value "test", safe'],
         },
         receivedAt: "2026-07-07T01:00:01.000Z",
       },
@@ -59,14 +59,14 @@ describe("readings export", () => {
     const lines = csv.trimEnd().split("\r\n");
 
     expect(lines[0]).toBe(
-      "id_reading,id_tangki,id_perangkat,waktu_pengukuran_utc,waktu_pengukuran_wib,waktu_diterima_utc,waktu_diterima_wib,jarak_sensor_cm,tinggi_solar_cm,volume_liter,persentase_isi,sisa_runtime_jam,baterai_volt,sinyal_rssi_dbm,status_konfigurasi,perlu_review,peringatan,resolusi,bucket_mulai_utc,bucket_mulai_wib,bucket_selesai_utc,bucket_selesai_wib,jumlah_sampel,volume_min_liter,volume_max_liter,persentase_min,persentase_max,periode_unduhan",
+      "reading_id,tank_id,device_id,measured_at_utc,measured_at_wib,received_at_utc,received_at_wib,sensor_distance_cm,fuel_height_cm,volume_liter,fill_percent,remaining_runtime_hour,battery_volt,rssi_dbm,config_status,needs_review,warnings,resolution,bucket_start_utc,bucket_start_wib,bucket_end_utc,bucket_end_wib,sample_count,volume_min_liter,volume_max_liter,percent_min,percent_max,download_period",
     );
     expect(lines[1]).toContain("reading-1");
     expect(lines[2]).toContain("reading-2");
-    expect(lines[1]).toContain('"nilai ""uji"", aman"');
+    expect(lines[1]).toContain('"value ""test"", safe"');
     expect(lines[1]).toContain(",5m,");
     expect(lines[1]).toContain(",15,480,520,48,52,");
-    expect(lines[1]).toContain("1 hari (7 Juli 2026)");
+    expect(lines[1]).toContain("1 day (July 7, 2026)");
   });
 
   it("filters export data by the selected calendar range in WIB", () => {
@@ -91,7 +91,7 @@ describe("readings export", () => {
     const filteredReadings = filterReadingsForExportPeriod(readings, period);
     const csv = createTankReadingsCsv(readings, { rangeKey: "day" });
 
-    expect(period.label).toBe("1 hari (7 Juli 2026)");
+    expect(period.label).toBe("1 day (July 7, 2026)");
     expect(filteredReadings.map((reading) => reading.id)).toEqual([
       "first-period-reading",
       "latest-period-reading",
@@ -106,15 +106,15 @@ describe("readings export", () => {
       period,
       siteCode: "STO Psr-01",
       tankId: "tank-1",
-      tankName: "Tangki Utama",
+      tankName: "Main Tank",
     });
 
     expect(parseReadingExportRange(null)).toBe("day");
     expect(parseReadingExportRange("7d")).toBe("week");
     expect(parseReadingExportRange("unknown")).toBeNull();
-    expect(period.label).toBe("7 hari (1 Juli 2026 sampai 7 Juli 2026)");
+    expect(period.label).toBe("7 days (July 1, 2026 to July 7, 2026)");
     expect(filename).toBe(
-      "solartank_sto-psr-01_tangki-utama_reading_7-hari_2026-07-01_sampai_2026-07-07.csv",
+      "solartank_sto-psr-01_main-tank_reading_7-days_2026-07-01_to_2026-07-07.csv",
     );
   });
 });

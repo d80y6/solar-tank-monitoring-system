@@ -25,7 +25,7 @@ function MobileNavItem({
     return (
       <span className={className}>
         {item.label}
-        <span className="text-xs font-semibold text-white/80">Aktif</span>
+        <span className="text-xs font-semibold text-white/80">Active</span>
       </span>
     );
   }
@@ -80,7 +80,7 @@ export function DashboardMobileNav({ navItems }: DashboardMobileNavProps) {
       <button
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        aria-label={isOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
+        aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
         className="grid size-10 place-items-center rounded-full border border-zinc-200 bg-white text-zinc-800 shadow-sm transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
         onClick={() => setIsOpen((current) => !current)}
         type="button"
@@ -103,13 +103,13 @@ export function DashboardMobileNav({ navItems }: DashboardMobileNavProps) {
         >
           <div className="border-b border-zinc-100 px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-              Navigasi
+              Navigation
             </p>
             <p className="mt-1 text-sm font-semibold text-zinc-950">
               FTM
             </p>
           </div>
-          <nav className="mt-2 grid gap-1" aria-label="Navigasi mobile">
+          <nav className="mt-2 grid gap-1" aria-label="Mobile navigation">
             {navItems.map((item) => (
               <MobileNavItem
                 item={item}

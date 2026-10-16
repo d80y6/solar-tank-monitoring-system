@@ -123,22 +123,22 @@ type ChartSamplingOptions = {
 export const SIMPLE_TANK_CHART_RANGES: SimpleTankChartRange[] = [
   {
     key: "day",
-    label: "1 hari",
-    bucketLabel: "Bucket 5 menit",
+    label: "1 day",
+    bucketLabel: "5-minute buckets",
     bucketMinutes: 5,
     days: 1,
   },
   {
     key: "week",
-    label: "7 hari",
-    bucketLabel: "Rata-rata per jam",
+    label: "7 days",
+    bucketLabel: "Hourly averages",
     bucketMinutes: 60,
     days: 7,
   },
   {
     key: "month",
-    label: "30 hari",
-    bucketLabel: "Rata-rata per tanggal",
+    label: "30 days",
+    bucketLabel: "Daily averages",
     bucketMinutes: 60 * 24,
     days: 30,
   },
@@ -146,9 +146,9 @@ export const SIMPLE_TANK_CHART_RANGES: SimpleTankChartRange[] = [
 
 const deviceStatusLabels: Record<DeviceStatus, string> = {
   online: "Online",
-  delayed: "Terlambat",
+  delayed: "Delayed",
   offline: "Offline",
-  unknown: "Belum terbaca",
+  unknown: "No data",
 };
 
 function parseTime(value: string) {
@@ -157,18 +157,16 @@ function parseTime(value: string) {
 }
 
 function formatClockLabel(date: Date) {
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
     timeZone: DISPLAY_TIME_ZONE,
-  })
-    .format(date)
-    .replaceAll(".", ":");
+  }).format(date);
 }
 
 function formatDateLabel(date: Date) {
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     month: "short",
     timeZone: DISPLAY_TIME_ZONE,
@@ -194,14 +192,14 @@ function formatDurationLabel(durationMs: number) {
   const minutes = totalMinutes % 60;
 
   if (days > 0) {
-    return hours > 0 ? `${days} hari ${hours} jam` : `${days} hari`;
+    return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
   }
 
   if (hours > 0) {
-    return minutes > 0 ? `${hours} jam ${minutes} menit` : `${hours} jam`;
+    return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
   }
 
-  return `${minutes} menit`;
+  return `${minutes}m`;
 }
 
 function startOfDisplayDay(time: number) {

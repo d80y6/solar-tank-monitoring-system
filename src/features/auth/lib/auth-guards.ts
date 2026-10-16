@@ -56,7 +56,7 @@ export async function requireApiUser(
     return {
       ok: false,
       response: NextResponse.json(
-        { ok: false, error: "Autentikasi diperlukan." },
+        { ok: false, error: "Authentication required." },
         { status: 401 },
       ),
     };
@@ -66,7 +66,7 @@ export async function requireApiUser(
     return {
       ok: false,
       response: NextResponse.json(
-        { ok: false, error: "Akses tidak tersedia untuk peran akun ini." },
+        { ok: false, error: "Access is not available for this account role." },
         { status: 403 },
       ),
     };

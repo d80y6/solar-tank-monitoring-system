@@ -3,9 +3,9 @@ import { DashboardRouteLoading } from "@/components/dashboard/dashboard-route-lo
 export default function LocationsLoading() {
   return (
     <DashboardRouteLoading
-      label="Memuat lokasi"
-      title="Menyiapkan lokasi perangkat"
-      description="Sistem sedang membaca data STO, perangkat, dan konfigurasi tangki."
+      label="Loading locations"
+      title="Preparing device locations"
+      description="The system is reading STO data, devices, and tank configuration."
     />
   );
 }

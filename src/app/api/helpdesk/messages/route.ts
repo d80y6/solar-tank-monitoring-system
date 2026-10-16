@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     if (!sessionToken) {
       return NextResponse.json(
-        { ok: false, error: "Token sesi helpdesk tidak tersedia." },
+        { ok: false, error: "Helpdesk session token is unavailable." },
         { status: 400 },
       );
     }
@@ -55,9 +55,9 @@ export async function GET(request: NextRequest) {
       {
         ok: false,
         error: getSafeErrorMessage(error, {
-          fallbackMessage: "Pesan helpdesk belum bisa dimuat.",
+          fallbackMessage: "Helpdesk messages could not be loaded yet.",
           internalMessage:
-            "Pesan helpdesk belum bisa dimuat karena layanan database belum siap.",
+            "Helpdesk messages could not be loaded because the database service is not ready.",
         }),
       },
       { status: 500 },
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { ok: false, error: "Terlalu banyak pesan helpdesk." },
+        { ok: false, error: "Too many helpdesk messages." },
         {
           status: 429,
           headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
@@ -106,9 +106,9 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         error: getSafeErrorMessage(error, {
-          fallbackMessage: "Pesan helpdesk belum bisa dikirim.",
+          fallbackMessage: "Helpdesk message could not be sent yet.",
           internalMessage:
-            "Pesan helpdesk belum bisa dikirim karena layanan database belum siap.",
+            "Helpdesk message could not be sent because the database service is not ready.",
         }),
       },
       { status: 500 },

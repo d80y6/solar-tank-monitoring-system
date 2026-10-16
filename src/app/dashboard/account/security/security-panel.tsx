@@ -8,7 +8,7 @@ import { KeyRound, Link2, LogOut, RefreshCcw, Send } from "lucide-react";
 import type { AuthSessionSummary, AuthSessionUser } from "@/features/auth/types";
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     month: "short",
     hour: "2-digit",
@@ -80,17 +80,17 @@ export default function AccountSecurityPanel({
       const result = await readJson(response);
 
       if (!response.ok || !result?.ok) {
-        throw new Error(result?.error ?? "Password belum bisa diganti.");
+        throw new Error(result?.error ?? "Password could not be changed yet.");
       }
 
-      setMessage(String(result.data?.message ?? "Password berhasil diganti."));
+      setMessage(String(result.data?.message ?? "Password changed successfully."));
       form.reset();
       await refreshSessions();
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Password belum bisa diganti.",
+          : "Password could not be changed yet.",
       );
     } finally {
       setPasswordPending(false);
@@ -110,23 +110,23 @@ export default function AccountSecurityPanel({
       const result = await readJson(response);
 
       if (!response.ok || !result?.ok) {
-        throw new Error(result?.error ?? "Sesi belum bisa dicabut.");
+        throw new Error(result?.error ?? "Session could not be revoked yet.");
       }
 
-      setMessage(String(result.data?.message ?? "Sesi berhasil dicabut."));
+      setMessage(String(result.data?.message ?? "Session revoked successfully."));
       await refreshSessions();
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Sesi belum bisa dicabut.",
+          : "Session could not be revoked yet.",
       );
     }
   }
 
   async function startTelegramBinding() {
     if (telegramConnected) {
-      setMessage("Telegram sudah terhubung ke akun ini.");
+      setMessage("Telegram is connected to this account.");
       return;
     }
 
@@ -149,19 +149,19 @@ export default function AccountSecurityPanel({
         | null;
 
       if (!response.ok || !result?.ok) {
-        throw new Error(result?.error ?? "Binding Telegram belum bisa dimulai.");
+        throw new Error(result?.error ?? "Telegram binding could not be started yet.");
       }
 
       setTelegramLink(result.data?.deepLink ?? null);
       setTelegramToken(result.data?.token ?? null);
       setMessage(
-        "Token Telegram dibuat. Buka bot Telegram atau kirim perintah /start TOKEN ke bot.",
+        "Telegram token created. Open the Telegram bot or send the /start TOKEN command to the bot.",
       );
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Binding Telegram belum bisa dimulai.",
+          : "Telegram binding could not be started yet.",
       );
     } finally {
       setTelegramPending(false);
@@ -184,7 +184,7 @@ export default function AccountSecurityPanel({
         | null;
 
       if (!response.ok || !result?.ok || !result.data?.user) {
-        throw new Error(result?.error ?? "Status Telegram belum bisa dicek.");
+        throw new Error(result?.error ?? "Telegram status could not be checked yet.");
       }
 
       const nextVerifiedAt = result.data.user.telegramVerifiedAt;
@@ -193,18 +193,18 @@ export default function AccountSecurityPanel({
       if (nextVerifiedAt) {
         setTelegramLink(null);
         setTelegramToken(null);
-        setMessage("Telegram sudah terhubung ke akun ini.");
+        setMessage("Telegram is connected to this account.");
         router.refresh();
       } else {
         setMessage(
-          "Telegram belum terhubung. Selesaikan instruksi dari bot, lalu cek status lagi.",
+          "Telegram is not connected. Complete the bot instructions, then check the status again.",
         );
       }
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Status Telegram belum bisa dicek.",
+          : "Telegram status could not be checked yet.",
       );
     } finally {
       setTelegramStatusPending(false);
@@ -222,7 +222,7 @@ export default function AccountSecurityPanel({
             <p className="text-sm font-semibold uppercase text-zinc-500">
               Password
             </p>
-            <h2 className="text-xl font-semibold">Ganti kata sandi</h2>
+            <h2 className="text-xl font-semibold">Change password</h2>
           </div>
         </div>
 
@@ -231,7 +231,7 @@ export default function AccountSecurityPanel({
             autoComplete="current-password"
             className="h-11 rounded-lg border border-zinc-300 px-3 text-sm outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
             name="currentPassword"
-            placeholder="Password saat ini"
+            placeholder="Current password"
             required
             type="password"
           />
@@ -239,7 +239,7 @@ export default function AccountSecurityPanel({
             autoComplete="new-password"
             className="h-11 rounded-lg border border-zinc-300 px-3 text-sm outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
             name="password"
-            placeholder="Password baru"
+            placeholder="New password"
             required
             type="password"
           />
@@ -247,7 +247,7 @@ export default function AccountSecurityPanel({
             autoComplete="new-password"
             className="h-11 rounded-lg border border-zinc-300 px-3 text-sm outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
             name="confirmPassword"
-            placeholder="Ulangi password baru"
+            placeholder="Repeat new password"
             required
             type="password"
           />
@@ -257,7 +257,7 @@ export default function AccountSecurityPanel({
             type="submit"
           >
             <KeyRound className="size-4" aria-hidden="true" />
-            {passwordPending ? "Menyimpan..." : "Simpan password"}
+            {passwordPending ? "Saving..." : "Save password"}
           </button>
         </form>
 
@@ -269,11 +269,11 @@ export default function AccountSecurityPanel({
             <div>
               <h3 className="font-semibold">Telegram</h3>
               <p className="text-sm text-zinc-500">
-                Status: {telegramConnected ? "terhubung" : "belum terhubung"}
+                Status: {telegramConnected ? "connected" : "not connected"}
               </p>
               {telegramVerifiedAt ? (
                 <p className="mt-0.5 text-xs text-zinc-500">
-                  Terhubung {formatDate(telegramVerifiedAt)}.
+                  Connected {formatDate(telegramVerifiedAt)}.
                 </p>
               ) : null}
             </div>
@@ -287,7 +287,7 @@ export default function AccountSecurityPanel({
                 type="button"
               >
                 <Send className="size-4" aria-hidden="true" />
-                {telegramPending ? "Membuat token..." : "Hubungkan Telegram"}
+                {telegramPending ? "Creating token..." : "Connect Telegram"}
               </button>
             ) : null}
             <button
@@ -297,7 +297,7 @@ export default function AccountSecurityPanel({
               type="button"
             >
               <RefreshCcw className="size-4" aria-hidden="true" />
-              {telegramStatusPending ? "Mengecek..." : "Cek status Telegram"}
+              {telegramStatusPending ? "Checking..." : "Check Telegram status"}
             </button>
           </div>
           {telegramLink || telegramToken ? (
@@ -309,12 +309,12 @@ export default function AccountSecurityPanel({
                   rel="noreferrer"
                   target="_blank"
                 >
-                  Buka bot Telegram
+                  Open Telegram bot
                 </a>
               ) : null}
               {telegramToken ? (
                 <p className="mt-2 break-all">
-                  Kirim ke bot:{" "}
+                  Send to bot:{" "}
                   <code className="rounded bg-zinc-100 px-1.5 py-1 font-semibold text-zinc-950">
                     /start {telegramToken}
                   </code>
@@ -329,9 +329,9 @@ export default function AccountSecurityPanel({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold uppercase text-zinc-500">
-              Sesi aktif
+              Active sessions
             </p>
-            <h2 className="text-xl font-semibold">Perangkat yang masuk</h2>
+            <h2 className="text-xl font-semibold">Signed-in devices</h2>
           </div>
           <button
             className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-100"
@@ -339,7 +339,7 @@ export default function AccountSecurityPanel({
             type="button"
           >
             <RefreshCcw className="size-4" aria-hidden="true" />
-            Muat ulang
+            Reload
           </button>
         </div>
 
@@ -355,7 +355,7 @@ export default function AccountSecurityPanel({
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-semibold">
-                      {session.current ? "Sesi saat ini" : "Sesi lain"}
+                      {session.current ? "Current session" : "Other session"}
                     </h3>
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
@@ -364,12 +364,12 @@ export default function AccountSecurityPanel({
                           : "bg-zinc-100 text-zinc-600 ring-zinc-200"
                       }`}
                     >
-                      {active ? "Aktif" : "Tidak aktif"}
+                      {active ? "Active" : "Inactive"}
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-zinc-500">
-                    Terakhir terlihat {formatDate(session.lastSeenAt)}.
-                    Kedaluwarsa {formatDate(session.expiresAt)}.
+                    Last seen {formatDate(session.lastSeenAt)}.
+                    Expires {formatDate(session.expiresAt)}.
                   </p>
                 </div>
                 <button
@@ -379,7 +379,7 @@ export default function AccountSecurityPanel({
                   type="button"
                 >
                   <LogOut className="size-4" aria-hidden="true" />
-                  Cabut
+                  Revoke
                 </button>
               </article>
             );

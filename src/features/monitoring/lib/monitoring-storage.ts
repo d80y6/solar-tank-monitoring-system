@@ -68,7 +68,7 @@ function createStorageSource({
     configuredDriver,
     activeDriver,
     isFallback,
-    label: "Memory lokal",
+    label: "Local memory",
   };
 }
 

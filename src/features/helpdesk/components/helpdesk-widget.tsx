@@ -44,7 +44,7 @@ function isOwnMessage(message: HelpdeskMessage): boolean {
 }
 
 function formatMessageTime(value: string): string {
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     timeZone: "Asia/Jakarta",
@@ -83,7 +83,7 @@ export function HelpdeskWidget() {
     const payload = (await response.json()) as HelpdeskApiResponse;
 
     if (!response.ok || !payload.ok || !payload.data) {
-      throw new Error(payload.error || "Helpdesk belum tersedia.");
+      throw new Error(payload.error || "Helpdesk is not available yet.");
     }
 
     applyBundle(payload.data);
@@ -152,7 +152,7 @@ export function HelpdeskWidget() {
       const payload = (await response.json()) as HelpdeskApiResponse;
 
       if (!response.ok || !payload.ok || !payload.data) {
-        throw new Error(payload.error || "Pesan belum bisa dikirim.");
+        throw new Error(payload.error || "Message could not be sent yet.");
       }
 
       setDraft("");
@@ -161,7 +161,7 @@ export function HelpdeskWidget() {
       setError(
         sendError instanceof Error
           ? sendError.message
-          : "Pesan belum bisa dikirim.",
+          : "Message could not be sent yet.",
       );
     } finally {
       setPending(false);
@@ -177,7 +177,7 @@ export function HelpdeskWidget() {
           setError(
             openError instanceof Error
               ? openError.message
-              : "Helpdesk belum tersedia.",
+              : "Helpdesk is not available yet.",
           );
         });
       }
@@ -196,7 +196,7 @@ export function HelpdeskWidget() {
       setError(
         openError instanceof Error
           ? openError.message
-          : "Helpdesk belum tersedia.",
+          : "Helpdesk is not available yet.",
       );
     });
   }
@@ -222,7 +222,7 @@ export function HelpdeskWidget() {
               </p>
             </div>
             <button
-              aria-label="Tutup helpdesk"
+              aria-label="Close helpdesk"
               className="grid size-9 place-items-center rounded-lg text-zinc-300 transition hover:bg-white/10 hover:text-white"
               onClick={() => setIsOpen(false)}
               type="button"
@@ -284,7 +284,7 @@ export function HelpdeskWidget() {
                 onClick={startNewSession}
                 type="button"
               >
-                Sesi baru
+                New session
               </button>
             </div>
           ) : (
@@ -295,12 +295,12 @@ export function HelpdeskWidget() {
               <textarea
                 className="max-h-28 min-h-11 resize-none rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none transition placeholder:text-zinc-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 onChange={(event) => setDraft(event.target.value)}
-                placeholder="Tulis pesan..."
+                placeholder="Type a message..."
                 rows={1}
                 value={draft}
               />
               <button
-                aria-label="Kirim pesan"
+                aria-label="Send message"
                 className="grid size-11 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:shadow-none"
                 disabled={pending || !draft.trim()}
                 type="submit"
@@ -314,7 +314,7 @@ export function HelpdeskWidget() {
 
       {!isOpen ? (
         <button
-          aria-label="Buka helpdesk"
+          aria-label="Open helpdesk"
           className="grid size-14 place-items-center rounded-full bg-blue-600 text-white shadow-2xl shadow-blue-700/30 ring-1 ring-blue-400/50 transition hover:bg-blue-700"
           onClick={toggleWidget}
           type="button"

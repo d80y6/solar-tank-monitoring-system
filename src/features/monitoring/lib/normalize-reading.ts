@@ -42,7 +42,7 @@ function resolveMeasuredAtCandidate(
     return {
       measuredAt: receivedAt.toISOString(),
       source: "server",
-      warning: "Timestamp device tidak valid; measuredAt memakai waktu server.",
+      warning: "Device timestamp is invalid; measuredAt uses server time.",
     };
   }
 
@@ -53,7 +53,7 @@ function resolveMeasuredAtCandidate(
       measuredAt: receivedAt.toISOString(),
       source: "server",
       warning:
-        "Timestamp device berbeda lebih dari 24 jam dari waktu server; measuredAt memakai waktu server.",
+        "Device timestamp differs from server time by more than 24 hours; measuredAt uses server time."
     };
   }
 
@@ -106,18 +106,18 @@ function normalizeDistanceCm({
 }): number {
   if (value === null) {
     warnings.push(
-      "Payload tidak membawa distance_cm; jarak sensor fallback ke 0 cm.",
+      "Payload does not carry distance_cm; sensor distance falls back to 0 cm."
     );
     return 0;
   }
 
   if (value < 0) {
-    warnings.push("distance_cm bernilai negatif; nilai dikunci ke 0 cm.");
+    warnings.push("distance_cm is negative; value clamped to 0 cm.");
   }
 
   if (value > maxFuelHeightCm) {
     warnings.push(
-      "distance_cm lebih tinggi dari batas tinggi tangki; nilai dikunci ke tinggi maksimum tangki.",
+      "distance_cm exceeds the tank height limit; value clamped to the tank maximum height.",
     );
   }
 
@@ -142,7 +142,7 @@ function normalizeClampedDeviceNumber({
   }
 
   if (value < min || value > max) {
-    warnings.push(`${label} dari payload di luar rentang wajar dan dikunci.`);
+    warnings.push(`${label} from payload is out of the reasonable range and clamped.`);
   }
 
   return roundTo(clampNumber(value, min, max), 2);
@@ -163,7 +163,7 @@ function normalizePercent({
 
   if (value < 0 || value > 100) {
     warnings.push(
-      `${label} dari payload harus 0-100%; nilai payload diabaikan dan backend menghitung ulang.`,
+      `${label} from payload must be 0-100%; payload value ignored and recalculated by the backend.`,
     );
     return null;
   }
@@ -191,7 +191,7 @@ function normalizeBatteryVolt(
   }
 
   if (value < 0 || value > MAX_REASONABLE_VOLTAGE) {
-    warnings.push("Tegangan payload di luar rentang wajar; nilai diabaikan.");
+    warnings.push("Payload voltage is out of the reasonable range; value ignored.");
     return null;
   }
 
@@ -214,7 +214,7 @@ function normalizeRssiDbm(
   }
 
   if (value < MIN_REASONABLE_RSSI || value > MAX_REASONABLE_RSSI) {
-    warnings.push("RSSI payload di luar rentang wajar; nilai diabaikan.");
+    warnings.push("Payload RSSI is out of the reasonable range; value ignored.");
     return null;
   }
 
@@ -242,7 +242,7 @@ function pushCalculationMismatchWarning({
 
   if (differenceRatio > CALCULATION_MISMATCH_RATIO) {
     warnings.push(
-      `${label} dari device berbeda lebih dari 5% kapasitas terhadap hitungan backend.`,
+      `${label} from the device differs by more than 5% of capacity against the backend calculation.`,
     );
   }
 }
@@ -274,7 +274,7 @@ export function normalizeCatPayload({
 
   if (!canUseDeviceCalculatedValues) {
     warnings.push(
-      "Nilai tinggi, volume, dan persen dari device diabaikan sampai config payload direview.",
+      "Device height, volume, and percent values are ignored until the payload config is reviewed.",
     );
   }
 
@@ -311,7 +311,7 @@ export function normalizeCatPayload({
         ]),
         min: 0,
         max: maxFuelHeightCm,
-        label: "Tinggi bahan bakar",
+        label: "Fuel height",
         warnings,
       })
     : null;
@@ -387,7 +387,7 @@ export function normalizeCatPayload({
     deviceValue: deviceFillPercent,
     backendValue: backendFillPercent,
     capacityLiter: 100,
-    label: "Persen isi",
+    label: "Fill percent",
     warnings,
   });
 

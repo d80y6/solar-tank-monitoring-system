@@ -1,0 +1,1431 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FTM User Manual - Fuel Tank Management</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #111827;
+        --muted: #4b5563;
+        --line: #d7dee8;
+        --soft: #f5faf8;
+        --soft-blue: #eff6ff;
+        --blue: #1d4ed8;
+        --red: #dc2626;
+        --green: #047857;
+        --amber: #b45309;
+      }
+
+      @page {
+        size: A4;
+        margin: 16mm 14mm;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #ffffff;
+        color: var(--ink);
+        font-family:
+          Arial,
+          Helvetica,
+          sans-serif;
+        font-size: 11pt;
+        line-height: 1.55;
+      }
+
+      h1,
+      h2,
+      h3 {
+        line-height: 1.2;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 30pt;
+        letter-spacing: -0.02em;
+      }
+
+      h2 {
+        border-bottom: 2px solid var(--line);
+        font-size: 18pt;
+        margin-top: 28px;
+        padding-bottom: 7px;
+      }
+
+      h3 {
+        break-after: avoid-page;
+        font-size: 13pt;
+        margin-top: 18px;
+        page-break-after: avoid;
+      }
+
+      p {
+        margin: 7px 0;
+      }
+
+      a {
+        color: var(--blue);
+        text-decoration: none;
+      }
+
+      code {
+        background: #eef2f7;
+        border-radius: 4px;
+        color: #0f172a;
+        font-family:
+          Consolas,
+          "Courier New",
+          monospace;
+        font-size: 0.92em;
+        padding: 1px 5px;
+      }
+
+      ul,
+      ol {
+        margin: 8px 0 8px 22px;
+        padding: 0;
+      }
+
+      li {
+        margin: 4px 0;
+      }
+
+      table {
+        border-collapse: collapse;
+        margin: 10px 0 14px;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 8px 9px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #f3f6fb;
+        color: #1f2937;
+        font-weight: 700;
+      }
+
+      .cover {
+        align-items: stretch;
+        background:
+          linear-gradient(135deg, rgba(29, 78, 216, 0.1), rgba(220, 38, 38, 0.08)),
+          var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        display: grid;
+        min-height: 252mm;
+        padding: 30px;
+        page-break-after: always;
+      }
+
+      .brand {
+        align-items: center;
+        display: flex;
+        gap: 12px;
+        font-size: 17pt;
+        font-weight: 700;
+      }
+
+      .logo {
+        height: 34px;
+        object-fit: contain;
+        width: 34px;
+      }
+
+      .cover-main {
+        align-self: center;
+      }
+
+      .eyebrow {
+        color: var(--red);
+        font-size: 9pt;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        font-size: 13pt;
+        margin-top: 14px;
+        max-width: 620px;
+      }
+
+      .meta-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-top: 28px;
+        max-width: 620px;
+      }
+
+      .meta-card,
+      .callout,
+      .role-card,
+      .check-card {
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px;
+      }
+
+      .meta-card strong {
+        display: block;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+
+      .toc {
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px 18px;
+      }
+
+      .toc ol {
+        columns: 2;
+        column-gap: 28px;
+      }
+
+      .callout {
+        margin: 12px 0;
+      }
+
+      .callout.info {
+        background: var(--soft-blue);
+        border-color: #bfdbfe;
+      }
+
+      .callout.warn {
+        background: #fffbeb;
+        border-color: #fde68a;
+      }
+
+      .callout.ok {
+        background: #ecfdf5;
+        border-color: #a7f3d0;
+      }
+
+      .roles {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .badge {
+        border-radius: 999px;
+        display: inline-block;
+        font-size: 9pt;
+        font-weight: 700;
+        margin-right: 5px;
+        padding: 2px 8px;
+      }
+
+      .badge.blue {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      .badge.green {
+        background: #d1fae5;
+        color: #047857;
+      }
+
+      .badge.red {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+
+      .badge.amber {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .steps {
+        counter-reset: step;
+        display: grid;
+        gap: 9px;
+        margin: 12px 0;
+      }
+
+      .step {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 34px 1fr;
+        padding: 11px;
+        page-break-inside: avoid;
+      }
+
+      .step::before {
+        align-items: center;
+        background: var(--blue);
+        border-radius: 50%;
+        color: #ffffff;
+        content: counter(step);
+        counter-increment: step;
+        display: flex;
+        font-size: 10pt;
+        font-weight: 700;
+        height: 28px;
+        justify-content: center;
+        margin-top: 1px;
+        width: 28px;
+      }
+
+      .step-title {
+        font-weight: 700;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .grid-2 {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .check-card {
+        page-break-inside: avoid;
+      }
+
+      .keep-together {
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+      }
+
+      .check-card h3 {
+        margin-top: 0;
+      }
+
+      .formula {
+        background: #111827;
+        border-radius: 12px;
+        color: #ffffff;
+        font-family:
+          Consolas,
+          "Courier New",
+          monospace;
+        margin: 12px 0;
+        padding: 14px 16px;
+        white-space: pre-wrap;
+      }
+
+      .footer-note {
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 9pt;
+        margin-top: 26px;
+        padding-top: 10px;
+      }
+
+      @media print {
+        body {
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+
+        .step,
+        .callout,
+        table,
+        .check-card {
+          page-break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="cover">
+      <div class="brand">
+        <img class="logo" src="../public/logo/android-icon-192x192.png" alt="" />
+        <span>FTM</span>
+      </div>
+      <div class="cover-main">
+        <p class="eyebrow">User Manual</p>
+        <h1>FTM Operational Guide - Fuel Tank Management</h1>
+        <p class="subtitle">
+          Web usage guide for account registration, new device requests,
+          admin review, and diesel tank monitoring at locations/STOs.
+        </p>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <strong>Document version</strong>
+            <span>1.2 - 14 July 2026</span>
+          </div>
+          <div class="meta-card">
+            <strong>Target readers</strong>
+            <span>Operators, field technicians, reviewers, and admins</span>
+          </div>
+          <div class="meta-card">
+            <strong>System</strong>
+            <span>FTM - Fuel Tank Management</span>
+          </div>
+          <div class="meta-card">
+            <strong>Guide focus</strong>
+            <span>Accounts, devices, firmware, dashboard, and helpdesk</span>
+          </div>
+        </div>
+      </div>
+      <p class="footer-note">
+        This document was created from the active FTM application flow in the repository.
+        Use it together with internal SOPs and field validation results.
+      </p>
+    </section>
+
+    <main>
+      <section>
+        <h2>Table of Contents</h2>
+        <div class="toc">
+          <ol>
+            <li>System Flow Summary</li>
+            <li>User Access Rights</li>
+            <li>New User Registration</li>
+            <li>Admin Account Approval</li>
+            <li>Sign In and Dashboard Navigation</li>
+            <li>New Device Request</li>
+            <li>Admin Device Review and Activation</li>
+            <li>Uploading Firmware to the Device</li>
+            <li>Monitoring Devices/STOs on the Dashboard</li>
+            <li>Operational Admin Features</li>
+            <li>Helpdesk and Telegram</li>
+            <li>Quick Troubleshooting</li>
+          </ol>
+        </div>
+      </section>
+
+      <section>
+        <h2>1. System Flow Summary</h2>
+        <p>
+          FTM is used to manage and monitor fuel levels in tanks across several
+          locations/STOs. A device reads the sensor, sends data to the server endpoint,
+          then the dashboard displays volume, fill percentage, remaining runtime,
+          device status, charts, and location.
+        </p>
+        <div class="callout info">
+          <strong>Big flow:</strong> User registers -&gt; admin approves the account
+          -&gt; user requests a device -&gt; admin reviews the device -&gt; the system creates
+          the firmware/device key -&gt; firmware is uploaded to the device -&gt; the device sends
+          data -&gt; the dashboard shows monitoring.
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Area</th>
+              <th>Main function</th>
+              <th>Roles that usually use it</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>/register</code></td>
+              <td>Request a new account.</td>
+              <td>New users/operators/technicians</td>
+            </tr>
+            <tr>
+              <td><code>/login</code></td>
+              <td>Sign in to the system once the account is active.</td>
+              <td>All active users</td>
+            </tr>
+            <tr>
+              <td><code>/dashboard</code></td>
+              <td>Compact monitoring of all STOs.</td>
+              <td>Users and admins</td>
+            </tr>
+            <tr>
+              <td><code>/dashboard/devices/request</code></td>
+              <td>Request a new device/STO.</td>
+              <td>Users and admins</td>
+            </tr>
+            <tr>
+              <td><code>/dashboard/admin/users</code></td>
+              <td>Review user accounts, roles, status, and sessions.</td>
+              <td>Admin</td>
+            </tr>
+            <tr>
+              <td><code>/dashboard/admin/device-requests</code></td>
+              <td>Review device requests and firmware packages.</td>
+              <td>Admin</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>2. User Access Rights</h2>
+        <div class="roles">
+          <div class="role-card">
+            <h3>User / Operator</h3>
+            <ul>
+              <li>Request an account and sign in once approved.</li>
+              <li>Request a new device/STO.</li>
+              <li>View the monitoring dashboard and operational details.</li>
+              <li>Download reading CSV from the operational detail page.</li>
+              <li>Contact the admin through the helpdesk live chat.</li>
+            </ul>
+          </div>
+          <div class="role-card">
+            <h3>Admin / Developer</h3>
+            <ul>
+              <li>Approve or reject new accounts.</li>
+              <li>Change account role/status and revoke user sessions.</li>
+              <li>Approve or reject device requests.</li>
+              <li>Resend or regenerate firmware packages.</li>
+              <li>Reset readings, delete monitoring data, and check the audit log.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout warn">
+          <strong>Security note:</strong> admin access is only granted to truly trusted accounts.
+          Admin actions such as resetting readings and deleting monitoring data directly affect operational data.
+        </div>
+      </section>
+
+      <section class="page-break">
+        <h2>3. New User Registration</h2>
+        <p>
+          Registration is used to request dashboard access. The account is not
+          active immediately; the email must be verified and the admin must approve the request.
+        </p>
+        <div class="steps">
+          <div class="step">
+            <div>
+              <div class="step-title">Open the registration page</div>
+              <p>Open <code>/register</code>, then fill in the access request form.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Fill in the main identity</div>
+              <p>
+                Enter full name, username, work email, phone number,
+                and job role. The phone number is stored in a consistent
+                Indonesian format.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Create a password</div>
+              <p>
+                Fill in a password of at least 10 characters and repeat it in the
+                password confirmation field.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Fill in the access note</div>
+              <p>
+                Explain the reason for access, for example needing to monitor the tank status of a
+                particular area STO. This note helps the admin assess the request.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Complete the security check and send</div>
+              <p>
+                If captcha is active, complete the security verification. Press
+                <strong>Request access</strong>.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Check the verification email</div>
+              <p>
+                Once the request is accepted, check your work email and click the
+                verification link. The admin still needs to approve the account before it can be used to sign in.
+              </p>
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Full name</td>
+              <td>User name matching work identity.</td>
+            </tr>
+            <tr>
+              <td>Username</td>
+              <td>Username for account identification.</td>
+            </tr>
+            <tr>
+              <td>Work email</td>
+              <td>Email used for verification and admin communication.</td>
+            </tr>
+            <tr>
+              <td>Phone number</td>
+              <td>Indonesian mobile number, e.g. 08xx or +628xx.</td>
+            </tr>
+            <tr>
+              <td>Job role</td>
+              <td>Monitoring operator, field technician, or operational reviewer.</td>
+            </tr>
+            <tr>
+              <td>Access note</td>
+              <td>The reason or scope of access being requested.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout ok">
+          When registration succeeds, a notification can arrive in the Telegram topic
+          <strong>New Account</strong> so the admin immediately knows an account request arrived.
+        </div>
+      </section>
+
+      <section>
+        <h2>4. Admin Account Approval</h2>
+        <p>
+          The admin reviews new accounts from the <code>/dashboard/admin/users</code> page.
+          Unapproved requests appear in the
+          <strong>pending access requests</strong> section.
+        </p>
+        <div class="steps">
+          <div class="step">
+            <div>
+              <div class="step-title">Sign in as admin</div>
+              <p>Sign in to the system with an active admin account.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Open User Management</div>
+              <p>Choose the <strong>User Management</strong> menu in the dashboard header.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Check the request data</div>
+              <p>
+                Check name, email, username, requested role, email verification
+                status, and access note.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Make a decision</div>
+              <p>
+                Press <strong>Approve</strong> if the data is valid. Press
+                <strong>Reject</strong> if the data does not match. If the email has not
+                been verified, the admin can choose <strong>Send verification</strong>.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Manage active accounts</div>
+              <p>
+                In the user list, the admin can change the role, deactivate
+                an account, reactivate an account, revoke sessions, or send a password reset.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-break">
+        <h2>5. Sign In and Dashboard Navigation</h2>
+        <div class="steps">
+          <div class="step">
+            <div>
+              <div class="step-title">Open the sign-in page</div>
+              <p>Open <code>/login</code>, enter email or username and password.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Enter the dashboard</div>
+              <p>
+                After signing in successfully, the user lands on <code>/dashboard</code>
+                to see the STO monitoring summary.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Use the header menu</div>
+              <p>
+                The header shows the monitoring, contact, profile/user menu, and
+                admin menu if the account has the admin role.
+              </p>
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Menu</th>
+              <th>Function</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tank Management</td>
+              <td>View all STOs as cards or on a map.</td>
+            </tr>
+            <tr>
+              <td>Add device</td>
+              <td>Request a new STO/device for admin review.</td>
+            </tr>
+            <tr>
+              <td>Contact</td>
+              <td>System contact/helpdesk information.</td>
+            </tr>
+            <tr>
+              <td>Profile / user menu</td>
+              <td>Manage profile, account security, and sign out.</td>
+            </tr>
+            <tr>
+              <td>Admin menu</td>
+              <td>Access user review, device review, audit, and admin operational features.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>6. New Device Request</h2>
+        <p>
+          Device requests are made from <code>/dashboard/devices/request</code>.
+          The user fills in location data, tank configuration, sensor, and generator load.
+          The system automatically calculates tank capacity and diesel consumption.
+        </p>
+        <div class="callout info">
+          The device is not active after the form is sent. The admin must review and
+          approve it so the system creates the device key and firmware package.
+        </div>
+
+        <h3>6.1 STO Location Data</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Description</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>STO name</td>
+              <td>The location name that will appear on the dashboard.</td>
+              <td>STO Bangil</td>
+            </tr>
+            <tr>
+              <td>Regional / Territory / Area</td>
+              <td>The location group order from the largest to the closest to the STO.</td>
+              <td>TREG 5 / TIF 3 / Pasuruan</td>
+            </tr>
+            <tr>
+              <td>Latitude</td>
+              <td>Optional, supports up to 7 decimal places.</td>
+              <td>-7.7201234</td>
+            </tr>
+            <tr>
+              <td>Longitude</td>
+              <td>Optional, supports up to 7 decimal places.</td>
+              <td>112.8801234</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>6.2 Sensor and Tank</h3>
+        <div class="steps">
+          <div class="step">
+            <div>
+              <div class="step-title">Choose the tank shape</div>
+              <p>
+                Choose <strong>Rectangular tank</strong> for a box tank,
+                or <strong>Horizontal cylinder tank</strong> for a sleeping tube.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Choose the sensor mode</div>
+              <p>
+                The currently active mode is <strong>Fuel sensor</strong>. The
+                energy mode is not yet active for operations.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Choose the hardware profile</div>
+              <p>
+                The hardware profile determines the board, sensor, trigger pin, and
+                echo pin used by the firmware.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Fill in tank dimensions</div>
+              <p>
+                For a box tank, fill in length, width, and height. For a horizontal
+                cylinder, fill in length and diameter.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Fill in the sensor reference</div>
+              <p>
+                The sensor reference is the height/distance of the sensor installation
+                used as the field reading reference. This value differs from the
+                physical tank height if the sensor is not exactly at the top tank boundary.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h3>6.3 Automatic Tank Capacity</h3>
+        <p>
+          The user does not need to fill in capacity in liters manually. The system
+          calculates it from the dimensions:
+        </p>
+        <div class="formula">Rectangular tank:
+capacity_liters = length_cm x width_cm x height_cm / 1000
+
+Horizontal cylinder tank:
+capacity_liters = 3.14159 x (diameter_cm / 2)^2 x length_cm / 1000</div>
+
+        <h3>6.4 Generator Load and Diesel Consumption</h3>
+        <p>
+          The system calculates consumption in liters per hour from the location load,
+          load unit, diesel engine capacity, and cos phi.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Location load</td>
+              <td>The load value currently in use at the location.</td>
+            </tr>
+            <tr>
+              <td>Load unit</td>
+              <td>Choose kW or kVA depending on the available data.</td>
+            </tr>
+            <tr>
+              <td>Diesel engine capacity</td>
+              <td>Fill in the generator capacity in kVA.</td>
+            </tr>
+            <tr>
+              <td>Cos phi</td>
+              <td>The power factor value, commonly 0.8. Fill between 0 and 1.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="formula">Short formula:
+kw_max = capacity_kva x cos_phi
+load_percent = load_kw / kw_max
+consumption_liters_per_hour = capacity_kva x load_percent x 0.21
+
+If the load is entered as kVA:
+load_kw = load_kva x cos_phi</div>
+
+        <h3>6.5 Send the Request</h3>
+        <div class="steps">
+          <div class="step">
+            <div>
+              <div class="step-title">Make sure the preview makes sense</div>
+              <p>
+                Check the automatic liter capacity and diesel consumption. If they look
+                unreasonable, re-check the dimensions, load unit, and cos phi.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Press Request device</div>
+              <p>
+                The system creates a request code and stores the request status.
+                A notification arrives in the Telegram topic <strong>New Device</strong>.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Monitor request history</div>
+              <p>
+                The history section shows status, request code, STO, device,
+                capacity, consumption, and notes if the request was rejected.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-break">
+        <h2>7. Admin Device Review and Activation</h2>
+        <p>
+          The admin reviews device requests from
+          <code>/dashboard/admin/device-requests</code>. This page shows the
+          request list and a detail modal.
+        </p>
+        <div class="steps">
+          <div class="step">
+            <div>
+              <div class="step-title">Open the Review requests page</div>
+              <p>Sign in as admin, then open the <strong>Review requests</strong> menu.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Choose a request item</div>
+              <p>
+                Press <strong>Review</strong> on the request to check.
+                The admin can view location, tank specifications, operational data,
+                hardware profile, and validation notes.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Validate field data</div>
+              <p>
+                Make sure coordinates, tank dimensions, sensor height/reference, sensor
+                mode, hardware profile, and diesel consumption are correct.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Approve or reject</div>
+              <p>
+                Press <strong>Approve</strong> if the data is valid. Press
+                <strong>Reject</strong> and fill in the reason if the data needs fixing.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Manage the firmware package</div>
+              <p>
+                After approval, the admin can resend the package link,
+                regenerate the package, revoke provisioning access, or delete
+                the request data if truly needed.
+              </p>
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Waiting for admin</td>
+              <td>A new request arrived and has not been reviewed.</td>
+            </tr>
+            <tr>
+              <td>Approved, waiting for firmware package</td>
+              <td>The admin approved it; the system is preparing the package.</td>
+            </tr>
+            <tr>
+              <td>Firmware package ready</td>
+              <td>The firmware/device package is ready to download or resend.</td>
+            </tr>
+            <tr>
+              <td>Waiting for firmware download</td>
+              <td>The user/technician has not downloaded the firmware package.</td>
+            </tr>
+            <tr>
+              <td>Waiting for device online</td>
+              <td>Firmware is ready; the system awaits the first valid ping/data.</td>
+            </tr>
+            <tr>
+              <td>Device active</td>
+              <td>The device has sent valid data and appears in monitoring.</td>
+            </tr>
+            <tr>
+              <td>Rejected / Revoked / Expired</td>
+              <td>The request is inactive or needs to be recreated.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>8. Uploading Firmware to the Device</h2>
+        <p>
+          After the admin approves the request, the system prepares a firmware package
+          containing the device configuration. The firmware file can be used by a technician
+          to upload it to the board matching the hardware profile.
+        </p>
+        <div class="steps">
+          <div class="step">
+            <div>
+              <div class="step-title">Download the firmware package</div>
+              <p>
+                Open the package link from the email or admin page, then download the
+                firmware file provided by the system.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Open the firmware in Arduino IDE</div>
+              <p>
+                If the generated result is text/script, copy the script contents into a
+                <code>.ino</code> file in Arduino IDE. Make sure the board, port, and libraries
+                match.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Check the important configuration</div>
+              <p>
+                Check Wi-Fi, API URL, device id, API key, provisioning key, tank dimensions,
+                coordinates, trigger pin, and echo pin.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Upload to the board</div>
+              <p>
+                Connect the board, select the port, upload the firmware, then open the Serial
+                Monitor to confirm the sensor reads data and the POST succeeds.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Validate the first data</div>
+              <p>
+                If the POST succeeds, wait for the dashboard to refresh. The device moves to
+                active status once the server receives valid data.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="callout warn">
+          Do not share device keys, tokens, Wi-Fi passwords, or database URLs
+          with unauthorized parties. Secret data may only live in secure configuration files.
+        </div>
+      </section>
+
+      <section class="page-break">
+        <h2>9. Monitoring Devices/STOs on the Dashboard</h2>
+        <h3>9.1 Main Dashboard</h3>
+        <p>
+          The main dashboard shows a summary of all STOs. Use this page
+          to see conditions quickly and determine which locations need checking.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>How to use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Total STOs, Online, Offline</td>
+              <td>See the summary of location counts and device status.</td>
+            </tr>
+            <tr>
+              <td>Search STOs</td>
+              <td>Search by code, name, regional, territory, area, or device.</td>
+            </tr>
+            <tr>
+              <td>Status filter</td>
+              <td>Choose All, Online, or Offline.</td>
+            </tr>
+            <tr>
+              <td>Location filter</td>
+              <td>Choose a specific regional, territory, or area when the STO list grows.</td>
+            </tr>
+            <tr>
+              <td>Card view</td>
+              <td>See each STO as a card containing volume, capacity, and last update.</td>
+            </tr>
+            <tr>
+              <td>Map view</td>
+              <td>See STO positions based on latitude/longitude coordinates.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="steps">
+          <div class="step">
+            <div>
+              <div class="step-title">Open STO details</div>
+              <p>
+                Click an STO card or a map marker to open the device/tank
+                operational details.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Check quick status</div>
+              <p>
+                Make sure the Online/Offline badge and last update time match the
+                device send interval.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h3>9.2 Tank Operational Detail</h3>
+        <p>
+          The operational detail page can be accessed by active users. This page
+          is used to monitor the daily condition of one STO.
+        </p>
+        <div class="callout info">
+          <strong>Data resolution:</strong> the latest values on the dashboard update
+          roughly every 20 seconds. To preserve storage capacity, long-term history is
+          rolled up every 5 minutes with sample count, mean, minimum, and maximum values.
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Section</th>
+              <th>Information displayed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tank content</td>
+              <td>Current volume versus maximum capacity.</td>
+            </tr>
+            <tr>
+              <td>3D visual</td>
+              <td>Box or cylinder tank model with the fuel level.</td>
+            </tr>
+            <tr>
+              <td>Device status</td>
+              <td>Online, delayed, offline, or unknown.</td>
+            </tr>
+            <tr>
+              <td>Remaining hours/runtime</td>
+              <td>Estimated operation duration based on volume and L/hr consumption.</td>
+            </tr>
+            <tr>
+              <td>Volume trend</td>
+              <td>Chart of volume changes from the weighted 5-minute summary and daily/weekly/monthly range options.</td>
+            </tr>
+            <tr>
+              <td>Download CSV</td>
+              <td>Download bucket times, sample counts, means, minimums, and maximums for analysis or reports.</td>
+            </tr>
+            <tr>
+              <td>Tank dimensions</td>
+              <td>Length, width/diameter, capacity, and hourly consumption.</td>
+            </tr>
+            <tr>
+              <td>Operational information</td>
+              <td>Regional, territory, area, device code, tank type, capacity, and reading time.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>9.3 Runtime Parameters</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Range</th>
+              <th>Operational meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge red">Critical</span></td>
+              <td>&lt; 13 hrs</td>
+              <td>Priority for fast action.</td>
+            </tr>
+            <tr>
+              <td><span class="badge amber">Threshold Under</span></td>
+              <td>13 - &lt;14 hrs</td>
+              <td>Approaching the lower limit.</td>
+            </tr>
+            <tr>
+              <td><span class="badge amber">Under</span></td>
+              <td>14 - &lt;16 hrs</td>
+              <td>Below the ideal operational zone.</td>
+            </tr>
+            <tr>
+              <td><span class="badge blue">Threshold Upper</span></td>
+              <td>16 - &lt;19 hrs</td>
+              <td>Starting to enter the safe zone.</td>
+            </tr>
+            <tr>
+              <td><span class="badge blue">Upper</span></td>
+              <td>19 - &lt;24 hrs</td>
+              <td>Normal upper zone.</td>
+            </tr>
+            <tr>
+              <td><span class="badge green">Overstock</span></td>
+              <td>&gt;= 24 hrs</td>
+              <td>Very long runtime reserve.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>9.4 Admin Technical Detail</h3>
+        <p>
+          The admin can open technical analysis for deeper information: empty space height
+          (sensor distance to the fuel surface), fuel height, capacity, sensor height, dimensions,
+          consumption, low level, critical level, RSSI, battery, received time,
+          configuration review, raw payload, location, and the sensor data flow.
+        </p>
+      </section>
+
+      <section>
+        <h2>10. Operational Admin Features</h2>
+        <div class="grid-2">
+          <div class="check-card">
+            <h3>Reset readings per STO</h3>
+            <p>
+              On the dashboard card, the admin can choose the reset readings
+              button to clear the history and latest snapshot of one STO. STO data,
+              tank, device, requests, and firmware remain.
+            </p>
+          </div>
+          <div class="check-card">
+            <h3>Reset all readings</h3>
+            <p>
+              The admin can clear all reading history and snapshots so
+              the dashboard starts reading fresh data. This action requires a confirmation phrase.
+            </p>
+          </div>
+          <div class="check-card">
+            <h3>Delete STO monitoring data</h3>
+            <p>
+              Deletes reading data, devices, tanks, and events for a particular
+              STO. Accounts, admins, firmware templates, and hardware profiles stay safe.
+            </p>
+          </div>
+          <div class="check-card">
+            <h3>MySQL backup</h3>
+            <p>
+              Run a database backup per the operational SOP before major
+              changes or before mass data cleanup.
+            </p>
+          </div>
+        </div>
+        <div class="callout warn">
+          Reset and delete actions must be performed after operational approval.
+          Use these features for correcting test data or data that is truly no longer relevant.
+          FTM shows a confirmation modal explaining the target and impact before a sensitive action runs.
+        </div>
+      </section>
+
+      <section class="page-break">
+        <h2>11. Helpdesk and Telegram</h2>
+        <p>
+          The system has a live chat/helpdesk for user-to-admin communication.
+          Users can send messages from the web widget, then the admin replies from Telegram.
+        </p>
+        <h3>11.1 From the user side</h3>
+        <div class="steps">
+          <div class="step">
+            <div>
+              <div class="step-title">Open the chat widget</div>
+              <p>Click the chat button at the bottom right of the web page.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Send a question</div>
+              <p>Write an issue or question, then send.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <div class="step-title">Wait for the admin reply</div>
+              <p>The admin reply from Telegram appears back in the web widget.</p>
+            </div>
+          </div>
+        </div>
+        <h3>11.2 From the Telegram admin side</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Telegram topic</th>
+              <th>Notification content</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Account</td>
+              <td>New account/registration request notification.</td>
+            </tr>
+            <tr>
+              <td>New Device</td>
+              <td>New device/STO request notification.</td>
+            </tr>
+            <tr>
+              <td>Live Chat</td>
+              <td>Helpdesk messages from the web widget and admin replies.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="formula">Telegram reply format:
+/reply SESSION_ID admin reply text
+
+Session close format:
+/close SESSION_ID</div>
+        <div class="callout info">
+          Separate the Telegram topics so the admin is not confused between account,
+          new device, and helpdesk chat notifications.
+        </div>
+        <div class="keep-together">
+          <h3>11.3 Personal commands after binding</h3>
+          <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Function</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>/help</code></td>
+              <td>Shows the available FTM bot commands.</td>
+            </tr>
+            <tr>
+              <td><code>/status</code></td>
+              <td>Checks account, role, status, and binding time without showing email, phone, password, OTP, session, or token.</td>
+            </tr>
+            <tr>
+              <td><code>/dashboard</code></td>
+              <td>Sends the FTM dashboard link. Sign-in still happens securely in the browser.</td>
+            </tr>
+          </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>12. Quick Troubleshooting</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Symptom</th>
+              <th>Common cause</th>
+              <th>Check steps</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>User cannot sign in</td>
+              <td>Account not active, email not verified, or wrong password.</td>
+              <td>Check status in User Management, resend verification if needed.</td>
+            </tr>
+            <tr>
+              <td>Device request not appearing in monitoring</td>
+              <td>Not yet approved by admin or the device has not sent valid data.</td>
+              <td>Check request status, firmware package, and device Serial Monitor.</td>
+            </tr>
+            <tr>
+              <td>Dashboard unchanged after device POST</td>
+              <td>Device ID/API key mismatch, data rejected, or dashboard not refreshed.</td>
+              <td>Check the POST response, server logs, the <code>/api/ingest</code> endpoint, then refresh the dashboard.</td>
+            </tr>
+            <tr>
+              <td>Offline status</td>
+              <td>Last data is beyond the expected send interval.</td>
+              <td>Check Wi-Fi, device power, send interval, and connection to the server.</td>
+            </tr>
+            <tr>
+              <td>Volume or runtime looks unreasonable</td>
+              <td>Tank dimensions, sensor reference, or L/hr consumption are wrong.</td>
+              <td>Compare the configuration with the physical tank size and generator parameters.</td>
+            </tr>
+            <tr>
+              <td>Map marker is inaccurate</td>
+              <td>Latitude/longitude entered incorrectly.</td>
+              <td>Use coordinates with precision up to 7 decimal places.</td>
+            </tr>
+            <tr>
+              <td>Telegram not receiving notifications</td>
+              <td>Bot token, group chat ID, topic thread ID, or webhook not correct.</td>
+              <td>Check environment configuration and make sure the bot is a group admin.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Operational Checklist</h2>
+        <div class="grid-2">
+          <div class="check-card">
+            <h3>Before users use the system</h3>
+            <ul>
+              <li>The account is approved by the admin.</li>
+              <li>The user email is verified.</li>
+              <li>The user role matches the need.</li>
+              <li>The user can sign in to the dashboard.</li>
+            </ul>
+          </div>
+          <div class="check-card">
+            <h3>Before device installation</h3>
+            <ul>
+              <li>Tank dimensions are re-measured.</li>
+              <li>The sensor reference matches the installation position.</li>
+              <li>Location coordinates are correct.</li>
+              <li>Generator load, kVA capacity, and cos phi are valid.</li>
+            </ul>
+          </div>
+          <div class="check-card">
+            <h3>During firmware testing</h3>
+            <ul>
+              <li>The sensor reads a valid distance.</li>
+              <li>The Serial Monitor shows a successful POST.</li>
+              <li>Device ID and API key match the database.</li>
+              <li>The dashboard receives new data after refresh.</li>
+            </ul>
+          </div>
+          <div class="check-card">
+            <h3>While monitoring runs</h3>
+            <ul>
+              <li>Device status is online.</li>
+              <li>Volume and percent make sense.</li>
+              <li>Runtime matches L/hr consumption.</li>
+              <li>Charts and reading CSV are available.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="footer-note">
+          End of document. The next revision should add screenshots of production pages
+          once the final domain and deployment flow are stable.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

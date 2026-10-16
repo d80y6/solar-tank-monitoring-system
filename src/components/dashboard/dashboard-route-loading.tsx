@@ -7,9 +7,9 @@ type DashboardRouteLoadingProps = {
 };
 
 export function DashboardRouteLoading({
-  label = "Memuat halaman",
-  title = "Menyiapkan data terbaru",
-  description = "Sistem sedang membaca data dan menyiapkan tampilan. Halaman akan terbuka otomatis setelah siap.",
+  label = "Loading page",
+  title = "Preparing the latest data",
+  description = "The system is reading data and preparing the view. The page will open automatically once it is ready.",
 }: DashboardRouteLoadingProps) {
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-[#f5faf8] text-zinc-950">

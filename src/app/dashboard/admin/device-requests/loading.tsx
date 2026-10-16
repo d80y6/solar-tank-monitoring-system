@@ -3,9 +3,9 @@ import { DashboardRouteLoading } from "@/components/dashboard/dashboard-route-lo
 export default function DeviceRequestsLoading() {
   return (
     <DashboardRouteLoading
-      label="Memuat pengajuan"
-      title="Menyiapkan antrean perangkat"
-      description="Sistem sedang membaca pengajuan perangkat dan status provisioning terbaru."
+      label="Loading requests"
+      title="Preparing the device queue"
+      description="The system is reading device requests and the latest provisioning status."
     />
   );
 }

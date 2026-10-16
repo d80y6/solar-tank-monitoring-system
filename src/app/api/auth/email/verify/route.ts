@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   try {
     if (!token) {
-      throw new Error("Token verifikasi tidak ditemukan.");
+      throw new Error("Verification token not found.");
     }
 
     await verifyEmailToken({ token, request });
@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
     redirectUrl.searchParams.set(
       "reason",
       getSafeErrorMessage(error, {
-        fallbackMessage: "Verifikasi email gagal.",
+        fallbackMessage: "Email verification failed.",
         internalMessage:
-          "Verifikasi email belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
+          "Email verification could not be processed because the service is being prepared. Try again later.",
       }),
     );
   }

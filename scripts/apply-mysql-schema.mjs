@@ -21,7 +21,7 @@ const databaseUrl = process.env.MYSQL_DATABASE_URL?.trim();
 
 if (!databaseUrl) {
   console.error(
-    "MYSQL_DATABASE_URL wajib diisi sebelum menjalankan script ini.",
+    "MYSQL_DATABASE_URL is required before running this script.",
   );
   process.exit(1);
 }
@@ -86,7 +86,7 @@ try {
       if (isDuplicateSchemaObjectError(error)) {
         skippedStatements += 1;
         console.log(
-          `[schema] object sudah ada, statement dilewati: ${summarizeStatement(statement)}...`,
+          `[schema] object already exists, statement skipped: ${summarizeStatement(statement)}...`,
         );
         continue;
       }
@@ -97,11 +97,11 @@ try {
 
   const skippedInfo =
     skippedStatements > 0
-      ? `, ${skippedStatements} statement dilewati karena object sudah ada`
+      ? `, ${skippedStatements} statements skipped because the object already exists`
       : "";
 
   console.log(
-    `Berhasil menjalankan ${appliedStatements} statement dari ${sqlFile}${skippedInfo}`,
+    `Executed ${appliedStatements} statements from ${sqlFile}${skippedInfo}`,
   );
 } finally {
   await connection.end();

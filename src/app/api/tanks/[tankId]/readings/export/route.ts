@@ -34,7 +34,7 @@ export async function GET(
     return Response.json(
       {
         ok: false,
-        error: "Range export tidak dikenal. Gunakan day, week, atau month.",
+        error: "Unknown export range. Use day, week, or month.",
       },
       { status: 400 },
     );
@@ -50,7 +50,7 @@ export async function GET(
     return Response.json(
       {
         ok: false,
-        error: "Tangki tidak ditemukan.",
+        error: "Tank not found.",
       },
       { status: 404 },
     );

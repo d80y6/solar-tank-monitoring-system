@@ -68,11 +68,11 @@ export function LiveRefreshControl({
   }, [isAutoRefreshActive, normalizedIntervalMs, refreshNow]);
 
   const stateLabel = isPaused
-    ? "Auto-refresh dijeda"
+    ? "Auto-refresh paused"
     : !isPageVisible
-      ? "Tab tidak aktif"
+      ? "Tab inactive"
       : isPending
-        ? "Memperbarui data"
+        ? "Refreshing data"
         : `Auto-refresh ${intervalLabel}`;
 
   return (
@@ -101,8 +101,8 @@ export function LiveRefreshControl({
           type="button"
           className="grid size-8 place-items-center rounded-full text-zinc-600 transition hover:bg-zinc-100 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-100"
           onClick={refreshNow}
-          title="Refresh data sekarang"
-          aria-label="Refresh data sekarang"
+          title="Refresh data now"
+          aria-label="Refresh data now"
         >
           <RefreshCw
             className={`size-4 ${isPending ? "animate-spin" : ""}`}
@@ -114,8 +114,8 @@ export function LiveRefreshControl({
           type="button"
           className="grid size-8 place-items-center rounded-full text-zinc-600 transition hover:bg-zinc-100 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-100"
           onClick={() => setIsPaused((current) => !current)}
-          title={isPaused ? "Lanjutkan auto-refresh" : "Jeda auto-refresh"}
-          aria-label={isPaused ? "Lanjutkan auto-refresh" : "Jeda auto-refresh"}
+          title={isPaused ? "Resume auto-refresh" : "Pause auto-refresh"}
+          aria-label={isPaused ? "Resume auto-refresh" : "Pause auto-refresh"}
         >
           {isPaused ? (
             <Play className="size-4" aria-hidden="true" />

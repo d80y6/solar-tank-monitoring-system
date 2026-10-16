@@ -52,11 +52,11 @@ function buildPackageEmailHtml({
   const safeSiteName = escapeHtml(siteName);
 
   return `<!doctype html>
-<html lang="id">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Firmware FTM siap</title>
+    <title>FTM firmware ready</title>
   </head>
   <body style="margin:0;background:#f5faf8;color:#18181b;font-family:Arial,Helvetica,sans-serif;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5faf8;padding:24px 12px;">
@@ -66,24 +66,24 @@ function buildPackageEmailHtml({
             <tr>
               <td style="padding:22px 24px;border-bottom:1px solid #eef2f7;">
                 <div style="font-size:18px;font-weight:700;color:#18181b;">FTM</div>
-                <div style="margin-top:4px;font-size:13px;color:#64748b;">Paket firmware perangkat telemetri</div>
+                <div style="margin-top:4px;font-size:13px;color:#64748b;">Telemetry device firmware package</div>
               </td>
             </tr>
             <tr>
               <td style="padding:24px;">
-                <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;color:#18181b;">Perangkat Anda disetujui</h1>
-                <p style="margin:0 0 18px;font-size:15px;line-height:1.7;color:#475569;">Pengajuan <strong>${safeRequestCode}</strong> untuk <strong>${safeSiteName}</strong> sudah disetujui. Paket firmware untuk <strong>${safeDeviceCode}</strong> siap diunduh.</p>
+                <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;color:#18181b;">Your device is approved</h1>
+                <p style="margin:0 0 18px;font-size:15px;line-height:1.7;color:#475569;">Request <strong>${safeRequestCode}</strong> for <strong>${safeSiteName}</strong> has been approved. The firmware package for <strong>${safeDeviceCode}</strong> is ready to download.</p>
                 <p style="margin:22px 0;"><a href="${safeDownloadUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:12px 18px;border-radius:10px;">Download firmware</a></p>
-                <p style="margin:0 0 18px;font-size:12px;line-height:1.6;color:#64748b;word-break:break-all;">Jika tombol tidak bisa dibuka, salin link ini:<br>${safeDownloadUrl}</p>
+                <p style="margin:0 0 18px;font-size:12px;line-height:1.6;color:#64748b;word-break:break-all;">If the button does not open, copy this link:<br>${safeDownloadUrl}</p>
                 <div style="margin:18px 0;padding:14px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;color:#1d4ed8;font-size:13px;line-height:1.7;">
-                  Isi ZIP: solar_tank_firmware.ino, device_config.h, hardware_profile.h, README_LANGKAH_UPLOAD.md, dan manifest.json.
+                  ZIP contents: solar_tank_firmware.ino, device_config.h, hardware_profile.h, README_UPLOAD_STEPS.md, and manifest.json.
                 </div>
-                <p style="margin:18px 0 0;font-size:13px;line-height:1.6;color:#64748b;">Link berlaku sampai ${safeExpiresAtLabel}. Jangan membagikan paket ini karena file konfigurasi berisi key khusus perangkat tersebut.</p>
+                <p style="margin:18px 0 0;font-size:13px;line-height:1.6;color:#64748b;">Link valid until ${safeExpiresAtLabel}. Do not share this package because the configuration file contains the device-specific key.</p>
               </td>
             </tr>
             <tr>
               <td style="padding:16px 24px;background:#f8fafc;border-top:1px solid #eef2f7;font-size:12px;line-height:1.6;color:#64748b;">
-                Email ini dikirim otomatis oleh FTM. Jangan balas email ini.
+                This email was sent automatically by FTM. Do not reply to this email.
               </td>
             </tr>
           </table>
@@ -95,7 +95,7 @@ function buildPackageEmailHtml({
 }
 
 function formatExpiresAt(value: string): string {
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
@@ -121,26 +121,26 @@ export async function sendDevicePackageReadyEmail({
   siteName: string;
 }): Promise<DevicePackageEmailDeliveryResult> {
   const expiresAtLabel = formatExpiresAt(downloadExpiresAt);
-  const subject = `Firmware FTM siap - ${deviceCode}`;
+  const subject = `FTM firmware ready - ${deviceCode}`;
   const text = [
-    `Pengajuan ${requestCode} untuk ${siteName} sudah disetujui.`,
+    `Request ${requestCode} for ${siteName} has been approved.`,
     "",
     `Download firmware ${deviceCode}:`,
     downloadUrl,
     "",
-    "Isi ZIP:",
+    "ZIP contents:",
     "- solar_tank_firmware.ino",
     "- device_config.h",
     "- hardware_profile.h",
-    "- README_LANGKAH_UPLOAD.md",
+    "- README_UPLOAD_STEPS.md",
     "- manifest.json",
     "",
-    `Link berlaku sampai ${expiresAtLabel}.`,
-    "Jangan membagikan paket ini karena file konfigurasi berisi key perangkat.",
+    `Link valid until ${expiresAtLabel}.`,
+    "Do not share this package because the configuration file contains the device key.",
     "",
     isProductionLikeEnvironment()
       ? ""
-      : "Ini pesan dari environment non-production.",
+      : "This message is from a non-production environment.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -154,7 +154,7 @@ export async function sendDevicePackageReadyEmail({
     return {
       delivered: false,
       delivery: "none",
-      reason: "SMTP belum dikonfigurasi.",
+      reason: "SMTP is not configured.",
     };
   }
 

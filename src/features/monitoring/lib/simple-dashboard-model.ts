@@ -44,7 +44,7 @@ export type SimpleDashboardSummary = {
 };
 
 function normalizeSearchValue(value: string) {
-  return value.toLocaleLowerCase("id-ID").trim();
+  return value.toLocaleLowerCase("en-US").trim();
 }
 
 function getReceivedTime(value: string) {
@@ -95,7 +95,7 @@ export function getSimpleDashboardAreas(sites: SimpleDashboardSite[]) {
         .map((site) => site.areaLabel.trim())
         .filter((areaLabel) => areaLabel.length > 0),
     ),
-  ).sort((first, second) => first.localeCompare(second, "id-ID"));
+  ).sort((first, second) => first.localeCompare(second, "en-US"));
 }
 
 export function getSimpleDashboardRegionals(sites: SimpleDashboardSite[]) {
@@ -105,7 +105,7 @@ export function getSimpleDashboardRegionals(sites: SimpleDashboardSite[]) {
         .map((site) => site.regionalLabel.trim())
         .filter((regionalLabel) => regionalLabel.length > 0),
     ),
-  ).sort((first, second) => first.localeCompare(second, "id-ID"));
+  ).sort((first, second) => first.localeCompare(second, "en-US"));
 }
 
 export function getSimpleDashboardWilayahs(sites: SimpleDashboardSite[]) {
@@ -115,7 +115,7 @@ export function getSimpleDashboardWilayahs(sites: SimpleDashboardSite[]) {
         .map((site) => site.wilayahLabel.trim())
         .filter((wilayahLabel) => wilayahLabel.length > 0),
     ),
-  ).sort((first, second) => first.localeCompare(second, "id-ID"));
+  ).sort((first, second) => first.localeCompare(second, "en-US"));
 }
 
 export function filterSimpleDashboardSites(
@@ -182,7 +182,7 @@ export function sortSimpleDashboardSites(sites: SimpleDashboardSite[]) {
     return (
       getReceivedTime(second.lastReceivedAt) -
         getReceivedTime(first.lastReceivedAt) ||
-      first.code.localeCompare(second.code, "id-ID")
+      first.code.localeCompare(second.code, "en-US")
     );
   });
 }

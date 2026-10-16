@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error: "Terlalu banyak percobaan. Coba lagi nanti.",
+          error: "Too many attempts. Try again later.",
         },
         {
           status: 429,
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       data: {
-        message: "Kata sandi berhasil diganti. Sesi lain sudah dicabut.",
+        message: "Password changed successfully. Other sessions have been revoked.",
       },
     });
   } catch (error) {
@@ -56,9 +56,9 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         error: getSafeErrorMessage(error, {
-          fallbackMessage: "Kata sandi belum bisa diganti.",
+          fallbackMessage: "Password could not be changed yet.",
           internalMessage:
-            "Kata sandi belum bisa diganti karena layanan sedang disiapkan. Coba lagi nanti.",
+            "Password could not be changed because the service is being prepared. Try again later.",
         }),
       },
       { status: getSafeErrorStatus(error) },

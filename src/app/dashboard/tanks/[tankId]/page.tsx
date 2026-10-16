@@ -56,9 +56,9 @@ import type {
 } from "@/features/monitoring/types/monitoring";
 
 export const metadata: Metadata = {
-  title: "Detail Tangki Bahan Bakar | FTM",
+  title: "Fuel Tank Details | FTM",
   description:
-    "Halaman detail untuk membaca kondisi satu tangki bahan bakar, visual isi tangki, parameter perangkat, dan riwayat pembacaan.",
+    "Detail page for reading the condition of one fuel tank, tank level visuals, device parameters, and reading history.",
 };
 
 export const runtime = "nodejs";
@@ -178,7 +178,7 @@ const statusMeta: Record<
     soft: "bg-emerald-50",
   },
   warning: {
-    label: "Waspada",
+    label: "Warning",
     dot: "bg-amber-500",
     badge: "bg-amber-50 text-amber-700 ring-amber-100",
     ring: "ring-amber-200",
@@ -186,7 +186,7 @@ const statusMeta: Record<
     soft: "bg-amber-50",
   },
   critical: {
-    label: "Kritis",
+    label: "Critical",
     dot: "bg-red-600",
     badge: "bg-red-50 text-red-700 ring-red-100",
     ring: "ring-red-200",
@@ -205,49 +205,49 @@ const statusMeta: Record<
 
 const runtimeLevelParameters: RuntimeLevelParameter[] = [
   {
-    label: "Kritis",
-    range: "< 13 jam",
-    description: "Sisa runtime sudah masuk prioritas tindakan cepat.",
+    label: "Critical",
+    range: "< 13 hrs",
+    description: "Remaining runtime is already a fast-action priority.",
     badge: "bg-red-50 text-red-700 ring-red-100",
     card: "border-red-200 bg-red-50",
     dot: "bg-red-600",
   },
   {
     label: "Threshold Under",
-    range: "13 - <14 jam",
-    description: "Mendekati batas bawah dan perlu dipantau lebih rapat.",
+    range: "13 - <14 hrs",
+    description: "Approaching the lower bound and needs closer monitoring.",
     badge: "bg-orange-50 text-orange-700 ring-orange-100",
     card: "border-orange-200 bg-orange-50",
     dot: "bg-orange-500",
   },
   {
     label: "Under",
-    range: "14 - <16 jam",
-    description: "Masih di bawah zona ideal operasional.",
+    range: "14 - <16 hrs",
+    description: "Still below the ideal operational zone.",
     badge: "bg-amber-50 text-amber-700 ring-amber-100",
     card: "border-amber-200 bg-amber-50",
     dot: "bg-amber-500",
   },
   {
     label: "Threshold Upper",
-    range: "16 - <19 jam",
-    description: "Sudah melewati batas bawah dan menuju zona atas.",
+    range: "16 - <19 hrs",
+    description: "Past the lower bound and moving toward the upper zone.",
     badge: "bg-cyan-50 text-cyan-700 ring-cyan-100",
     card: "border-cyan-200 bg-cyan-50",
     dot: "bg-cyan-500",
   },
   {
     label: "Upper",
-    range: "19 - <24 jam",
-    description: "Runtime berada di zona atas yang masih normal.",
+    range: "19 - <24 hrs",
+    description: "Runtime is in the upper zone, still normal.",
     badge: "bg-blue-50 text-blue-700 ring-blue-100",
     card: "border-blue-200 bg-blue-50",
     dot: "bg-blue-600",
   },
   {
     label: "Overstock",
-    range: ">= 24 jam",
-    description: "Cadangan runtime sangat panjang dibanding batas parameter.",
+    range: ">= 24 hrs",
+    description: "Runtime reserve is very long compared to the parameter bounds.",
     badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
     card: "border-emerald-200 bg-emerald-50",
     dot: "bg-emerald-600",
@@ -255,16 +255,16 @@ const runtimeLevelParameters: RuntimeLevelParameter[] = [
 ];
 
 const unknownRuntimeLevel: RuntimeLevelParameter = {
-  label: "Belum terbaca",
+  label: "No data",
   range: "-",
-  description: "Parameter sisa jam menunggu data volume dan konsumsi valid.",
+  description: "Remaining-hours parameter is waiting for valid volume and consumption data.",
   badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
   card: "border-zinc-200 bg-zinc-50",
   dot: "bg-zinc-400",
 };
 
 function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID").format(value);
+  return new Intl.NumberFormat("en-US").format(value);
 }
 
 function formatMeasurement(value: number | null, unit: string) {
@@ -277,10 +277,10 @@ function formatPercent(value: number) {
 
 function formatSourceLabel(source: ReadingValueSource) {
   const labels: Record<ReadingValueSource, string> = {
-    device: "perangkat",
+    device: "device",
     backend: "backend",
     server: "server",
-    unknown: "belum diketahui",
+    unknown: "unknown",
   };
 
   return labels[source];
@@ -289,10 +289,10 @@ function formatSourceLabel(source: ReadingValueSource) {
 function formatConfigStatusLabel(status: TankConfigStatus) {
   const labels: Record<TankConfigStatus, string> = {
     normal: "normal",
-    minor_config_difference: "beda kecil",
+    minor_config_difference: "minor difference",
     config_mismatch: "mismatch",
     invalid_config: "invalid",
-    needs_review: "perlu review",
+    needs_review: "needs review",
   };
 
   return labels[status];
@@ -303,9 +303,9 @@ function formatRuntimeHour(value: number | null) {
     return "-";
   }
 
-  return `${new Intl.NumberFormat("id-ID", {
+  return `${new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 2,
-  }).format(value)} jam`;
+  }).format(value)} hrs`;
 }
 
 function clampPercent(value: number) {
@@ -496,82 +496,82 @@ function TankVisual({ tank }: { tank: TankDetail }) {
   const isRectangular = tank.shape === "rectangular";
   const fillPercent = tank.hasReading ? clampPercent(tank.fillPercent) : 0;
   const visualDescription = isRectangular
-    ? "Model tampilan mengikuti tangki balok/persegi panjang. Sensor berada di atas, sehingga perubahan level dibaca secara vertikal."
-    : "Model tampilan mengikuti tangki silinder horizontal. Sensor berada di atas, sehingga permukaan bahan bakar naik-turun secara vertikal.";
+    ? "The display model follows a rectangular tank. The sensor sits on top, so level changes are read vertically."
+    : "The display model follows a horizontal cylinder tank. The sensor sits on top, so the fuel surface rises and falls vertically.";
   const dimensionItems: ParameterItem[] = [
     {
-      label: "Tinggi ruang kosong",
+      label: "Empty space height",
       value: tank.hasReading ? `${tank.sensorDistanceCm} cm` : "-",
       note: tank.hasReading
-        ? "ruang kosong dari atas tangki ke permukaan cairan"
-        : "menunggu data perangkat",
+        ? "empty space from the top of the tank to the liquid surface"
+        : "waiting for device data",
       icon: Ruler,
     },
     {
-      label: "Tinggi bahan bakar",
+      label: "Fuel height",
       value: tank.hasReading ? `${tank.fuelHeightCm} cm` : "-",
       note: tank.hasReading
-        ? "raw.H_cm setelah normalisasi"
-        : "menunggu pembacaan sensor",
+        ? "raw.H_cm after normalization"
+        : "waiting for sensor reading",
       icon: Droplets,
     },
     {
-      label: "Kapasitas tangki",
+      label: "Tank capacity",
       value: `${formatLiter(tank.capacityLiter)} L`,
-      note: "kapasitas konfigurasi perangkat",
+      note: "device configuration capacity",
       icon: Fuel,
     },
     {
-      label: "Tinggi sensor",
+      label: "Sensor height",
       value: formatMeasurement(tank.sensorMountHeightCm, "cm"),
       note: "sensor_mount_height_cm",
       icon: Radio,
     },
     {
-      label: "Panjang tangki",
+      label: "Tank length",
       value: formatMeasurement(tank.lengthCm, "cm"),
-      note: "konfigurasi fisik tangki",
+      note: "physical tank configuration",
       icon: Settings,
     },
     ...(isRectangular
       ? [
           {
-            label: "Lebar tangki",
+            label: "Tank width",
             value: formatMeasurement(tank.widthCm, "cm"),
-            note: "konfigurasi tangki balok",
+            note: "rectangular tank configuration",
             icon: Ruler,
           },
           {
-            label: "Tinggi tangki",
+            label: "Tank height",
             value: formatMeasurement(tank.heightCm, "cm"),
-            note: "batas tinggi bahan bakar",
+            note: "fuel height limit",
             icon: Gauge,
           },
         ]
       : [
           {
-            label: "Diameter tangki",
+            label: "Tank diameter",
             value: formatMeasurement(tank.diameterCm, "cm"),
-            note: "konfigurasi tangki silinder",
+            note: "cylinder tank configuration",
             icon: Gauge,
           },
         ]),
     {
-      label: "Konsumsi per jam",
-      value: `${tank.consumptionLiterPerHour} L/jam`,
-      note: "parameter estimasi runtime",
+      label: "Consumption per hour",
+      value: `${tank.consumptionLiterPerHour} L/h`,
+      note: "runtime estimation parameter",
       icon: Activity,
     },
     {
       label: "Low level",
       value: formatPercent(tank.lowLevelPercent),
-      note: "ambang status waspada",
+      note: "warning status threshold",
       icon: AlertTriangle,
     },
     {
       label: "Critical level",
       value: formatPercent(tank.criticalLevelPercent),
-      note: "ambang prioritas kritis",
+      note: "critical priority threshold",
       icon: Zap,
     },
   ];
@@ -580,7 +580,7 @@ function TankVisual({ tank }: { tank: TankDetail }) {
     <div className="relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <SectionHeading
-          label="Visual tangki"
+          label="Tank visual"
           title={tank.shapeLabel}
           description={visualDescription}
         />
@@ -592,11 +592,11 @@ function TankVisual({ tank }: { tank: TankDetail }) {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-semibold text-zinc-600 shadow-sm ring-1 ring-zinc-200">
               <Radio className="size-4 text-red-600" aria-hidden="true" />
-              Sensor di atas
+              Sensor on top
             </div>
 
             <div className="rounded-full bg-cyan-50 px-3 py-2 text-xs font-semibold text-cyan-700 ring-1 ring-cyan-100">
-              {tank.hasReading ? `Isi ${tank.fillPercent}%` : "belum ada data"}
+              {tank.hasReading ? `Level ${tank.fillPercent}%` : "no data yet"}
             </div>
           </div>
 
@@ -624,15 +624,15 @@ function TankVisual({ tank }: { tank: TankDetail }) {
           <div className="mt-1 grid grid-cols-3 gap-2 text-xs font-medium text-zinc-500">
             <span>0%</span>
             <span className="text-center">
-              kapasitas {formatLiter(tank.capacityLiter)} L
+              capacity {formatLiter(tank.capacityLiter)} L
             </span>
             <span className="text-right">100%</span>
           </div>
 
           <div className="mt-4 rounded-lg border border-cyan-100 bg-white p-3 text-xs leading-5 text-zinc-500">
-            Garis merah menunjukkan tinggi ruang kosong dari titik sensor ke
-            permukaan bahan bakar. Area biru mengikuti tinggi bahan bakar secara
-            vertikal, bukan kiri ke kanan.
+            The red line shows the empty-space height from the sensor point to
+            the fuel surface. The blue area follows the fuel height
+            vertically, not left to right.
           </div>
         </div>
 
@@ -681,9 +681,9 @@ function LocationPanel({ tank }: { tank: TankDetail }) {
     <article className="animate-soft-fade overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
       <div className="flex flex-col gap-4 border-b border-zinc-200 p-5 sm:flex-row sm:items-start sm:justify-between">
         <SectionHeading
-          label="Lokasi manual"
-          title="Titik STO pada peta manual"
-          description="Koordinat ditampilkan sebagai input manual agar tidak bergantung pada modul GPS."
+          label="Manual location"
+          title="STO points on the manual map"
+          description="Coordinates are shown as manual input so the display does not depend on the GPS module."
         />
         <span className="w-fit rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
           {tank.coordinateLabel}
@@ -760,10 +760,10 @@ function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
       label: "Registry",
       shape:
         registryConfig.shape === "rectangular"
-          ? "Tangki balok"
-          : "Silinder horizontal",
+          ? "Rectangular tank"
+          : "Horizontal cylinder",
       capacity: formatSnapshotItem(registryConfig.capacityLiter, " L"),
-      source: "data resmi aplikasi",
+      source: "official application data",
     },
     {
       label: "Payload",
@@ -773,16 +773,16 @@ function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
           : "Silinder horizontal"
         : "-",
       capacity: formatSnapshotItem(payloadConfig?.capacityLiter, " L"),
-      source: "laporan perangkat",
+      source: "device report",
     },
     {
-      label: "Dipakai pembacaan",
+      label: "Used by readings",
       shape:
         appliedConfig.shape === "rectangular"
-          ? "Tangki balok"
-          : "Silinder horizontal",
+          ? "Rectangular tank"
+          : "Horizontal cylinder",
       capacity: formatSnapshotItem(appliedConfig.capacityLiter, " L"),
-      source: "hasil normalisasi",
+      source: "normalization result",
     },
   ];
 
@@ -794,7 +794,7 @@ function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
         <SectionHeading
           label="Review config"
           title={review.summaryLabel}
-          description="Payload perangkat boleh membawa konfigurasi tangki, tetapi tetap dibandingkan dengan registry agar perubahan besar tidak dipercaya diam-diam."
+          description="Device payloads may carry tank configuration, but it is still compared against the registry so large changes are not silently trusted."
         />
         <div className="flex flex-wrap gap-2">
           <span
@@ -803,7 +803,7 @@ function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
             {formatConfigStatusLabel(review.status)}
           </span>
           <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-semibold text-zinc-700 ring-1 ring-zinc-200">
-            sumber {review.configSource}
+            source {review.configSource}
           </span>
         </div>
       </div>
@@ -845,7 +845,7 @@ function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
                 </span>
               </div>
               <p className="mt-2 text-xs text-zinc-500">
-                Data resmi: {issue.registryValue} | Data perangkat:{" "}
+                Registry data: {issue.registryValue} | Device data:{" "}
                 {issue.payloadValue}
               </p>
             </div>
@@ -853,8 +853,7 @@ function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
         </div>
       ) : (
         <p className="mt-4 rounded-lg border border-white/70 bg-white/80 p-4 text-sm leading-6 text-zinc-600 shadow-sm">
-          Tidak ada konflik konfigurasi besar yang terdeteksi pada pembacaan
-          terbaru.
+          No major configuration conflict was detected in the latest reading.
         </p>
       )}
     </section>
@@ -869,9 +868,9 @@ function RuntimeParameterPanel({ tank }: { tank: TankDetail }) {
   return (
     <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
       <SectionHeading
-        label="Sisa jam"
-        title="Level parameter runtime"
-        description="Kategori ini membaca sisa runtime genset agar operator tahu posisi tangki terhadap batas operasional."
+        label="Remaining hours"
+        title="Runtime parameter level"
+        description="This category reads the generator runtime remaining so operators know the tank position against operational bounds."
       />
 
       <div
@@ -880,7 +879,7 @@ function RuntimeParameterPanel({ tank }: { tank: TankDetail }) {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-              Parameter aktif
+              Active parameter
             </p>
             <p className="mt-2 text-2xl font-semibold text-zinc-950">
               {activeParameter.label}
@@ -933,36 +932,36 @@ function TankConfigurationPanel({ tank }: { tank: TankDetail }) {
   const dimensionRows =
     tank.shape === "rectangular"
       ? [
-          ["Panjang tangki", formatMeasurement(tank.lengthCm, "cm")],
-          ["Lebar tangki", formatMeasurement(tank.widthCm, "cm")],
-          ["Tinggi tangki", formatMeasurement(tank.heightCm, "cm")],
+          ["Tank length", formatMeasurement(tank.lengthCm, "cm")],
+          ["Tank width", formatMeasurement(tank.widthCm, "cm")],
+          ["Tank height", formatMeasurement(tank.heightCm, "cm")],
         ]
       : [
-          ["Panjang tabung", formatMeasurement(tank.lengthCm, "cm")],
-          ["Diameter tabung", formatMeasurement(tank.diameterCm, "cm")],
+          ["Cylinder length", formatMeasurement(tank.lengthCm, "cm")],
+          ["Cylinder diameter", formatMeasurement(tank.diameterCm, "cm")],
         ];
   const configRows = [
     ["Status config", tank.configReview.summaryLabel],
-    ["Sumber config", tank.configReview.configSource],
-    ["Tipe visual", tank.shapeLabel],
-    ["Kapasitas", `${formatLiter(tank.capacityLiter)} L`],
+    ["Config source", tank.configReview.configSource],
+    ["Visual type", tank.shapeLabel],
+    ["Capacity", `${formatLiter(tank.capacityLiter)} L`],
     ...dimensionRows,
     ["Tinggi sensor", formatMeasurement(tank.sensorMountHeightCm, "cm")],
-    ["Konsumsi per jam", `${tank.consumptionLiterPerHour} L/jam`],
+    ["Consumption per hour", `${tank.consumptionLiterPerHour} L/h`],
     ["Low level", formatPercent(tank.lowLevelPercent)],
     ["Critical level", formatPercent(tank.criticalLevelPercent)],
-    ["Interval kirim", `${tank.expectedIntervalMin} menit`],
+    ["Report interval", `${tank.expectedIntervalMin} min`],
   ];
 
   return (
     <section
-      id="konfigurasi"
+      id="configuration"
       className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
     >
       <SectionHeading
-        label="Konfigurasi"
-        title="Spesifikasi tangki dan perangkat"
-        description="Ringkasan config yang dipakai UI untuk memilih visual, menghitung volume, dan menentukan ambang operasional."
+        label="Configuration"
+        title="Tank and device specifications"
+        description="Config summary used by the UI to choose visuals, calculate volume, and set operational thresholds."
       />
 
       <div className="mt-6 space-y-3">
@@ -988,10 +987,10 @@ function ReadingTable({ tank }: { tank: TankDetail }) {
       <table className="w-full min-w-[720px] border-separate border-spacing-y-2 text-left text-sm">
         <thead>
           <tr className="text-xs uppercase tracking-[0.12em] text-zinc-400">
-            <th className="px-4 py-2 font-semibold">Jam</th>
-            <th className="px-4 py-2 font-semibold">Persen</th>
+            <th className="px-4 py-2 font-semibold">Time</th>
+            <th className="px-4 py-2 font-semibold">Percent</th>
             <th className="px-4 py-2 font-semibold">Volume</th>
-            <th className="px-4 py-2 font-semibold">Ruang kosong</th>
+            <th className="px-4 py-2 font-semibold">Empty space</th>
             <th className="px-4 py-2 font-semibold">Status</th>
           </tr>
         </thead>
@@ -1002,7 +1001,7 @@ function ReadingTable({ tank }: { tank: TankDetail }) {
                 colSpan={5}
                 className="rounded-lg px-4 py-8 text-center text-sm text-zinc-500"
               >
-                Belum ada pembacaan tersimpan untuk tangki ini.
+                No readings stored for this tank yet.
               </td>
             </tr>
           ) : (
@@ -1039,7 +1038,7 @@ function ReadingTable({ tank }: { tank: TankDetail }) {
                 </td>
                 <td className="rounded-r-lg px-4 py-4">
                   <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
-                    diterima
+                    received
                   </span>
                 </td>
               </tr>
@@ -1090,94 +1089,94 @@ export default async function TankDetailPage({
   const status = statusMeta[tank.status];
   const metrics = [
     {
-      label: "Volume saat ini",
+      label: "Current volume",
       value: tank.hasReading ? `${formatLiter(tank.volumeLiter)} L` : "-",
       note: tank.hasReading
-        ? `${tank.fillPercent}% dari kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L, sumber volume ${formatSourceLabel(tank.dataSources.volumeSource)}`
-        : `menunggu pembacaan pertama dari perangkat, kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L`,
+        ? `${tank.fillPercent}% of the configured capacity of ${formatLiter(tank.capacityLiter)} L, volume source ${formatSourceLabel(tank.dataSources.volumeSource)}`
+        : `waiting for the first reading from the device, configured capacity ${formatLiter(tank.capacityLiter)} L`,
       icon: Fuel,
       tone: "bg-cyan-50 text-cyan-700 ring-cyan-100",
     },
     {
-      label: "Estimasi runtime",
+      label: "Runtime estimate",
       value: tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-",
       note: tank.hasReading
-        ? `berdasarkan konsumsi ${tank.consumptionLiterPerHour} L/jam, dihitung ${formatSourceLabel(tank.dataSources.runtimeSource)}`
-        : `akan dihitung setelah volume terbaca, konsumsi konfigurasi ${tank.consumptionLiterPerHour} L/jam`,
+        ? `based on ${tank.consumptionLiterPerHour} L/h consumption, calculated ${formatSourceLabel(tank.dataSources.runtimeSource)}`
+        : `will be calculated after volume is read, configured consumption ${tank.consumptionLiterPerHour} L/h`,
       icon: Clock,
       tone: "bg-emerald-50 text-emerald-700 ring-emerald-100",
     },
     {
-      label: "Status perangkat",
+      label: "Device status",
       value: status.label,
-      note: `update terakhir ${tank.lastUpdateLabel}`,
+      note: `last update ${tank.lastUpdateLabel}`,
       icon: Wifi,
       tone: `${status.soft} ${status.text} ${status.ring}`,
     },
     {
-      label: "Sinyal RSSI",
+      label: "RSSI signal",
       value: formatMeasurement(tank.rssiDbm, "dBm"),
-      note: "nilai dari data perangkat jika tersedia",
+      note: "value from device data if available",
       icon: Radio,
       tone: "bg-zinc-100 text-zinc-700 ring-zinc-200",
     },
   ];
   const deviceParameters: ParameterItem[] = [
     {
-      label: "ID perangkat",
+      label: "Device ID",
       value: tank.deviceId,
-      note: "identitas perangkat untuk header X-Device-Id nanti",
+      note: "device identity for the X-Device-Id header",
       icon: Database,
     },
     {
-      label: "Interval kirim",
-      value: `${tank.expectedIntervalMin} menit`,
-      note: "angka ini menjadi dasar status stale/offline",
+      label: "Report interval",
+      value: `${tank.expectedIntervalMin} min`,
+      note: "this number is the basis for stale/offline status",
       icon: Activity,
     },
     {
-      label: "Tegangan",
+      label: "Voltage",
       value: formatMeasurement(tank.batteryVolt, "V"),
-      note: "nilai dari data perangkat jika tersedia",
+      note: "value from device data if available",
       icon: Battery,
     },
     {
-      label: "Waktu terima",
+      label: "Received at",
       value: tank.receivedAtLabel,
-      note: "waktu server menerima data terakhir",
+      note: "server time the latest data was received",
       icon: History,
     },
   ];
   const dataFlow: TimelineItem[] = [
     {
-      label: "Tinggi ruang kosong terbaca",
+      label: "Empty-space height read",
       value: tank.hasReading ? `${tank.sensorDistanceCm} cm` : "-",
       detail: tank.hasReading
-        ? "jarak kosong dari titik sensor ke permukaan bahan bakar"
-        : "belum ada tinggi ruang kosong yang diterima",
+        ? "empty distance from the sensor point to the fuel surface"
+        : "no empty-space height received yet",
     },
     {
-      label: "Tinggi bahan bakar dihitung",
+      label: "Fuel height calculated",
       value: tank.hasReading ? `${tank.fuelHeightCm} cm` : "-",
       detail: tank.hasReading
-        ? `sumber tinggi bahan bakar ${formatSourceLabel(tank.dataSources.fuelHeightSource)}`
-        : "tinggi bahan bakar belum dihitung sebelum data masuk",
+        ? `fuel height source ${formatSourceLabel(tank.dataSources.fuelHeightSource)}`
+        : "fuel height is not calculated before data arrives",
     },
     {
-      label: "Volume dan persen",
+      label: "Volume and percent",
       value: tank.hasReading
         ? `${formatLiter(tank.volumeLiter)} L / ${tank.fillPercent}%`
         : "-",
       detail: tank.hasReading
-        ? `volume dari ${formatSourceLabel(tank.dataSources.volumeSource)}, persen dari ${formatSourceLabel(tank.dataSources.fillPercentSource)}`
-        : "dashboard tetap menampilkan STO sambil menunggu data pertama",
+        ? `volume from ${formatSourceLabel(tank.dataSources.volumeSource)}, percent from ${formatSourceLabel(tank.dataSources.fillPercentSource)}`
+        : "the dashboard keeps showing the STO while waiting for the first data",
     },
     {
-      label: "Runtime operasional",
-      value: tank.hasReading ? `${tank.runtimeHour} jam` : "-",
+      label: "Operational runtime",
+      value: tank.hasReading ? `${tank.runtimeHour} hrs` : "-",
       detail: tank.hasReading
-        ? "perkiraan durasi genset dari konsumsi per jam"
-        : "runtime baru valid setelah volume bahan bakar tersedia",
+        ? "estimated generator duration from hourly consumption"
+        : "runtime is only valid after the fuel volume is available",
     },
   ];
 
@@ -1185,18 +1184,18 @@ export default async function TankDetailPage({
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { current: true, label: "Detail Tangki" },
-          { href: "#riwayat", label: "Riwayat" },
-          { href: "#lokasi", label: "Lokasi" },
-          { href: "#konfigurasi", label: "Konfigurasi" },
-          { href: "#data-perangkat", label: "Data perangkat" },
+          { href: "/dashboard", label: "Tank Management" },
+          { current: true, label: "Tank Details" },
+          { href: "#history", label: "History" },
+          { href: "#location", label: "Location" },
+          { href: "#configuration", label: "Configuration" },
+          { href: "#device-data", label: "Device Data" },
         ]}
         rightSlot={
           <>
             <LiveRefreshControl
               intervalMs={refreshIntervalMs}
-              lastSyncedLabel={`Update ${tank.lastUpdateLabel}`}
+              lastSyncedLabel={`Updated ${tank.lastUpdateLabel}`}
               className="hidden md:inline-flex"
             />
             <div className="hidden sm:block">
@@ -1218,10 +1217,10 @@ export default async function TankDetailPage({
                   className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200 transition hover:bg-zinc-200"
                 >
                   <ArrowLeft className="size-3.5" aria-hidden="true" />
-                  Kembali ke dashboard
+                  Back to dashboard
                 </Link>
                 <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 ring-1 ring-red-100">
-                  detail tangki
+                  tank details
                 </span>
                 <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
                   data operasional
@@ -1232,9 +1231,9 @@ export default async function TankDetailPage({
                 {tank.tankName} {tank.siteName}
               </h1>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-500 sm:text-base">
-                Detail ini menampilkan isi tangki, parameter sensor, estimasi
-                runtime, riwayat pembacaan, dan posisi STO berbasis koordinat
-                manual.
+                These details show the tank level, sensor parameters, runtime
+                estimates, reading history, and STO position based on manual
+                coordinates.
               </p>
             </div>
 
@@ -1255,7 +1254,7 @@ export default async function TankDetailPage({
               </div>
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
-                  Wilayah
+                  Territory
                 </p>
                 <p className="mt-1 text-lg font-semibold">
                   {tank.wilayahLabel ?? "-"}
@@ -1297,14 +1296,14 @@ export default async function TankDetailPage({
 
             {/* History Section */}
             <section
-              id="riwayat"
+              id="history"
               className="animate-soft-fade min-w-0 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <SectionHeading
-                  label="Riwayat"
-                  title="Tren pembacaan"
-                  description="Pilih rentang grafik, lalu unduh CSV dengan periode data yang sama."
+                  label="History"
+                  title="Reading trend"
+                  description="Pick a chart range, then download the CSV for the same data period."
                 />
               </div>
               <SimpleTankVolumeChart
@@ -1322,9 +1321,9 @@ export default async function TankDetailPage({
             <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
               <div className="flex items-start justify-between gap-4">
                 <SectionHeading
-                  label="Perangkat"
-                  title="Status sensor"
-                  description="Informasi ini disiapkan untuk health check perangkat saat data real mulai masuk."
+                  label="Device"
+                  title="Sensor status"
+                  description="This information is prepared for device health checks once live data starts arriving."
                 />
                 <StatusBadge status={tank.status} />
               </div>
@@ -1340,7 +1339,7 @@ export default async function TankDetailPage({
         </div>
 
         {/* Location Section */}
-        <section id="lokasi" className="mt-5 min-w-0">
+        <section id="location" className="mt-5 min-w-0">
           <LocationPanel tank={tank} />
         </section>
 
@@ -1348,9 +1347,9 @@ export default async function TankDetailPage({
           {/* Data Flow Section */}
           <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
             <SectionHeading
-              label="Alur baca"
-              title="Dari sensor ke keputusan"
-              description="Urutan ini menjaga dashboard tidak salah memahami data mentah perangkat."
+              label="Reading flow"
+              title="From sensor to decision"
+              description="This sequence keeps the dashboard from misreading raw device data."
             />
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
@@ -1380,13 +1379,13 @@ export default async function TankDetailPage({
 
           {/* Device Data Section */}
           <section
-            id="data-perangkat"
+            id="device-data"
             className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
           >
             <SectionHeading
-              label="Data perangkat"
-              title="Field kompatibel CAT"
-              description="Nilai berikut menjadi jembatan dari format perangkat lama ke data internal yang lebih rapi."
+              label="Device data"
+              title="CAT-compatible fields"
+              description="The values below bridge the legacy device format to cleaner internal data."
             />
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
@@ -1445,8 +1444,7 @@ export default async function TankDetailPage({
                 POST /api/ingest
               </div>
               <p className="mt-2 text-zinc-300">
-                Dashboard membaca data yang sudah dinormalisasi, bukan membaca
-                sensor secara langsung.
+                The dashboard reads normalized data, not the sensor directly.
               </p>
             </div>
           </section>
@@ -1454,17 +1452,17 @@ export default async function TankDetailPage({
           {/* Validation Notes Section */}
           <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
             <SectionHeading
-              label="Validasi lapangan"
-              title="Data yang perlu dikonfirmasi"
-              description="Gunakan daftar ini untuk memastikan pembacaan perangkat, konfigurasi tangki, dan lokasi STO sudah sesuai kondisi lapangan sebelum dipakai sebagai acuan operasional."
+              label="Field validation"
+              title="Data to confirm"
+              description="Use this list to make sure device readings, tank configuration, and STO locations match field conditions before they are used as operational references."
             />
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
               {[
-                "Dimensi tangki mengikuti pengukuran fisik terakhir.",
-                "Konsumsi bahan bakar per jam sesuai beban genset masing-masing STO.",
-                "Interval kirim data perangkat sesuai konfigurasi aktif.",
-                "Koordinat manual sudah disetujui penanggung jawab lokasi.",
+                "Tank dimensions follow the latest physical measurements.",
+                "Hourly fuel consumption matches each STO's generator load.",
+                "Device report interval matches the active configuration.",
+                "Manual coordinates are approved by the location owner.",
               ].map((note) => (
                 <div
                   key={note}

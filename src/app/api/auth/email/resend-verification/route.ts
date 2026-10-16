@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error: "Terlalu banyak permintaan. Coba lagi nanti.",
+          error: "Too many requests. Try again later.",
         },
         {
           status: 429,
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       ok: true,
       data: {
         message:
-          "Jika akun ditemukan dan belum terverifikasi, link verifikasi akan dikirim ulang.",
+          "If the account is found and unverified, the verification link will be resent.",
       },
     });
   } catch (error) {
@@ -72,9 +72,9 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         error: getSafeErrorMessage(error, {
-          fallbackMessage: "Permintaan verifikasi belum bisa diproses.",
+          fallbackMessage: "Verification request could not be processed yet.",
           internalMessage:
-            "Permintaan verifikasi belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
+            "Verification request could not be processed because the service is being prepared. Try again later.",
         }),
       },
       { status: getSafeErrorStatus(error) },

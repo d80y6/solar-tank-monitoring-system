@@ -1,20 +1,20 @@
 # Database Backup
 
-Backup database wajib disiapkan sebelum aplikasi dipakai sebagai sistem operasional.
+Database backup must be prepared before the application is used as an operational system.
 
-## Prinsip
+## Principles
 
-- Backup dibuat dari MySQL, bukan dari browser.
-- Device tidak pernah diberi password database.
-- File backup tidak boleh di-commit.
-- Restore harus pernah diuji ke database lokal/staging.
-- Untuk Google Drive, gunakan folder Google Drive Desktop atau `rclone` di server, bukan OAuth Drive di aplikasi web.
-- Vercel tidak cocok menjadi tempat membuat file backup berkala karena runtime serverless tidak punya storage permanen dan tidak bisa menjaga proses scheduler jangka panjang.
-- Otomatisasi backup dikerjakan di laptop/server operasional yang punya `MYSQL_DATABASE_URL`, `mysqldump`, dan akses ke folder Google Drive.
+- Backups are created from MySQL, not from the browser.
+- Devices are never given the database password.
+- Backup files must not be committed.
+- Restore must have been tested to a local/staging database.
+- For Google Drive, use the Google Drive Desktop folder or `rclone` on the server, not OAuth Drive in the web application.
+- Vercel is not a good place to create periodic backup files because the serverless runtime has no permanent storage and cannot maintain a long-term scheduler process.
+- Backup automation is done on the operational laptop/server that has `MYSQL_DATABASE_URL`, `mysqldump`, and access to the Google Drive folder.
 
 ## Environment
 
-Contoh env lokal/server:
+Local/server env example:
 
 ```env
 SOLAR_TANK_STORAGE_DRIVER="mysql"
@@ -24,55 +24,55 @@ MYSQL_BACKUP_OUTPUT_DIR="backups/mysql"
 MYSQL_BACKUP_RETENTION_DAYS="90"
 ```
 
-Untuk dua backup per bulan, retention 90 hari menyimpan kira-kira 6 file backup terakhir. Jika storage Drive kecil, gunakan 45 atau 60 hari.
+For two backups per month, a 90-day retention keeps roughly the last 6 backup files. If Drive storage is small, use 45 or 60 days.
 
-Jika memakai Google Drive Desktop di Windows server/laptop operasional, arahkan `MYSQL_BACKUP_OUTPUT_DIR` ke folder yang tersinkronisasi, misalnya:
+When using Google Drive Desktop on a Windows server/operational laptop, point `MYSQL_BACKUP_OUTPUT_DIR` to a synchronized folder, for example:
 
 ```env
 MYSQL_BACKUP_OUTPUT_DIR="C:\Users\SolarTank\Google Drive\SolarTank Backups\mysql"
 ```
 
-Pastikan folder tersebut tidak berada di dalam repository agar file `.sql` tidak ikut terdeteksi git.
+Make sure that folder is not inside the repository so `.sql` files are not detected by git.
 
-## Membuat Backup Manual
+## Creating a Manual Backup
 
-Pastikan MySQL client tersedia dan perintah `mysqldump` bisa dipanggil dari terminal.
+Make sure the MySQL client is available and the `mysqldump` command can be called from the terminal.
 
 ```powershell
 pnpm db:backup:mysql
 ```
 
-Output berupa file:
+The output is a file:
 
 ```text
 solar_tank_mysql_YYYYMMDDTHHMMSSZ.sql
 ```
 
-## Backup Otomatis ke Google Drive Desktop
+## Automatic Backup to Google Drive Desktop
 
-Cara ini paling mudah untuk Windows karena Google Drive Desktop yang mengurus upload otomatis ke Google Drive.
+This is the easiest method on Windows because Google Drive Desktop handles the automatic upload to Google Drive.
 
-1. Install MySQL client sampai command `mysqldump` bisa dipanggil dari PowerShell.
-2. Install Google Drive Desktop dan login memakai akun Google Drive operasional.
-3. Buat folder Drive khusus, misalnya `SolarTank Backups\mysql`.
-4. Isi `.env.local` lokal/server dengan `MYSQL_BACKUP_OUTPUT_DIR` mengarah ke folder Drive tersebut.
-5. Jalankan sekali:
+1. Install the MySQL client until the `mysqldump` command can be called from PowerShell.
+2. Install Google Drive Desktop and sign in with the operational Google Drive account.
+3. Create a dedicated Drive folder, for example `SolarTank Backups\mysql`.
+4. Fill the local/server `.env.local` with `MYSQL_BACKUP_OUTPUT_DIR` pointing to that Drive folder.
+5. Run once:
 
 ```powershell
 pnpm db:backup:mysql
 ```
 
-6. Pastikan file `solar_tank_mysql_YYYYMMDDTHHMMSSZ.sql` muncul di folder Drive.
-7. Tunggu status Google Drive Desktop sampai file selesai tersinkron.
-8. Baru jadwalkan otomatis lewat Task Scheduler.
+6. Make sure the `solar_tank_mysql_YYYYMMDDTHHMMSSZ.sql` file appears in the Drive folder.
+7. Wait for Google Drive Desktop until the file finishes syncing.
+8. Only then schedule automation through Task Scheduler.
 
-Gunakan script ini untuk Task Scheduler:
+Use this script for Task Scheduler:
 
 ```text
 scripts/run-mysql-backup-task.ps1
 ```
 
-Contoh Task Scheduler Windows:
+Example Windows Task Scheduler setup:
 
 ```text
 Program/script:
@@ -85,74 +85,74 @@ Start in:
 D:\path\solar-tank-monitoring-system
 ```
 
-Jadwal yang disarankan:
+Recommended schedule:
 
-- tanggal 1 pukul 02.00;
-- tanggal 15 pukul 02.00;
-- jalankan ulang manual sebelum migration besar, reset massal, atau cleanup data besar.
+- the 1st at 02:00;
+- the 15th at 02:00;
+- run manually again before large migrations, mass resets, or large data cleanups.
 
-Log backup otomatis akan dibuat di:
+The automatic backup log is created at:
 
 ```text
 backups/logs/mysql_backup_YYYYMMDDTHHMMSSZ.log
 ```
 
-## Backup Otomatis ke Google Drive via rclone
+## Automatic Backup to Google Drive via rclone
 
-Gunakan `rclone` jika backup dijalankan di server/headless tanpa Google Drive Desktop.
+Use `rclone` when the backup runs on a headless/server without Google Drive Desktop.
 
 1. Install `rclone`.
-2. Buat remote Google Drive:
+2. Create a Google Drive remote:
 
 ```powershell
 rclone config
 ```
 
-3. Buat folder output lokal, misalnya:
+3. Create a local output folder, for example:
 
 ```env
 MYSQL_BACKUP_OUTPUT_DIR="backups/mysql"
 ```
 
-4. Jadwalkan backup, lalu sync hasilnya ke Drive:
+4. Schedule the backup, then sync the result to Drive:
 
 ```powershell
 pnpm db:backup:mysql
 rclone copy ".\backups\mysql" "gdrive:SolarTank Backups/mysql" --include "solar_tank_mysql_*.sql" --drive-use-trash=false
 ```
 
-Jika memakai Linux server, gunakan cron:
+On a Linux server, use cron:
 
 ```cron
 0 2 1,15 * * cd /srv/solar-tank-monitoring-system && pnpm db:backup:mysql && rclone copy ./backups/mysql "gdrive:SolarTank Backups/mysql" --include "solar_tank_mysql_*.sql" --drive-use-trash=false
 ```
 
-## Cek Backup Berhasil
+## Checking That Backup Succeeded
 
-Backup belum dianggap aman hanya karena file `.sql` ada. Minimal cek:
+A backup is not considered safe just because the `.sql` file exists. Minimum checks:
 
-- file baru muncul sesuai jadwal;
-- ukuran file masuk akal dan tidak `0 bytes`;
-- Google Drive Desktop/rclone sudah selesai upload;
-- file lama terhapus sesuai retention;
-- restore drill pernah sukses di database lokal/staging;
-- file backup tidak masuk `git status`.
+- a new file appears on schedule;
+- the file size is reasonable and not `0 bytes`;
+- Google Drive Desktop/rclone finished uploading;
+- old files are deleted per retention;
+- a restore drill once succeeded on a local/staging database;
+- backup files do not appear in `git status`.
 
 ## Restore Drill
 
-Jangan restore langsung ke database production sebelum diuji.
+Do not restore directly to the production database before testing.
 
-Contoh restore ke database lokal/staging:
+Example restore to a local/staging database:
 
 ```powershell
 mysql -h 127.0.0.1 -P 3306 -u solar_tank_app -p solar_tank_restore < .\backups\mysql\solar_tank_mysql_YYYYMMDDTHHMMSSZ.sql
 ```
 
-Checklist restore:
+Restore checklist:
 
-- aplikasi bisa login;
-- `/api/ready` tidak error;
-- registry site/tank/device terbaca;
-- dashboard tampil;
-- riwayat reading sesuai backup;
-- tidak ada credential backup yang masuk git.
+- the application can sign in;
+- `/api/ready` does not error;
+- the site/tank/device registry is readable;
+- the dashboard displays;
+- reading history matches the backup;
+- no backup credentials ended up in git.

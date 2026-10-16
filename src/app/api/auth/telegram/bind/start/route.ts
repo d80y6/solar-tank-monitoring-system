@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
   if (!isTelegramConfigured()) {
     return NextResponse.json(
-      { ok: false, error: "Telegram bot belum dikonfigurasi." },
+      { ok: false, error: "Telegram bot is not configured." },
       { status: 503 },
     );
   }
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
   if (!rateLimit.allowed) {
     return NextResponse.json(
-      { ok: false, error: "Terlalu banyak permintaan binding Telegram." },
+      { ok: false, error: "Too many Telegram binding requests." },
       {
         status: 429,
         headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },

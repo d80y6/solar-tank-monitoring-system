@@ -25,13 +25,13 @@ export default function LoginLoading() {
 
           <div className="mx-auto flex w-full max-w-[27rem] flex-1 flex-col justify-center py-9 sm:py-10 lg:py-8">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
-              Masuk ke sistem
+              Signing in
             </p>
             <h1 className="mt-3 text-[clamp(2rem,3vw,2.5rem)] font-medium leading-tight tracking-normal text-zinc-950">
-              Menyiapkan halaman masuk
+              Preparing the sign-in page
             </h1>
             <p className="mt-4 text-sm leading-7 text-zinc-600 sm:text-[0.95rem]">
-              Sistem sedang memeriksa sesi dan menyiapkan akses dashboard.
+              The system is checking your session and preparing dashboard access.
             </p>
 
             <div className="mt-7 space-y-4">

@@ -54,8 +54,8 @@ describe("tank detail view model", () => {
       status: "offline",
       fillPercent: 0,
       volumeLiter: 0,
-      lastUpdateLabel: "belum ada data",
-      receivedAtLabel: "belum ada data",
+      lastUpdateLabel: "No data yet",
+      receivedAtLabel: "No data yet",
       readings: [],
     });
   });
@@ -73,7 +73,7 @@ describe("tank detail view model", () => {
     const detail = buildTankDetail("tank-tph-main", { now, sites });
 
     expect(detail?.coordinate.label).toBe(
-      "-7.7201234, 112.8809876 (koordinat manual)",
+      "-7.7201234, 112.8809876 (manual coordinates)",
     );
   });
 
@@ -119,7 +119,7 @@ describe("tank detail view model", () => {
     expect(detail).toMatchObject({
       capacityLiter: 5000,
       shape: "horizontal-cylinder",
-      shapeLabel: "Tangki silinder horizontal",
+      shapeLabel: "Horizontal cylinder tank",
       lengthCm: 283,
       widthCm: null,
       heightCm: null,
@@ -146,8 +146,8 @@ describe("tank detail view model", () => {
     });
     expect(detail?.configReview.reasons).toEqual(
       expect.arrayContaining([
-        "Bentuk tangki payload berbeda dari registry resmi.",
-        "Kapasitas tangki payload berbeda 89.2% dari registry.",
+        "Payload tank shape differs from the official registry.",
+        "Tank capacity payload differs by 89.2% from the registry.",
       ]),
     );
   });

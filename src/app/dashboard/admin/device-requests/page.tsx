@@ -21,14 +21,14 @@ const DEVICE_REQUEST_STATUS_OPTIONS: Array<{
   label: string;
   value: DeviceRequestStatus | "all";
 }> = [
-  { label: "Semua status", value: "all" },
-  { label: "Menunggu review", value: "pending_admin_review" },
-  { label: "Disetujui", value: "approved_package_ready" },
-  { label: "Menunggu perangkat", value: "waiting_first_valid_ping" },
-  { label: "Aktif", value: "active" },
-  { label: "Ditolak", value: "rejected" },
-  { label: "Dicabut", value: "revoked" },
-  { label: "Kedaluwarsa", value: "expired" },
+  { label: "All statuses", value: "all" },
+  { label: "Waiting for review", value: "pending_admin_review" },
+  { label: "Approved", value: "approved_package_ready" },
+  { label: "Waiting for device", value: "waiting_first_valid_ping" },
+  { label: "Active", value: "active" },
+  { label: "Rejected", value: "rejected" },
+  { label: "Revoked", value: "revoked" },
+  { label: "Expired", value: "expired" },
 ];
 
 type AdminDeviceRequestsPageProps = {
@@ -39,16 +39,16 @@ type AdminDeviceRequestsPageProps = {
 };
 
 export const metadata: Metadata = {
-  title: "Tinjau Pengajuan Perangkat | FTM",
+  title: "Review Device Requests | FTM",
   description:
-    "Tinjauan admin untuk pengajuan perangkat baru sebelum paket firmware FTM dibuat.",
+    "Admin review for new device requests before the FTM firmware package is created.",
 };
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function normalizeFilterValue(value: string) {
-  return value.toLocaleLowerCase("id-ID").trim();
+  return value.toLocaleLowerCase("en-US").trim();
 }
 
 function getRequestedStatus(value: string | undefined) {
@@ -128,9 +128,9 @@ export default async function AdminDeviceRequestsPage({
     <main className="flex min-h-screen flex-col overflow-x-hidden bg-[#f5faf8] text-zinc-950 lg:h-screen lg:overflow-hidden">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { current: true, label: "Tinjau Pengajuan" },
-          { href: "/dashboard/admin/users", label: "Manajemen Pengguna" },
+          { href: "/dashboard", label: "Tank Management" },
+          { current: true, label: "Review requests" },
+          { href: "/dashboard/admin/users", label: "User Management" },
         ]}
         user={admin}
       />
@@ -141,15 +141,14 @@ export default async function AdminDeviceRequestsPage({
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_520px] xl:items-center">
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-red-600">
-                Tinjauan perangkat baru
+                New device review
               </p>
               <h1 className="mt-2 text-2xl font-semibold sm:text-3xl">
-                Pengajuan perangkat sebelum paket firmware dibuat
+                Device requests before the firmware package is created
               </h1>
               <p className="mt-2 max-w-4xl text-sm leading-6 text-zinc-500">
-                Admin cukup melihat daftar ringkas terlebih dahulu. Detail teknis,
-                validasi, dan aksi keputusan dibuka dari tombol tinjau agar halaman
-                tetap bersih.
+                Admins first see a compact list. Technical details, validation, and
+                decision actions open from the review button to keep the page clean.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
@@ -195,9 +194,8 @@ export default async function AdminDeviceRequestsPage({
 
         {!isMysqlEnabled ? (
           <section className="shrink-0 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
-            Tinjauan pengajuan perangkat memerlukan storage MySQL. Aktifkan
-            database MySQL dan jalankan migrasi provisioning perangkat terlebih
-            dahulu.
+            Device request review requires MySQL storage. Enable the MySQL
+            database and run the device provisioning migrations first.
           </section>
         ) : null}
 
@@ -209,7 +207,7 @@ export default async function AdminDeviceRequestsPage({
               className="contents"
             >
               <label className="grid gap-1.5 text-sm font-semibold text-zinc-950">
-                Cari pengajuan
+                Search requests
                 <span className="relative block">
                   <Search
                     aria-hidden="true"
@@ -219,7 +217,7 @@ export default async function AdminDeviceRequestsPage({
                     className="h-10 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm font-medium text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
                     defaultValue={query}
                     name="q"
-                    placeholder="Cari STO, device, email, atau kode"
+                    placeholder="Search STO, device, email, or code"
                     type="search"
                   />
                 </span>
@@ -242,7 +240,7 @@ export default async function AdminDeviceRequestsPage({
                 className="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-600/15 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
                 type="submit"
               >
-                Terapkan
+                Apply
               </button>
               <Link
                 className="inline-flex h-10 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15"

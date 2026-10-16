@@ -22,13 +22,13 @@ const INITIAL_ACTION_STATE: DashboardAdminActionState = {
   status: "idle",
   message: "",
 };
-const DELETE_TANK_CONFIRMATION = "HAPUS DATA STO";
-const RESET_TANK_READINGS_CONFIRMATION = "RESET READING STO";
-const RESET_ALL_READINGS_CONFIRMATION = "RESET SEMUA READING";
+const DELETE_TANK_CONFIRMATION = "DELETE STO DATA";
+const RESET_TANK_READINGS_CONFIRMATION = "RESET STO READINGS";
+const RESET_ALL_READINGS_CONFIRMATION = "RESET ALL READINGS";
 const TELKOM_WATERMARK_SRC = "/brand/Logo_Telkom1.png";
 
 function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID", {
+  return new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 0,
   }).format(value);
 }
@@ -57,11 +57,11 @@ function EmptyState() {
   return (
     <div className="rounded-lg border border-dashed border-zinc-300 bg-white px-5 py-10 text-center">
       <p className="text-base font-semibold text-zinc-950">
-        Tidak ada STO yang cocok dengan filter ini.
+        No STO matches these filters.
       </p>
       <p className="mt-2 text-sm text-zinc-500">
-        Coba ubah kata kunci, status, regional, wilayah, area, atau STO yang
-        dipilih.
+        Try changing the keyword, status, regional, territory, area, or
+        selected STO.
       </p>
     </div>
   );
@@ -107,17 +107,17 @@ function DeleteTankDialog({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-600">
-              Hapus data monitoring
+              Delete monitoring data
             </p>
             <h2
               className="mt-2 text-xl font-semibold text-zinc-950"
               id="delete-dashboard-tank-title"
             >
-              Hapus {site.name}?
+              Delete {site.name}?
             </h2>
           </div>
           <button
-            aria-label="Tutup dialog hapus data"
+            aria-label="Close delete dialog"
             className="grid size-9 shrink-0 place-items-center rounded-full border border-zinc-200 text-zinc-500 transition hover:bg-zinc-50 hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15"
             disabled={pending}
             onClick={onClose}
@@ -128,10 +128,10 @@ function DeleteTankDialog({
         </div>
 
         <p className="mt-3 text-sm leading-6 text-zinc-600">
-          Data reading, perangkat, tangki, dan event untuk{" "}
-          <span className="font-semibold text-zinc-950">{siteLabel}</span> akan
-          dibersihkan dari dashboard. Akun, admin, template firmware, dan profil
-          hardware tetap aman.
+          Reading data, devices, tanks, and events for{" "}
+          <span className="font-semibold text-zinc-950">{siteLabel}</span>{" "}
+          will be cleared from the dashboard. Accounts, admins, firmware
+          templates, and hardware profiles remain safe.
         </p>
 
         <form action={formAction} className="mt-5 grid gap-3">
@@ -162,7 +162,7 @@ function DeleteTankDialog({
               onClick={onClose}
               type="button"
             >
-              Batal
+              Cancel
             </button>
             <button
               className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-semibold text-white shadow-lg shadow-red-600/15 transition hover:bg-red-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/20 disabled:cursor-wait disabled:bg-red-300"
@@ -170,7 +170,7 @@ function DeleteTankDialog({
               type="submit"
             >
               <Trash2 className="size-4" aria-hidden="true" />
-              {pending ? "Menghapus..." : "Ya, hapus data"}
+              {pending ? "Deleting..." : "Yes, delete data"}
             </button>
           </div>
         </form>
@@ -219,17 +219,17 @@ function ResetTankReadingsDialog({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-600">
-              Reset reading
+              Reset readings
             </p>
             <h2
               className="mt-2 text-xl font-semibold text-zinc-950"
               id="reset-dashboard-tank-title"
             >
-              Reset reading {site.name}?
+              Reset readings for {site.name}?
             </h2>
           </div>
           <button
-            aria-label="Tutup dialog reset reading"
+            aria-label="Close reset dialog"
             className="grid size-9 shrink-0 place-items-center rounded-full border border-zinc-200 text-zinc-500 transition hover:bg-zinc-50 hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15"
             disabled={pending}
             onClick={onClose}
@@ -240,10 +240,10 @@ function ResetTankReadingsDialog({
         </div>
 
         <p className="mt-3 text-sm leading-6 text-zinc-600">
-          History pembacaan untuk{" "}
-          <span className="font-semibold text-zinc-950">{siteLabel}</span> akan
-          dikosongkan. Data STO, tangki, perangkat, pengajuan, dan paket
-          firmware tetap ada.
+          Reading history for{" "}
+          <span className="font-semibold text-zinc-950">{siteLabel}</span>{" "}
+          will be cleared. STO data, tanks, devices, requests, and firmware
+          packages remain.
         </p>
 
         <form action={formAction} className="mt-5 grid gap-3">
@@ -274,7 +274,7 @@ function ResetTankReadingsDialog({
               onClick={onClose}
               type="button"
             >
-              Batal
+              Cancel
             </button>
             <button
               className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-amber-600 px-4 text-sm font-semibold text-white shadow-lg shadow-amber-600/15 transition hover:bg-amber-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-600/20 disabled:cursor-wait disabled:bg-amber-300"
@@ -282,7 +282,7 @@ function ResetTankReadingsDialog({
               type="submit"
             >
               <RotateCcw className="size-4" aria-hidden="true" />
-              {pending ? "Mereset..." : "Reset reading"}
+              {pending ? "Resetting..." : "Reset readings"}
             </button>
           </div>
         </form>
@@ -330,17 +330,17 @@ function ResetAllReadingsDialog({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-600">
-              Reset semua reading
+              Reset all readings
             </p>
             <h2
               className="mt-2 text-xl font-semibold text-zinc-950"
               id="reset-all-dashboard-readings-title"
             >
-              Kosongkan history pembacaan semua STO?
+              Clear reading history for all STOs?
             </h2>
           </div>
           <button
-            aria-label="Tutup dialog reset semua reading"
+            aria-label="Close reset-all dialog"
             className="grid size-9 shrink-0 place-items-center rounded-full border border-zinc-200 text-zinc-500 transition hover:bg-zinc-50 hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15"
             disabled={pending}
             onClick={onClose}
@@ -351,18 +351,18 @@ function ResetAllReadingsDialog({
         </div>
 
         <p className="mt-3 text-sm leading-6 text-zinc-600">
-          Aksi ini menghapus semua row{" "}
+          This action deletes every{" "}
           <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs font-semibold text-zinc-800">
             monitoring_readings
           </code>{" "}
-          agar dashboard mulai membaca data baru lagi. Registry STO, tangki,
-          perangkat, pengajuan, dan paket firmware tidak dihapus.
+          row so the dashboard starts reading fresh data. The STO registry,
+          tanks, devices, requests, and firmware packages are not deleted.
         </p>
 
         <form action={formAction} className="mt-5 grid gap-3">
           <input name="csrfToken" type="hidden" value={csrfToken} />
           <label className="grid gap-2 text-sm font-semibold text-zinc-900">
-            <span>Ketik {RESET_ALL_READINGS_CONFIRMATION}</span>
+            <span>Type {RESET_ALL_READINGS_CONFIRMATION}</span>
             <input
               className="h-11 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-amber-600 focus:ring-4 focus:ring-amber-600/15"
               name="confirmation"
@@ -390,7 +390,7 @@ function ResetAllReadingsDialog({
               onClick={onClose}
               type="button"
             >
-              Batal
+              Cancel
             </button>
             <button
               className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-amber-600 px-4 text-sm font-semibold text-white shadow-lg shadow-amber-600/15 transition hover:bg-amber-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-600/20 disabled:cursor-not-allowed disabled:bg-amber-300"
@@ -398,7 +398,7 @@ function ResetAllReadingsDialog({
               type="submit"
             >
               <RotateCcw className="size-4" aria-hidden="true" />
-              {pending ? "Mereset..." : "Reset semua reading"}
+              {pending ? "Resetting..." : "Reset all readings"}
             </button>
           </div>
         </form>
@@ -432,7 +432,7 @@ export function SimpleDashboardCards({
               type="button"
             >
               <RotateCcw className="size-4" aria-hidden="true" />
-              Reset semua reading
+              Reset all readings
             </button>
           </div>
         ) : null}
@@ -443,9 +443,9 @@ export function SimpleDashboardCards({
               key={`${site.code}-${site.tankId}`}
             >
               <Link
-                aria-label={`Buka detail tangki ${site.name}`}
+                aria-label={`Open tank details for ${site.name}`}
                 className="absolute inset-0 z-0 rounded-lg focus-visible:outline-none"
-                href={`/dashboard/ringkas/tanks/${site.tankId}`}
+                href={`/dashboard/operations/tanks/${site.tankId}`}
               />
               <Image
                 alt=""
@@ -478,27 +478,27 @@ export function SimpleDashboardCards({
                 {adminCleanupToken ? (
                   <>
                     <button
-                      aria-label={`Reset reading ${site.name}`}
+                      aria-label={`Reset readings for ${site.name}`}
                       className="pointer-events-auto grid size-8 place-items-center rounded-full border border-amber-100 bg-amber-50 text-amber-700 transition hover:border-amber-200 hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-600/15"
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
                         setSiteToReset(site);
                       }}
-                      title={`Reset reading ${site.name}`}
+                      title={`Reset readings for ${site.name}`}
                       type="button"
                     >
                       <RotateCcw className="size-4" aria-hidden="true" />
                     </button>
                     <button
-                      aria-label={`Hapus data monitoring ${site.name}`}
+                      aria-label={`Delete monitoring data for ${site.name}`}
                       className="pointer-events-auto grid size-8 place-items-center rounded-full border border-red-100 bg-red-50 text-red-600 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/15"
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
                         setSiteToDelete(site);
                       }}
-                      title={`Hapus data monitoring ${site.name}`}
+                      title={`Delete monitoring data for ${site.name}`}
                       type="button"
                     >
                       <Trash2 className="size-4" aria-hidden="true" />
@@ -510,13 +510,13 @@ export function SimpleDashboardCards({
 
             <div className="pointer-events-none relative z-10 mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
               <div className="min-w-0">
-                <p className="text-sm font-medium text-zinc-500">Isi tangki</p>
+                <p className="text-sm font-medium text-zinc-500">Tank level</p>
                 <p className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
                   {formatLiter(site.volumeLiter)} /{" "}
                   {formatLiter(site.capacityLiter)} L
                 </p>
                 <p className="mt-1 text-sm text-zinc-500">
-                  saat ini / kapasitas maksimal
+                  current / maximum capacity
                 </p>
               </div>
 
@@ -535,14 +535,14 @@ export function SimpleDashboardCards({
             <div className="pointer-events-none relative z-10 mt-5 flex items-center justify-between gap-3 border-t border-zinc-100 pt-4 text-sm">
               <div className="min-w-0">
                 <p className="text-xs font-medium text-zinc-500">
-                  Update terakhir
+                  Last update
                 </p>
                 <p className="mt-0.5 truncate font-semibold text-zinc-950">
                   {site.updateLabel}
                 </p>
               </div>
               <span className="inline-flex h-9 shrink-0 items-center gap-1 rounded-lg bg-blue-50 px-3 text-xs font-semibold text-blue-700 transition group-hover:bg-blue-600 group-hover:text-white">
-                Buka detail
+                Open details
                 <ArrowUpRight className="size-3.5" aria-hidden="true" />
               </span>
             </div>

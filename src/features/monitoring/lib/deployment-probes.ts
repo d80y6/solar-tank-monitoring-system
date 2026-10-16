@@ -94,7 +94,7 @@ async function checkStorageReadiness(
       ok: true,
       status: "degraded",
       message:
-        "Storage memory aktif. Aplikasi bisa berjalan, tetapi data tidak permanen.",
+        "Memory storage is active. The app can run, but data is not permanent.",
     };
   }
 
@@ -107,7 +107,7 @@ async function checkStorageReadiness(
       name: "mysql",
       ok: true,
       status: "ok",
-      message: "Koneksi MySQL aktif.",
+      message: "MySQL connection active.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   } catch {
@@ -116,7 +116,7 @@ async function checkStorageReadiness(
       ok: false,
       status: "error",
       message:
-        "Koneksi MySQL gagal. Cek MYSQL_DATABASE_URL, status database, SSL, network, dan allowlist provider.",
+        "MySQL connection failed. Check MYSQL_DATABASE_URL, database status, SSL, network, and the provider allowlist.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   }
@@ -134,8 +134,8 @@ async function checkReferenceRegistryReadiness(): Promise<DeploymentCheck> {
       ok,
       status: ok ? "ok" : "error",
       message: ok
-        ? `Registry MySQL aktif: ${counts.sites} site, ${counts.tanks} tangki, ${counts.devices} device.`
-        : "Registry MySQL belum lengkap. Pastikan seed monitoring_sites, monitoring_tanks, dan monitoring_devices sudah dijalankan.",
+        ? `MySQL registry active: ${counts.sites} sites, ${counts.tanks} tanks, ${counts.devices} devices.`
+        : "MySQL registry is incomplete. Make sure the monitoring_sites, monitoring_tanks, and monitoring_devices seeds have been run.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   } catch {
@@ -144,7 +144,7 @@ async function checkReferenceRegistryReadiness(): Promise<DeploymentCheck> {
       ok: false,
       status: "error",
       message:
-        "Registry MySQL gagal dicek. Cek migration, tabel reference, permission user database, dan MYSQL_DATABASE_URL.",
+        "MySQL registry check failed. Check migrations, reference tables, database user permissions, and MYSQL_DATABASE_URL.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   }
@@ -160,7 +160,7 @@ async function checkReadingStorageSchemaReadiness(): Promise<DeploymentCheck> {
       name: "mysql-reading-rollup",
       ok: true,
       status: "ok",
-      message: "Snapshot live dan rollup reading 5 menit siap digunakan.",
+      message: "Live snapshots and 5-minute reading rollups are ready.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   } catch {
@@ -169,7 +169,7 @@ async function checkReadingStorageSchemaReadiness(): Promise<DeploymentCheck> {
       ok: false,
       status: "error",
       message:
-        "Schema rollup reading belum siap. Jalankan migration 007 sebelum menerima telemetry MySQL.",
+        "Reading rollup schema is not ready. Run migration 007 before receiving MySQL telemetry.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   }
@@ -185,7 +185,7 @@ async function checkLocationTaxonomySchemaReadiness(): Promise<DeploymentCheck> 
       name: "mysql-location-taxonomy",
       ok: true,
       status: "ok",
-      message: "Regional, wilayah, dan area lokasi siap digunakan.",
+      message: "Regional, territory, and area location taxonomy is ready.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   } catch {
@@ -194,7 +194,7 @@ async function checkLocationTaxonomySchemaReadiness(): Promise<DeploymentCheck> 
       ok: false,
       status: "error",
       message:
-        "Struktur Regional dan Wilayah belum siap. Jalankan migration 009 sebelum men-deploy dashboard lokasi.",
+        "Regional and territory structure is not ready. Run migration 009 before deploying the location dashboard.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   }
@@ -217,14 +217,14 @@ async function checkAuthTelegramSchemaReadiness(): Promise<DeploymentCheck> {
     );
 
     if (Number(rows[0]?.count ?? 0) !== 1) {
-      throw new Error("Unique index Telegram binding belum tersedia.");
+      throw new Error("Telegram binding unique index is not available.");
     }
 
     return {
       name: "mysql-auth-telegram",
       ok: true,
       status: "ok",
-      message: "Relasi satu akun untuk satu Telegram siap digunakan.",
+      message: "One-account-per-Telegram relation is ready.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   } catch {
@@ -233,7 +233,7 @@ async function checkAuthTelegramSchemaReadiness(): Promise<DeploymentCheck> {
       ok: false,
       status: "error",
       message:
-        "Schema binding Telegram belum siap. Jalankan migration 008 sebelum mengaktifkan command Telegram.",
+        "Telegram binding schema is not ready. Run migration 008 before enabling Telegram commands.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   }
@@ -258,7 +258,7 @@ function checkAuthSecretReadiness(): DeploymentCheck {
         ok: true,
         status: "degraded",
         message:
-          "AUTH_SECRET belum diisi. Development fallback aktif dan tidak boleh dipakai untuk production.",
+          "AUTH_SECRET is not set. Development fallback is active and must not be used for production.",
       };
     }
 
@@ -266,14 +266,14 @@ function checkAuthSecretReadiness(): DeploymentCheck {
       name: "auth-secret",
       ok: true,
       status: "ok",
-      message: "AUTH_SECRET aktif.",
+      message: "AUTH_SECRET is active.",
     };
   } catch {
     return {
       name: "auth-secret",
       ok: false,
       status: "error",
-      message: "AUTH_SECRET minimal 32 karakter wajib diisi.",
+      message: "AUTH_SECRET with at least 32 characters is required.",
     };
   }
 }
@@ -293,7 +293,7 @@ function checkAppBaseUrlReadiness(): DeploymentCheck {
         ok: false,
         status: "error",
         message:
-          "APP_BASE_URL production tidak boleh memakai localhost karena dipakai untuk link email.",
+          "Production APP_BASE_URL must not use localhost because it is used for email links.",
       };
     }
 
@@ -302,8 +302,8 @@ function checkAppBaseUrlReadiness(): DeploymentCheck {
       ok: true,
       status: isLocalhost ? "degraded" : "ok",
       message: isLocalhost
-        ? "APP_BASE_URL masih memakai localhost. Aman untuk development, bukan untuk production."
-        : "APP_BASE_URL siap untuk link email.",
+        ? "APP_BASE_URL still uses localhost. Fine for development, not for production."
+        : "APP_BASE_URL is ready for email links.",
     };
   } catch {
     return {
@@ -311,7 +311,7 @@ function checkAppBaseUrlReadiness(): DeploymentCheck {
       ok: false,
       status: "error",
       message:
-        "APP_BASE_URL wajib diisi dengan URL aplikasi yang valid untuk production.",
+        "APP_BASE_URL must be set to a valid application URL for production.",
     };
   }
 }
@@ -325,8 +325,8 @@ function checkAdminOtpReadiness(): DeploymentCheck {
       ok: !productionLike,
       status: productionLike ? "error" : "degraded",
       message: productionLike
-        ? "OTP admin tidak boleh dimatikan di production."
-        : "OTP admin sedang dimatikan. Aktifkan sebelum production.",
+        ? "Admin OTP must not be disabled in production."
+        : "Admin OTP is disabled. Enable it before production.",
     };
   }
 
@@ -335,7 +335,7 @@ function checkAdminOtpReadiness(): DeploymentCheck {
       name: "admin-otp",
       ok: true,
       status: "ok",
-      message: "OTP admin aktif dengan SMTP.",
+      message: "Admin OTP active with SMTP.",
     };
   }
 
@@ -345,7 +345,7 @@ function checkAdminOtpReadiness(): DeploymentCheck {
       ok: true,
       status: "degraded",
       message:
-        "SMTP belum diisi. OTP admin hanya dicetak ke log development.",
+        "SMTP is not set. Admin OTP is only printed to the development log.",
     };
   }
 
@@ -353,7 +353,7 @@ function checkAdminOtpReadiness(): DeploymentCheck {
     name: "admin-otp",
     ok: false,
     status: "error",
-    message: "SMTP wajib diisi saat OTP admin aktif.",
+    message: "SMTP must be set when admin OTP is enabled.",
   };
 }
 
@@ -369,7 +369,7 @@ function checkAuthEmailFlowReadiness(): DeploymentCheck {
       ok: !isProductionLikeEnvironment(),
       status: isProductionLikeEnvironment() ? "error" : "degraded",
       message:
-        "Semua flow email auth sedang tidak wajib. Kondisi ini tidak disarankan untuk production.",
+        "All auth email flows are currently optional. This is not recommended for production.",
     };
   }
 
@@ -378,7 +378,7 @@ function checkAuthEmailFlowReadiness(): DeploymentCheck {
       name: "auth-email-flow",
       ok: true,
       status: "ok",
-      message: "SMTP siap untuk OTP, verifikasi email, dan reset password.",
+      message: "SMTP is ready for OTP, email verification, and password reset.",
     };
   }
 
@@ -388,7 +388,7 @@ function checkAuthEmailFlowReadiness(): DeploymentCheck {
       ok: true,
       status: "degraded",
       message:
-        "SMTP belum diisi. Email auth hanya dicetak ke log development.",
+        "SMTP is not set. Auth emails are only printed to the development log.",
     };
   }
 
@@ -397,7 +397,7 @@ function checkAuthEmailFlowReadiness(): DeploymentCheck {
     ok: false,
     status: "error",
     message:
-      "SMTP wajib diisi untuk OTP, verifikasi email, dan reset password.",
+      "SMTP must be set for OTP, email verification, and password reset.",
   };
 }
 
@@ -410,7 +410,7 @@ function checkCaptchaReadiness(): DeploymentCheck {
       ok: false,
       status: "error",
       message:
-        "AUTH_CAPTCHA_PROVIDER tidak dikenali. Gunakan disabled atau turnstile.",
+        "AUTH_CAPTCHA_PROVIDER is not recognized. Use disabled or turnstile.",
     };
   }
 
@@ -420,7 +420,7 @@ function checkCaptchaReadiness(): DeploymentCheck {
       ok: !isProductionLikeEnvironment(),
       status: isProductionLikeEnvironment() ? "error" : "degraded",
       message:
-        "CAPTCHA form publik nonaktif. Aktifkan Turnstile sebelum production.",
+        "Public form CAPTCHA is disabled. Enable Turnstile before production.",
     };
   }
 
@@ -430,7 +430,7 @@ function checkCaptchaReadiness(): DeploymentCheck {
       ok: false,
       status: "error",
       message:
-        "Turnstile aktif tetapi site key atau secret key CAPTCHA belum lengkap.",
+        "Turnstile is active but the CAPTCHA site key or secret key is incomplete.",
     };
   }
 
@@ -438,7 +438,7 @@ function checkCaptchaReadiness(): DeploymentCheck {
     name: "auth-captcha",
     ok: true,
     status: "ok",
-    message: "CAPTCHA Turnstile aktif untuk form publik.",
+    message: "Turnstile CAPTCHA active for public forms.",
   };
 }
 
@@ -451,7 +451,7 @@ function checkTelegramReadiness(): DeploymentCheck {
       name: "auth-telegram",
       ok: true,
       status: "ok",
-      message: "Telegram bot siap untuk binding akun.",
+      message: "Telegram bot is ready for account binding.",
     };
   }
 
@@ -460,7 +460,7 @@ function checkTelegramReadiness(): DeploymentCheck {
     ok: true,
     status: "degraded",
     message:
-      "Telegram bot belum lengkap. Sistem tetap berjalan dengan email sebagai kanal utama.",
+      "Telegram bot is incomplete. The system keeps running with email as the primary channel.",
   };
 }
 
@@ -473,8 +473,8 @@ function checkDeviceKeyPolicyReadiness(): DeploymentCheck {
       ok: !productionLike,
       status: productionLike ? "error" : "degraded",
       message: productionLike
-        ? "Global device key fallback wajib dimatikan di production."
-        : "Global device key fallback aktif untuk development.",
+        ? "Global device key fallback must be disabled in production."
+        : "Global device key fallback is active for development.",
     };
   }
 
@@ -482,7 +482,7 @@ function checkDeviceKeyPolicyReadiness(): DeploymentCheck {
     name: "device-key-policy",
     ok: true,
     status: "ok",
-    message: "Global device key fallback nonaktif.",
+    message: "Global device key fallback is disabled.",
   };
 }
 
@@ -492,7 +492,7 @@ function checkAutoProvisioningReadiness(): DeploymentCheck {
       name: "device-auto-provisioning",
       ok: true,
       status: "ok",
-      message: "Auto provisioning device nonaktif.",
+      message: "Device auto provisioning is disabled.",
     };
   }
 
@@ -502,7 +502,7 @@ function checkAutoProvisioningReadiness(): DeploymentCheck {
       ok: false,
       status: "error",
       message:
-        "Auto provisioning aktif tetapi SOLAR_TANK_DEVICE_PROVISIONING_KEY belum diisi.",
+        "Auto provisioning is active but SOLAR_TANK_DEVICE_PROVISIONING_KEY is not set.",
     };
   }
 
@@ -511,7 +511,7 @@ function checkAutoProvisioningReadiness(): DeploymentCheck {
     ok: true,
     status: "degraded",
     message:
-      "Auto provisioning device aktif. Gunakan hanya saat onboarding device baru.",
+      "Device auto provisioning is active. Use it only when onboarding new devices.",
   };
 }
 
@@ -525,7 +525,7 @@ function checkDevicePackageEncryptionReadiness(): DeploymentCheck {
         ok: true,
         status: "degraded",
         message:
-          "DEVICE_PACKAGE_ENCRYPTION_KEY belum diisi. Development fallback aktif dan tidak boleh dipakai untuk production.",
+          "DEVICE_PACKAGE_ENCRYPTION_KEY is not set. Development fallback is active and must not be used for production.",
       };
     }
 
@@ -533,7 +533,7 @@ function checkDevicePackageEncryptionReadiness(): DeploymentCheck {
       name: "device-package-encryption",
       ok: true,
       status: "ok",
-      message: "DEVICE_PACKAGE_ENCRYPTION_KEY aktif untuk paket firmware.",
+      message: "DEVICE_PACKAGE_ENCRYPTION_KEY is active for firmware packages.",
     };
   } catch {
     return {
@@ -541,7 +541,7 @@ function checkDevicePackageEncryptionReadiness(): DeploymentCheck {
       ok: false,
       status: "error",
       message:
-        "DEVICE_PACKAGE_ENCRYPTION_KEY wajib valid untuk production dan harus berupa key 32 byte base64/base64url/hex.",
+        "DEVICE_PACKAGE_ENCRYPTION_KEY must be valid for production and must be a 32-byte base64/base64url/hex key.",
     };
   }
 }
@@ -555,7 +555,7 @@ function checkDatabaseBackupReadiness(
       ok: true,
       status: "degraded",
       message:
-        "Backup MySQL belum relevan karena storage memory aktif. Gunakan storage mysql untuk data permanen.",
+        "MySQL backup is not relevant yet because memory storage is active. Use mysql storage for permanent data.",
     };
   }
 
@@ -568,7 +568,7 @@ function checkDatabaseBackupReadiness(
       ok: !isProductionLikeEnvironment(),
       status: isProductionLikeEnvironment() ? "error" : "degraded",
       message:
-        "MYSQL_BACKUP_OUTPUT_DIR belum diisi. Tentukan folder backup sebelum production.",
+        "MYSQL_BACKUP_OUTPUT_DIR is not set. Choose a backup folder before production.",
     };
   }
 
@@ -580,7 +580,7 @@ function checkDatabaseBackupReadiness(
       name: "database-backup",
       ok: false,
       status: "error",
-      message: "MYSQL_BACKUP_RETENTION_DAYS harus angka 0 atau lebih.",
+      message: "MYSQL_BACKUP_RETENTION_DAYS must be 0 or greater.",
     };
   }
 
@@ -589,7 +589,7 @@ function checkDatabaseBackupReadiness(
     ok: true,
     status: "ok",
     message:
-      "Target backup MySQL sudah dikonfigurasi. Jadwalkan pnpm db:backup:mysql dan uji restore berkala.",
+      "MySQL backup target is configured. Schedule pnpm db:backup:mysql and test restores regularly.",
   };
 }
 

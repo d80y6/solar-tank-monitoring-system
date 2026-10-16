@@ -33,7 +33,7 @@ type DashboardViewMode = "cards" | "map";
 const SIMPLE_DASHBOARD_ALL_STOS = "all";
 
 const STATUS_FILTERS: StatusFilterOption[] = [
-  { value: "all", label: "Semua" },
+  { value: "all", label: "All" },
   { value: "online", label: "Online" },
   { value: "offline", label: "Offline" },
 ];
@@ -110,8 +110,8 @@ export function SimpleDashboardView({
     () =>
       [...sites].sort(
         (first, second) =>
-          first.name.localeCompare(second.name, "id-ID") ||
-          first.code.localeCompare(second.code, "id-ID"),
+          first.name.localeCompare(second.name, "en-US") ||
+          first.code.localeCompare(second.code, "en-US"),
       ),
     [sites],
   );
@@ -148,7 +148,7 @@ export function SimpleDashboardView({
   return (
     <section className="flex min-h-0 w-[calc(100vw-2rem)] max-w-full min-w-0 flex-1 flex-col gap-4 sm:w-full">
       <div className="grid min-w-0 gap-3 sm:grid-cols-3">
-        <SummaryValue label="Total STO" tone="blue" value={summary.total} />
+        <SummaryValue label="Total STOs" tone="blue" value={summary.total} />
         <SummaryValue label="Online" tone="emerald" value={summary.online} />
         <SummaryValue label="Offline" tone="red" value={summary.offline} />
       </div>
@@ -156,7 +156,7 @@ export function SimpleDashboardView({
       <div className="grid min-w-0 grid-cols-1 gap-4 rounded-lg border border-zinc-200 bg-white p-3 shadow-sm md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 2xl:items-end">
         <label className="block min-w-0">
           <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
-            Cari STO
+            Search STO
           </span>
           <span className="relative block">
             <Search
@@ -166,7 +166,7 @@ export function SimpleDashboardView({
             <input
               className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm font-medium text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cari kode, nama, area, regional, wilayah, atau perangkat"
+              placeholder="Search code, name, area, regional, territory, or device"
               type="search"
               value={query}
             />
@@ -207,7 +207,7 @@ export function SimpleDashboardView({
               value={regionalFilter}
             >
               <option value={SIMPLE_DASHBOARD_ALL_REGIONALS}>
-                Semua regional
+                All regionals
               </option>
               {regionals.map((regional) => (
                 <option key={regional} value={regional}>
@@ -224,7 +224,7 @@ export function SimpleDashboardView({
 
         <label className="block min-w-0">
           <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
-            Wilayah
+            Territory
           </span>
           <span className="relative block">
             <select
@@ -233,7 +233,7 @@ export function SimpleDashboardView({
               value={wilayahFilter}
             >
               <option value={SIMPLE_DASHBOARD_ALL_WILAYAHS}>
-                Semua wilayah
+                All territories
               </option>
               {wilayahs.map((wilayah) => (
                 <option key={wilayah} value={wilayah}>
@@ -258,7 +258,7 @@ export function SimpleDashboardView({
               onChange={(event) => setAreaFilter(event.target.value)}
               value={areaFilter}
             >
-              <option value={SIMPLE_DASHBOARD_ALL_AREAS}>Semua area</option>
+              <option value={SIMPLE_DASHBOARD_ALL_AREAS}>All areas</option>
               {areas.map((area) => (
                 <option key={area} value={area}>
                   {area}
@@ -274,7 +274,7 @@ export function SimpleDashboardView({
 
         <label className="block min-w-0">
           <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
-            Pilih STO
+            Select STO
           </span>
           <span className="relative block">
             <select
@@ -282,7 +282,7 @@ export function SimpleDashboardView({
               onChange={(event) => setSelectedSto(event.target.value)}
               value={selectedSto}
             >
-              <option value={SIMPLE_DASHBOARD_ALL_STOS}>Semua STO</option>
+              <option value={SIMPLE_DASHBOARD_ALL_STOS}>All STOs</option>
               {stoOptions.map((site) => (
                 <option key={site.tankId} value={site.tankId}>
                   {site.name} ({site.code})
@@ -300,16 +300,16 @@ export function SimpleDashboardView({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold tracking-normal text-zinc-950">
-            Monitoring Tangki STO
+            STO Tank Monitoring
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            {visibleSites.length} dari {sites.length} STO ditampilkan
+            Showing {visibleSites.length} of {sites.length} STOs
           </p>
         </div>
 
         <div
           className="grid w-full grid-cols-2 rounded-lg border border-zinc-300 bg-zinc-50 p-1 sm:w-auto"
-          aria-label="Pilih tampilan dashboard"
+          aria-label="Choose dashboard view"
         >
           <button
             aria-pressed={viewMode === "cards"}
@@ -322,7 +322,7 @@ export function SimpleDashboardView({
             type="button"
           >
             <LayoutGrid className="size-4" aria-hidden="true" />
-            Kartu
+            Cards
           </button>
           <button
             aria-pressed={viewMode === "map"}
@@ -335,7 +335,7 @@ export function SimpleDashboardView({
             type="button"
           >
             <MapPinned className="size-4" aria-hidden="true" />
-            Peta
+            Map
           </button>
         </div>
       </div>

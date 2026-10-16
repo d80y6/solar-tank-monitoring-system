@@ -4,8 +4,8 @@ import Link from "next/link";
 import ResetPasswordForm from "./reset-password-form";
 
 export const metadata: Metadata = {
-  title: "Buat Password Baru | FTM",
-  description: "Buat kata sandi baru dari link reset akun FTM.",
+  title: "Create New Password | FTM",
+  description: "Create a new password from the FTM account reset link.",
 };
 
 export default async function ResetPasswordPage({
@@ -17,20 +17,20 @@ export default async function ResetPasswordPage({
 
   return (
     <AuthShell
-      description="Buat kata sandi baru. Setelah berhasil, semua sesi lama akan dicabut dan Anda perlu masuk ulang."
+      description="Create a new password. Once successful, all previous sessions will be revoked and you will need to sign in again."
       footerPrompt={
         <>
-          Kembali ke{" "}
+          Back to the{" "}
           <Link
             className="font-semibold text-blue-600 transition hover:text-blue-700"
             href="/login"
           >
-            halaman masuk
+            sign-in page
           </Link>
           .
         </>
       }
-      heading="Buat password baru"
+      heading="Create a new password"
     >
       <ResetPasswordForm token={token} />
     </AuthShell>

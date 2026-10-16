@@ -1,57 +1,56 @@
-# Kontrak API
+# API Contract
 
-Dokumen ini menjelaskan endpoint yang tersedia dan bentuk data yang diharapkan.
+This document describes the available endpoints and the expected data shapes.
 
-Base URL lokal:
+Local base URL:
 
 ```text
 http://localhost:3000
 ```
 
-## Ringkasan Endpoint
+## Endpoint Summary
 
-| Method | Endpoint | Fungsi |
+| Method | Endpoint | Function |
 |---|---|---|
-| `GET` | `/api/health` | Mengecek aplikasi hidup tanpa mengecek database |
-| `GET` | `/api/ready` | Mengecek kesiapan storage aktif |
-| `GET` | `/api/dashboard/overview` | Ringkasan semua lokasi/tangki |
-| `GET` | `/api/tanks/[tankId]` | Detail satu tangki |
-| `GET` | `/api/tanks/[tankId]/readings` | Riwayat pembacaan satu tangki |
-| `GET` | `/api/tanks/[tankId]/readings/export` | Download CSV reading satu tangki |
-| `POST` | `/api/ingest` | Menerima data device atau simulator |
-| `POST` | `/api/auth/login` | Login dengan email/username dan password |
-| `POST` | `/api/auth/login/verify-otp` | Verifikasi OTP login admin |
-| `POST` | `/api/auth/logout` | Keluar dan mencabut session aktif |
-| `GET` | `/api/auth/me` | Membaca user session aktif |
-| `POST` | `/api/auth/register-request` | Mengajukan akses pengguna baru |
-| `GET` | `/api/auth/email/verify` | Verifikasi email dari link token |
-| `POST` | `/api/auth/email/resend-verification` | Kirim ulang email verifikasi |
-| `POST` | `/api/auth/password/forgot` | Meminta link reset kata sandi |
-| `POST` | `/api/auth/password/reset` | Mengganti kata sandi memakai token reset |
-| `POST` | `/api/auth/password/change` | Mengganti kata sandi user yang sedang login |
-| `GET` | `/api/auth/sessions` | Melihat sesi aktif milik user |
-| `POST` | `/api/auth/sessions/revoke` | Mencabut sesi lain milik user |
-| `POST` | `/api/auth/telegram/bind/start` | Membuat token binding Telegram |
-| `POST` | `/api/auth/telegram/webhook` | Webhook Telegram untuk binding |
+| `GET` | `/api/health` | Checks the application is alive without checking the database |
+| `GET` | `/api/ready` | Checks active storage readiness |
+| `GET` | `/api/dashboard/overview` | Summary of all locations/tanks |
+| `GET` | `/api/tanks/[tankId]` | Detail of one tank |
+| `GET` | `/api/tanks/[tankId]/readings` | Reading history of one tank |
+| `GET` | `/api/tanks/[tankId]/readings/export` | Download one tank's reading CSV |
+| `POST` | `/api/ingest` | Accepts device or simulator data |
+| `POST` | `/api/auth/login` | Sign in with email/username and password |
+| `POST` | `/api/auth/login/verify-otp` | Verify admin sign-in OTP |
+| `POST` | `/api/auth/logout` | Sign out and revoke the active session |
+| `GET` | `/api/auth/me` | Read the active user session |
+| `POST` | `/api/auth/register-request` | Submit a new user access request |
+| `GET` | `/api/auth/email/verify` | Verify email from the token link |
+| `POST` | `/api/auth/email/resend-verification` | Resend the verification email |
+| `POST` | `/api/auth/password/forgot` | Request a password reset link |
+| `POST` | `/api/auth/password/reset` | Change password using the reset token |
+| `POST` | `/api/auth/password/change` | Change password for the signed-in user |
+| `GET` | `/api/auth/sessions` | View the user's active sessions |
+| `POST` | `/api/auth/sessions/revoke` | Revoke the user's other sessions |
+| `POST` | `/api/auth/telegram/bind/start` | Create a Telegram binding token |
+| `POST` | `/api/auth/telegram/webhook` | Telegram webhook for binding |
 
 ## GET /api/health
 
-Fungsi:
+Function:
 
 ```text
-Mengecek apakah aplikasi Next.js hidup.
+Checks whether the Next.js application is alive.
 ```
 
-Endpoint ini tidak mengecek database. Gunakan endpoint ini untuk membedakan
-apakah masalah ada di aplikasi atau di storage.
+This endpoint does not check the database. Use it to tell whether a problem is in the application or in storage.
 
-Contoh:
+Example:
 
 ```powershell
 curl.exe http://localhost:3000/api/health
 ```
 
-Response sukses:
+Success response:
 
 ```json
 {
@@ -66,28 +65,25 @@ Response sukses:
 
 ## GET /api/ready
 
-Fungsi:
+Function:
 
 ```text
-Mengecek apakah storage aktif siap dipakai dashboard dan API baca.
+Checks whether active storage is ready for the dashboard and read APIs.
 ```
 
-Endpoint ini berisi detail operasional dan di production hanya boleh dibuka
-dengan session admin atau token readiness.
+This endpoint carries operational details and in production may only be opened with an admin session or the readiness token.
 
-Jika `SOLAR_TANK_STORAGE_DRIVER="memory"`, endpoint ini tetap sukses tetapi
-statusnya `degraded` karena data memory tidak permanen.
+If `SOLAR_TANK_STORAGE_DRIVER="memory"`, the endpoint still succeeds but its status is `degraded` because memory data is not permanent.
 
-Jika `SOLAR_TANK_STORAGE_DRIVER="mysql"`, endpoint ini mengetes koneksi MySQL
-langsung. Jika MySQL gagal, response memakai HTTP `503`.
+If `SOLAR_TANK_STORAGE_DRIVER="mysql"`, the endpoint tests the MySQL connection directly. If MySQL fails, the response uses HTTP `503`.
 
-Contoh:
+Example:
 
 ```powershell
 curl.exe http://localhost:3000/api/ready
 ```
 
-Response MySQL siap:
+MySQL ready response:
 
 ```json
 {
@@ -101,26 +97,26 @@ Response MySQL siap:
         "name": "mysql",
         "ok": true,
         "status": "ok",
-        "message": "Koneksi MySQL aktif."
+        "message": "MySQL connection active."
       },
       {
         "name": "mysql-reference-registry",
         "ok": true,
         "status": "ok",
-        "message": "Registry MySQL berisi site, tangki, dan device aktif."
+        "message": "MySQL registry active: 3 sites, 3 tanks, 3 devices."
       },
       {
         "name": "mysql-reading-rollup",
         "ok": true,
         "status": "ok",
-        "message": "Snapshot live dan rollup reading 5 menit siap digunakan."
+        "message": "Live snapshots and 5-minute reading rollups are ready."
       }
     ]
   }
 }
 ```
 
-Response MySQL belum siap:
+MySQL not-ready response:
 
 ```json
 {
@@ -134,34 +130,35 @@ Response MySQL belum siap:
         "name": "mysql",
         "ok": false,
         "status": "error",
-        "message": "Koneksi MySQL gagal. Cek MYSQL_DATABASE_URL, status database, SSL, network, dan allowlist provider."
+        "message": "MySQL connection failed. Check MYSQL_DATABASE_URL, database status, SSL, network, and the provider allowlist."
       }
     ]
   }
 }
 ```
 
-Catatan:
+Note:
 
 ```text
-Jika baru mengubah .env.local, restart dev server. Tombol retry di dashboard tidak memuat ulang env.
+If you just changed .env.local, restart the dev server.
+The dashboard retry button does not reload env.
 ```
 
 ## GET /api/dashboard/overview
 
-Fungsi:
+Function:
 
 ```text
-Mengambil ringkasan dashboard.
+Fetches the dashboard summary.
 ```
 
-Contoh:
+Example:
 
 ```powershell
 curl.exe http://localhost:3000/api/dashboard/overview
 ```
 
-Response sukses:
+Success response:
 
 ```json
 {
@@ -194,70 +191,70 @@ Response sukses:
 }
 ```
 
-Catatan:
+Note:
 
 ```text
-Field data berisi isi dashboard. Field meta.storage membantu melihat apakah reading sedang dibaca dari MySQL atau memory lokal. Jika mode MySQL aktif tetapi tabel reading masih kosong, API tetap memakai MySQL dan mengembalikan daftar reading kosong; dashboard akan menampilkan STO dari registry dengan status belum ada data. Field meta.registry membantu melihat apakah referensi site/tangki/device sedang dibaca dari memory lokal atau MySQL. Pada MySQL, overview membandingkan snapshot live dengan kandidat history terbaru lalu memilih `receivedAt` paling baru agar status konsisten selama transisi deployment.
+The data field contains the dashboard contents. The meta.storage field helps you see whether readings are being read from MySQL or local memory. If MySQL mode is active but the reading table is still empty, the API still uses MySQL and returns an empty reading list; the dashboard shows STOs from the registry with a no data yet status. The meta.registry field helps you see whether site/tank/device references are read from local memory or MySQL. On MySQL, the overview compares the live snapshot with the latest history candidates and picks the newest receivedAt so status stays consistent during deployment transition.
 ```
 
 ## GET /api/tanks/[tankId]
 
-Fungsi:
+Function:
 
 ```text
-Mengambil detail satu tangki.
+Fetches the detail of one tank.
 ```
 
-Contoh:
+Example:
 
 ```powershell
 curl.exe http://localhost:3000/api/tanks/tank-tph-main
 ```
 
-Response sukses berisi:
+A successful response contains:
 
-- identitas tangki;
-- lokasi;
+- tank identity;
+- location;
 - status;
-- volume liter;
-- persen isi;
+- volume in liters;
+- fill percent;
 - runtime;
-- parameter sensor;
-- data terakhir;
-- riwayat ringkas;
-- titik lokasi contoh.
+- sensor parameters;
+- latest data;
+- compact history;
+- sample location points.
 
-Jika `tankId` tidak ditemukan:
+If `tankId` is not found:
 
 ```json
 {
   "ok": false,
-  "error": "Tangki tidak ditemukan."
+  "error": "Tank not found."
 }
 ```
 
 ## GET /api/tanks/[tankId]/readings
 
-Fungsi:
+Function:
 
 ```text
-Mengambil riwayat pembacaan satu tangki.
+Fetches the reading history of one tank.
 ```
 
-Catatan:
+Notes:
 
-- `measuredAt` dan `receivedAt` adalah ISO UTC.
-- UI boleh menampilkan label WIB, tetapi API tetap mengirim waktu standar UTC.
-- Endpoint ini membaca history tank terkait, bukan daftar global dashboard.
-- Setelah migration rollup, item history baru mewakili bucket 5 menit dan dapat membawa `resolution`, `bucketStart`, `bucketEnd`, `sampleCount`, nilai mean, min, dan max.
+- `measuredAt` and `receivedAt` are ISO UTC.
+- The UI may display WIB labels, but the API still sends standard UTC times.
+- This endpoint reads the related tank history, not the global dashboard list.
+- After the rollup migration, new history items represent 5-minute buckets and may carry `resolution`, `bucketStart`, `bucketEnd`, `sampleCount`, mean values, and min/max.
 
-Contoh:
+Example:
 
 ```powershell
 curl.exe "http://localhost:3000/api/tanks/tank-tph-main/readings?range=24h"
 ```
 
-Response sukses:
+Success response:
 
 ```json
 {
@@ -280,66 +277,60 @@ Response sukses:
 
 ## GET /api/tanks/[tankId]/readings/export
 
-Fungsi:
+Function:
 
 ```text
-Mengunduh CSV reading satu tangki sesuai periode yang dipilih.
+Downloads one tank's reading CSV for the selected period.
 ```
 
-Endpoint ini wajib memakai session user/admin aktif. Data CSV memakai header
-bahasa Indonesia, menyertakan waktu UTC dan WIB, dan nama file otomatis memuat
-site, tangki, rentang, serta tanggal periode.
+This endpoint requires an active user/admin session. The CSV uses English snake_case headers, includes UTC and WIB times, and the filename automatically contains the site, tank, range, and period dates.
 
-CSV juga menyertakan resolusi reading, batas bucket, jumlah sampel, mean pada
-kolom nilai utama, serta min/max volume dan persentase. Raw history lama tetap
-dapat diekspor berdampingan dengan row rollup.
+The CSV also includes reading resolution, bucket bounds, sample count, mean in the main value columns, and min/max volume and percentage. Old raw history can still be exported alongside rollup rows.
 
 Query:
 
-| Parameter | Nilai | Default | Keterangan |
+| Parameter | Value | Default | Description |
 |---|---|---|---|
-| `range` | `day`, `week`, `month` | `day` | Periode 1 hari, 7 hari, atau 30 hari berbasis kalender WIB |
+| `range` | `day`, `week`, `month` | `day` | 1 day, 7 day, or 30 day period based on the WIB calendar |
 
-Alias yang juga diterima:
+Accepted aliases:
 
-- `1d` dan `24h` untuk `day`;
-- `7d` untuk `week`;
-- `30d` untuk `month`.
+- `1d` and `24h` for `day`;
+- `7d` for `week`;
+- `30d` for `month`.
 
-Contoh:
+Example:
 
 ```powershell
 curl.exe -L "http://localhost:3000/api/tanks/tank-tph-main/readings/export?range=week"
 ```
 
-Contoh nama file:
+Example filename:
 
 ```text
-solartank_tph_tangki-utama_reading_7-hari_2026-07-01_sampai_2026-07-07.csv
+solartank_tph_main-tank_reading_7-days_2026-07-01_to_2026-07-07.csv
 ```
 
-Jika `range` tidak dikenal:
+If `range` is unknown:
 
 ```json
 {
   "ok": false,
-  "error": "Range export tidak dikenal. Gunakan day, week, atau month."
+  "error": "Unknown export range. Use day, week, or month."
 }
 ```
 
 ## POST /api/ingest
 
-Fungsi:
+Function:
 
 ```text
-Menerima payload dari device, simulator, atau smoke test pilot.
+Accepts payloads from a device, simulator, or pilot smoke test.
 ```
 
-Pada storage MySQL, satu request yang valid memperbarui snapshot live dan
-agregat 5 menit dalam satu transaksi. Response sukses hanya dikirim setelah
-kedua operasi berhasil di-commit.
+On MySQL storage, one valid request updates the live snapshot and the 5-minute aggregate in a single transaction. The success response is sent only after both operations are committed.
 
-Header wajib:
+Required headers:
 
 ```http
 Content-Type: application/json
@@ -347,15 +338,15 @@ X-Device-Id: demo-tph-01
 X-Api-Key: demo-tph-key
 ```
 
-`X-Device-Key` juga diterima sebagai alternatif `X-Api-Key`.
+`X-Device-Key` is also accepted as an alternative to `X-Api-Key`.
 
-Catatan key:
+Key notes:
 
-- setiap device contoh memiliki key development sendiri;
-- fallback `local-development-key` hanya untuk development lokal;
-- untuk mode yang lebih dekat pilot, set `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"`.
+- each sample device has its own development key;
+- the `local-development-key` fallback is only for local development;
+- for a mode closer to the pilot, set `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"`.
 
-Payload contoh:
+Sample payload:
 
 ```json
 {
@@ -372,7 +363,7 @@ Payload contoh:
 }
 ```
 
-Payload pilot real-format juga didukung. Payload ini dapat membawa config tangki dari device:
+Real-format pilot payloads are also supported. This payload can carry tank configuration from the device:
 
 ```json
 {
@@ -395,12 +386,9 @@ Payload pilot real-format juga didukung. Payload ini dapat membawa config tangki
 }
 ```
 
-Regional, Wilayah, dan Area tidak dikirim pada setiap reading. Data tersebut
-berasal dari registry site yang sudah disetujui, lalu digabungkan oleh server
-berdasarkan identitas device. Dengan demikian, satu salah ketik pada firmware
-tidak memindahkan STO ke kelompok lokasi yang berbeda.
+Regional, territory, and area are not sent on every reading. That data comes from the approved site registry and is joined by the server based on device identity. This way, one firmware typo does not move an STO to a different location group.
 
-Contoh curl:
+curl example:
 
 ```powershell
 curl.exe -X POST http://localhost:3000/api/ingest `
@@ -410,7 +398,7 @@ curl.exe -X POST http://localhost:3000/api/ingest `
   -d "{\"device\":\"demo-tph-01\",\"ts\":0,\"distance\":40.5,\"voltage\":3.86,\"raw\":{\"H_cm\":109.5,\"volume\":3650,\"percent\":73,\"wifi_rssi\":-55}}"
 ```
 
-Response sukses:
+Success response:
 
 ```json
 {
@@ -429,45 +417,45 @@ Response sukses:
 }
 ```
 
-Nilai `storage` bisa berisi:
+The `storage` value can be:
 
-| Nilai | Arti |
+| Value | Meaning |
 |---|---|
-| `memory` | Reading disimpan sementara di memory store development |
-| `mysql` | Reading disimpan ke MySQL sesuai `MYSQL_DATABASE_URL` |
+| `memory` | Reading stored temporarily in the development memory store |
+| `mysql` | Reading stored to MySQL per `MYSQL_DATABASE_URL` |
 
-Nilai `configStatus` membantu melihat apakah config payload cocok dengan registry:
+The `configStatus` value helps you see whether the payload configuration matches the registry:
 
-| Nilai | Arti |
+| Value | Meaning |
 |---|---|
-| `no_payload_config` | Payload tidak membawa config tangki |
-| `config_match` | Config payload dan registry cocok |
-| `config_minor_difference` | Ada beda kecil yang perlu diketahui |
-| `config_mismatch` | Ada beda besar dan perlu review |
-| `invalid_payload_config` | Config payload tidak valid |
+| `no_payload_config` | Payload carries no tank configuration |
+| `config_match` | Payload configuration and registry match |
+| `config_minor_difference` | Small difference worth knowing |
+| `config_mismatch` | Large difference that needs review |
+| `invalid_payload_config` | Payload configuration is invalid |
 
-## Error yang Mungkin Muncul
+## Possible Errors
 
-| Status | Penyebab |
+| Status | Cause |
 |---|---|
-| `400` | Body bukan JSON valid atau payload tidak sesuai |
-| `401` | Key kosong atau salah |
-| `403` | Device tidak aktif |
-| `404` | Device atau tangki tidak ditemukan |
-| `503` | Storage aktif belum siap, terutama MySQL belum bisa dikoneksi |
+| `400` | Body is not valid JSON or the payload does not match |
+| `401` | Key is empty or wrong |
+| `403` | Device is not active |
+| `404` | Device or tank not found |
+| `503` | Active storage not ready, especially MySQL cannot be connected |
 
-Contoh response error:
+Error response example:
 
 ```json
 {
   "ok": false,
-  "error": "Device key tidak valid."
+  "error": "Device key is invalid."
 }
 ```
 
-## Endpoint Auth
+## Auth Endpoints
 
-Endpoint auth memakai response JSON umum:
+Auth endpoints use a common JSON response:
 
 ```json
 {
@@ -476,29 +464,25 @@ Endpoint auth memakai response JSON umum:
 }
 ```
 
-Jika gagal:
+On failure:
 
 ```json
 {
   "ok": false,
-  "error": "Pesan error"
+  "error": "Error message"
 }
 ```
 
-Catatan keamanan auth:
+Auth security notes:
 
-- `/api/auth/register-request`, `/api/auth/password/forgot`, dan
-  `/api/auth/email/resend-verification` dapat dilindungi Turnstile jika
-  `AUTH_CAPTCHA_PROVIDER="turnstile"`;
-- token verifikasi keamanan dikirim sebagai `captchaToken`;
-- login admin dapat mengembalikan status `otp_required` jika OTP admin aktif;
-- session dikirim sebagai cookie `httpOnly`;
-- halaman admin tetap divalidasi server-side memakai role admin, bukan hanya
-  disembunyikan dari UI;
-- reset password, verifikasi email, dan Telegram binding memakai token sekali
-  pakai yang disimpan sebagai hash di database.
+- `/api/auth/register-request`, `/api/auth/password/forgot`, and `/api/auth/email/resend-verification` can be protected by Turnstile when `AUTH_CAPTCHA_PROVIDER="turnstile"`;
+- the security verification token is sent as `captchaToken`;
+- admin sign-in can return an `otp_required` status when admin OTP is active;
+- the session is sent as an `httpOnly` cookie;
+- admin pages are still validated server-side using the admin role, not merely hidden from the UI;
+- password reset, email verification, and Telegram binding use one-time tokens stored as hashes in the database.
 
-Contoh login:
+Sign-in example:
 
 ```powershell
 curl.exe -X POST http://localhost:3000/api/auth/login `
@@ -506,25 +490,24 @@ curl.exe -X POST http://localhost:3000/api/auth/login `
   -d "{\"identity\":\"admin@example.com\",\"password\":\"Password12345\"}"
 ```
 
-Contoh pengajuan akses:
+Access request example:
 
 ```powershell
 curl.exe -X POST http://localhost:3000/api/auth/register-request `
   -H "Content-Type: application/json" `
-  -d "{\"fullName\":\"Operator Monitoring\",\"username\":\"operator_1\",\"email\":\"operator@example.com\",\"phone\":\"081234567890\",\"password\":\"Password12345\",\"confirmPassword\":\"Password12345\",\"requestedRole\":\"user\",\"accessReason\":\"Perlu memantau STO area Pasuruan\",\"captchaToken\":\"token-turnstile\"}"
+  -d "{\"fullName\":\"Monitoring Operator\",\"username\":\"operator_1\",\"email\":\"operator@example.com\",\"phone\":\"081234567890\",\"password\":\"Password12345\",\"confirmPassword\":\"Password12345\",\"requestedRole\":\"user\",\"accessReason\":\"Need to monitor the Pasuruan area STO\",\"captchaToken\":\"turnstile-token\"}"
 ```
 
-## Catatan Versi
+## Version Notes
 
-Kontrak API ini dipakai untuk development dan pilot web monitoring. Ia belum
-menjadi kontrak permanen untuk seluruh perangkat nasional.
+This API contract serves the development and pilot of the web monitoring. It is not yet a permanent contract for all devices nationwide.
 
-Sebelum production, perlu ditambah atau dimatangkan:
+Before production, these need to be added or refined:
 
-- halaman manajemen registry site/tank/device;
-- aturan versi API sebelum banyak model perangkat dipasang;
-- perlindungan jaringan tambahan di luar rate limit aplikasi;
-- rotasi key device;
-- latihan restore database secara rutin;
-- SMTP dan Turnstile production;
-- versioning API jika device sudah banyak.
+- site/tank/device registry management pages;
+- API versioning rules before many device models are installed;
+- extra network protection beyond application rate limiting;
+- device key rotation;
+- routine database restore drills;
+- production SMTP and Turnstile;
+- API versioning once devices are numerous.

@@ -35,9 +35,9 @@ function getRegisterErrorResponse(error: unknown): {
 } {
   return {
     message: getSafeErrorMessage(error, {
-      fallbackMessage: "Pengajuan akses belum bisa diproses.",
+      fallbackMessage: "Access request could not be processed yet.",
       internalMessage:
-        "Pengajuan akses belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti atau hubungi administrator.",
+        "Access request could not be processed because the service is being prepared. Try again later or contact the administrator.",
     }),
     status: getSafeErrorStatus(error),
   };
@@ -46,7 +46,7 @@ function getRegisterErrorResponse(error: unknown): {
 export async function POST(request: NextRequest) {
   if (!isAccessRequestEnabled()) {
     return NextResponse.json(
-      { ok: false, error: "Pengajuan akses sedang ditutup." },
+      { ok: false, error: "Access requests are currently closed." },
       { status: 403 },
     );
   }
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error: "Terlalu banyak pengajuan. Coba lagi nanti.",
+          error: "Too many requests. Try again later.",
         },
         {
           status: 429,
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       data: {
         status: "pending",
         message:
-          "Pengajuan akses diterima. Administrator akan meninjau sebelum akun aktif.",
+          "Access request received. An administrator will review it before the account becomes active.",
       },
     });
   } catch (error) {

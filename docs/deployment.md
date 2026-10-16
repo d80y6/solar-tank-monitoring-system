@@ -1,122 +1,110 @@
 # Deployment
 
-Dokumen ini menjelaskan deployment yang aktif, cara menyiapkan environment lain,
-dan batas klaim operasionalnya.
+This document explains the active deployment, how to set up other environments, and its operational claim limits.
 
-## Status Saat Ini
+## Current Status
 
-Saat ini aplikasi aktif di Vercel dan memakai Aiven MySQL untuk pilot operasional
-serta peninjauan tim. Pemeriksaan 14 Juli 2026 membuktikan landing page dan
-`/api/health` merespons HTTP 200, sedangkan registry database berisi 3 site,
-3 tangki, dan 3 device. Deployment tersebut belum boleh dianggap sebagai sistem
-production-hardened sampai pemulihan backup, kalibrasi perangkat, observability,
-alerting, pembatasan akses per lokasi, dan rollback selesai diuji.
+The application is currently live on Vercel and uses Aiven MySQL for the operational pilot and team review. The 14 July 2026 check showed the landing page and `/api/health` responding with HTTP 200, while the database registry contains 3 sites, 3 tanks, and 3 devices. That deployment must not be considered production-hardened until backup recovery, device calibration, observability, alerting, per-location access restriction, and rollback have finished testing.
 
-Yang sudah aman dilakukan:
+Safe to do now:
 
-- menjalankan aplikasi lokal;
-- menjalankan simulator lokal;
-- menguji API lokal;
-- mengecek aplikasi hidup lewat `/api/health`;
-- mengecek kesiapan storage aktif lewat `/api/ready` memakai session admin atau token operasional di production;
-- menguji mode memory store;
-- menyiapkan migration dan seed MySQL untuk latihan registry monitoring dan persistent storage;
-- menjalankan setup MySQL lewat `pnpm db:setup:mysql`;
-- membuat hash key device pilot lewat `pnpm pilot:hash-key`;
-- memvalidasi dan apply registry pilot lokal lewat `pnpm pilot:registry`;
-- mengirim smoke payload real-format lewat `pnpm pilot:smoke`;
-- membuat backup MySQL manual lewat `pnpm db:backup:mysql`;
-- menjalankan migration auth lewat `pnpm db:migrate:auth` dan `pnpm db:migrate:auth-recovery`;
-- membuat admin awal lewat `pnpm auth:create-admin`;
-- menguji login, pengajuan akses, verifikasi email, reset password, dan halaman admin jika env auth lengkap;
-- menjalankan `pnpm check`;
-- membangun production build lokal.
+- run the application locally;
+- run the local simulator;
+- test the local API;
+- check the application is alive via `/api/health`;
+- check active storage readiness via `/api/ready` using an admin session or the operational token in production;
+- test memory store mode;
+- prepare MySQL migration and seed for monitoring registry and persistent storage practice;
+- run MySQL setup via `pnpm db:setup:mysql`;
+- create pilot device key hashes via `pnpm pilot:hash-key`;
+- validate and apply the local pilot registry via `pnpm pilot:registry`;
+- send real-format smoke payloads via `pnpm pilot:smoke`;
+- create manual MySQL backups via `pnpm db:backup:mysql`;
+- run auth migrations via `pnpm db:migrate:auth` and `pnpm db:migrate:auth-recovery`;
+- create the initial admin via `pnpm auth:create-admin`;
+- test sign-in, access requests, email verification, password reset, and admin pages when auth env is complete;
+- run `pnpm check`;
+- build the production build locally.
 
-Yang belum final:
+Not final yet:
 
-- backup terenkripsi dengan SOP restore yang telah diuji;
-- domain production final;
-- HTTPS production final di server pilihan akhir;
-- konfigurasi auth production final, termasuk SMTP, CAPTCHA, session secret, dan cookie secure;
+- encrypted backup with a tested restore SOP;
+- final production domain;
+- final production HTTPS on the chosen server;
+- final production auth configuration, including SMTP, CAPTCHA, session secret, and secure cookies;
 - backup;
-- monitoring server;
-- kalibrasi serta persetujuan keselamatan device fisik per lokasi.
+- server monitoring;
+- calibration and safety approval of physical devices per location.
 
-Untuk status operasional terbaru, baca juga:
+For the latest operational status, also read:
 
 ```text
 docs/current-operational-truth.md
 docs/database-backup.md
 ```
 
-## Menjalankan Lokal
+## Running Locally
 
 ```powershell
 pnpm install
 pnpm dev
 ```
 
-Buka:
+Open:
 
 ```text
 http://localhost:3000
 ```
 
-Cek aplikasi hidup:
+Check the application is alive:
 
 ```powershell
 curl.exe http://localhost:3000/api/health
 ```
 
-Cek storage aktif:
+Check active storage:
 
 ```powershell
 curl.exe http://localhost:3000/api/ready
 ```
 
-Perbedaan penting:
+Important difference:
 
 ```text
-/api/health hanya membuktikan aplikasi hidup.
-/api/ready membuktikan storage aktif siap dan berisi detail operasional. Di production,
-akses endpoint ini hanya untuk admin yang login atau request dengan header
-`x-solar-tank-readiness-token`.
+/api/health only proves the application is alive.
+/api/ready proves active storage is ready and carries operational details. In production,
+access to this endpoint is limited to signed-in admins or requests with the
+x-solar-tank-readiness-token header.
 ```
 
-Jika `/api/health` sukses tetapi `/api/ready` gagal, biasanya masalah ada pada
-database, connection string, SSL, allowlist, atau jaringan.
+If `/api/health` succeeds but `/api/ready` fails, the problem is usually in the database, connection string, SSL, allowlist, or network.
 
-Build lokal:
+Local build:
 
 ```powershell
 pnpm build
 pnpm start
 ```
 
-Jika ingin mencoba storage MySQL lokal atau cloud, isi `.env.local` dengan `MYSQL_DATABASE_URL`, jalankan `pnpm db:setup:mysql`, lalu set `SOLAR_TANK_STORAGE_DRIVER="mysql"`.
+To try local or cloud MySQL storage, fill `.env.local` with `MYSQL_DATABASE_URL`, run `pnpm db:setup:mysql`, then set `SOLAR_TANK_STORAGE_DRIVER="mysql"`.
 
-Untuk database lama yang sudah aktif, jalankan `pnpm db:migrate:auth-telegram`
-sebelum men-deploy command Telegram baru. Migration ini menambahkan invariant
-satu chat Telegram untuk satu akun FTM dan diperiksa oleh `/api/ready`. Jika ada
-binding ganda dari versi lama, binding yang paling baru diverifikasi dipertahankan
-dan pelepasan binding lama dicatat pada audit log.
+For an existing active database, run `pnpm db:migrate:auth-telegram` before deploying the new Telegram commands. This migration adds the one-Telegram-chat-per-FTM-account invariant and is checked by `/api/ready`. If duplicate bindings exist from an older version, the most recently verified binding is kept and the release of old bindings is recorded in the audit log.
 
-Setelah mengubah `.env.local`, restart `pnpm dev`. Perubahan environment tidak
-selalu terbaca hanya dengan menekan tombol refresh dashboard.
+After changing `.env.local`, restart `pnpm dev`. Environment changes are not always picked up just by pressing the dashboard refresh button.
 
-## Deployment Pilot Vercel + Aiven MySQL
+## Pilot Deployment: Vercel + Aiven MySQL
 
-Alur yang aktif dipakai saat ini:
+The flow actively used now:
 
 ```text
-Device real atau smoke test
+Real device or smoke test
   -> Vercel URL
   -> /api/ingest
   -> Cloud MySQL
   -> dashboard/detail
 ```
 
-Environment di Vercel harus diisi lewat dashboard Vercel, bukan file Git:
+Environment on Vercel must be filled through the Vercel dashboard, not Git files:
 
 ```env
 SOLAR_TANK_STORAGE_DRIVER="mysql"
@@ -145,40 +133,30 @@ SMTP_FROM="FTM <noreply@example.com>"
 SMTP_SECURE="false"
 ```
 
-Jika provider memberi CA certificate, isi `MYSQL_SSL_CA` di environment Vercel.
-Pastikan `APP_BASE_URL` memakai domain aplikasi yang benar. Production tidak
-boleh memakai localhost karena URL ini dipakai untuk link verifikasi email dan
-reset password. `AUTH_CAPTCHA_PROVIDER` hanya menerima `disabled` atau
-`turnstile`; salah ketik akan membuat readiness gagal supaya masalah terlihat
-sebelum dipakai user.
+If the provider supplies a CA certificate, fill in `MYSQL_SSL_CA` in the Vercel environment. Make sure `APP_BASE_URL` uses the correct application domain. Production must not use localhost because this URL is used for email verification and password reset links. `AUTH_CAPTCHA_PROVIDER` only accepts `disabled` or `turnstile`; a typo makes readiness fail so the problem is visible before users are affected.
 
-`DEVICE_PACKAGE_ENCRYPTION_KEY` wajib diisi di production karena paket firmware
-disimpan terenkripsi. Buat nilainya sekali, simpan di password manager, lalu
-pakai nilai yang sama selama paket firmware lama masih perlu bisa dibuka.
-Contoh membuat key dari terminal:
+`DEVICE_PACKAGE_ENCRYPTION_KEY` is required in production because firmware packages are stored encrypted. Create the value once, store it in a password manager, then use the same value while old firmware packages still need to be readable. Example key generation from the terminal:
 
 ```powershell
 node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"
 ```
 
-Langkah pilot:
+Pilot steps:
 
 ```powershell
 pnpm db:setup:mysql
 pnpm pilot:hash-key
 Copy-Item config/pilot-registry.example.json config/pilot-registry.local.json
-# edit config/pilot-registry.local.json sampai koordinat dan hash device sudah real/approved
+# edit config/pilot-registry.local.json until coordinates and device hashes are real/approved
 pnpm pilot:registry -- --dry-run
 pnpm pilot:registry
 $env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
 $env:PILOT_DEVICE_ID="pilot-tph-01"
-$env:PILOT_DEVICE_KEY="key-asli-device"
+$env:PILOT_DEVICE_KEY="real-device-key"
 pnpm pilot:smoke
 ```
 
-Jika database production sudah ada dan tidak boleh di-seed ulang, jangan pakai
-`pnpm db:setup:mysql`. Jalankan migration satu per satu, lalu apply registry
-yang memang sudah disetujui:
+If the production database already exists and must not be re-seeded, do not use `pnpm db:setup:mysql`. Run the migrations one by one, then apply the approved registry:
 
 ```powershell
 pnpm db:migrate:mysql
@@ -191,51 +169,50 @@ pnpm db:migrate:auth-telegram
 pnpm db:migrate:site-taxonomy
 ```
 
-Catatan:
+Notes:
 
-- `config/pilot-registry.local.json` tidak boleh di-commit;
-- `config/pilot-registry.example.json` hanya template aman dan sengaja belum memakai koordinat/hash final;
-- key asli device tidak boleh masuk repo;
-- fallback global key harus `false` untuk pilot;
-- jika `/api/ready` gagal, jangan lanjut uji device sebelum storage diperbaiki;
-- jalankan `pnpm db:backup:mysql` sebelum migration pada database operasional;
-- check readiness `mysql-reading-rollup` harus lulus sebelum writer rollup dianggap siap;
-- check readiness `mysql-location-taxonomy` harus lulus agar Regional dan Wilayah aman dibaca aplikasi;
-- setelah mengubah env Vercel, lakukan redeploy.
+- `config/pilot-registry.local.json` must not be committed;
+- `config/pilot-registry.example.json` is only a safe template and deliberately does not use final coordinates/hashes;
+- raw device keys must not enter the repo;
+- the global key fallback must be `false` for the pilot;
+- if `/api/ready` fails, do not continue device testing before storage is fixed;
+- run `pnpm db:backup:mysql` before migrations on the operational database;
+- the `mysql-reading-rollup` readiness check must pass before the rollup writer is considered ready;
+- the `mysql-location-taxonomy` readiness check must pass so regional and territory labels are safely read by the application;
+- after changing Vercel env, redeploy.
 
-## Opsi Deployment Development/Demo Terpisah
+## Separate Development/Demo Deployment Option
 
-Untuk demo tanpa data sensitif, aplikasi bisa diarahkan ke platform seperti Vercel.
+For demos without sensitive data, the application can be pointed at a platform such as Vercel.
 
-Syarat:
+Requirements:
 
-- hanya data contoh public-safe;
-- tidak ada credential asli;
-- tidak ada payload real;
-- tidak ada lokasi sensitif;
-- env var diisi lewat dashboard platform, bukan file Git.
+- only public-safe sample data;
+- no real credentials;
+- no real payloads;
+- no sensitive locations;
+- env vars filled through the platform dashboard, not Git files.
 
-Kelebihan:
+Advantages:
 
-- mudah dibuka reviewer;
-- cepat untuk validasi tampilan;
-- cocok untuk demo awal.
+- easy for reviewers to open;
+- fast for visual validation;
+- suitable for early demos.
 
-Batasan:
+Limits:
 
-- tidak otomatis cocok untuk perangkat lapangan;
-- memory store tidak stabil di serverless;
-- perlu database jika ingin history bertahan.
-- `/api/ready` harus sukses sebelum URL demo dianggap siap dipakai reviewer. Jangan
-  membuka endpoint ini sebagai URL publik tanpa session admin atau token readiness.
+- not automatically suitable for field devices;
+- memory store is unstable on serverless;
+- a database is needed for history to persist.
+- `/api/ready` must succeed before the demo URL is considered ready for reviewers. Do not open this endpoint as a public URL without an admin session or readiness token.
 
-## Environment Variable
+## Environment Variables
 
-Jangan upload `.env.local`.
+Do not upload `.env.local`.
 
-Gunakan `.env.example` sebagai referensi nama variabel.
+Use `.env.example` as the reference for variable names.
 
-Variabel utama saat ini:
+Current key variables:
 
 ```text
 NEXT_PUBLIC_APP_NAME
@@ -278,31 +255,31 @@ TELEGRAM_WEBHOOK_SECRET
 TELEGRAM_BOT_USERNAME
 ```
 
-## Checklist Sebelum Production
+## Pre-Production Checklist
 
-- Database sudah tersedia.
-- Secret tidak ada di Git.
-- Migration monitoring dan auth sudah dijalankan.
-- Admin awal sudah dibuat.
-- SMTP sudah diuji untuk OTP admin, verifikasi email, dan reset password.
-- Turnstile sudah aktif untuk form publik dan domain production sudah terdaftar di Cloudflare.
-- API key device tidak memakai key development/contoh.
-- Fallback global device key dimatikan.
-- HTTPS aktif.
-- Endpoint ingest punya rate limit.
-- User login, role, approval admin, dan deaktivasi akun sudah diuji.
-- Backup database disiapkan.
-- Registry site, tank, device, dan key berasal dari database yang dikelola.
-- Rumus volume sudah dikalibrasi.
-- Device fisik diuji aman.
-- Data yang ditampilkan sudah disetujui.
-- `/api/health` mengembalikan HTTP 200.
-- `/api/ready` mengembalikan HTTP 200 untuk storage production/pilot.
+- Database is available.
+- Secrets are not in Git.
+- Monitoring and auth migrations have run.
+- The initial admin is created.
+- SMTP is tested for admin OTP, email verification, and password reset.
+- Turnstile is active for public forms and the production domain is registered in Cloudflare.
+- Device API keys do not use development/sample keys.
+- Global device key fallback is disabled.
+- HTTPS is active.
+- The ingest endpoint has rate limiting.
+- User sign-in, roles, admin approval, and account deactivation are tested.
+- Database backup is prepared.
+- Site, tank, device, and key registry come from the managed database.
+- Volume formulas are calibrated.
+- Physical devices are tested safe.
+- Displayed data is approved.
+- `/api/health` returns HTTP 200.
+- `/api/ready` returns HTTP 200 for production/pilot storage.
 
-## Catatan Penting
+## Important Notes
 
-Memory store saat ini hanya untuk development.
+The memory store is currently for development only.
 
-Jika server restart, data hasil simulator hilang.
+If the server restarts, simulator data is lost.
 
-Untuk deployment yang perlu history, storage harus memakai database. Fondasi MySQL sudah tersedia untuk registry monitoring, reading, dan auth. Production tetap membutuhkan SMTP, Turnstile, HTTPS, backup/restore, rate limit ingest, rotasi key device, monitoring server, dan prosedur operasional. Detail deployment pilihan akhir ditunda sampai keputusan tim berikutnya.
+Deployments that need history must use database storage. The MySQL foundation is available for the monitoring registry, readings, and auth. Production still requires SMTP, Turnstile, HTTPS, backup/restore, ingest rate limiting, device key rotation, server monitoring, and operational procedures. Final deployment choices are postponed until the next team decision.

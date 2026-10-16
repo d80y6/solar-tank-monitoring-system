@@ -8,7 +8,7 @@ import { ContactMessageTemplate } from "./contact-message-template";
 export const metadata: Metadata = {
   title: "Kontak Operasional | FTM",
   description:
-    "Kontak operasional FTM untuk koordinasi bantuan manajemen tangki bahan bakar.",
+    "FTM operational contacts for coordinating fuel tank management assistance.",
 };
 
 export const dynamic = "force-dynamic";
@@ -29,7 +29,7 @@ const contactItems = [
   },
   {
     icon: MapPin,
-    label: "Alamat",
+    label: "Address",
     value: "STO Pasuruan",
   },
 ];
@@ -50,24 +50,24 @@ function buildContactMessage({
   username: string;
 }) {
   return [
-    "Halo Pak Astra, saya butuh bantuan terkait FTM.",
+    "Hello Mr. Astra, I need help with FTM.",
     "",
     `Nama: ${fullName}`,
     `Username: ${username}`,
     `Email: ${email}`,
-    `Role akun: ${formatRole(role)}`,
-    "Halaman terkait: /dashboard/contact",
+    `Account role: ${formatRole(role)}`,
+    "Related page: /dashboard/contact",
     "",
-    "Kebutuhan/kendala:",
+    "Need/issue:",
     "- ",
     "",
-    "STO/tangki/perangkat terkait:",
+    "Related STO/tank/device:",
     "- ",
     "",
-    "Langkah yang sudah dicoba:",
+    "Steps already tried:",
     "- ",
     "",
-    "Waktu kejadian:",
+    "Time of incident:",
     "- ",
   ].join("\n");
 }
@@ -85,8 +85,8 @@ export default async function DashboardContactPage() {
     <main className="min-h-screen overflow-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { current: true, label: "Kontak" },
+          { href: "/dashboard", label: "Tank Management" },
+          { current: true, label: "Contact" },
         ]}
         user={user}
       />
@@ -110,14 +110,14 @@ export default async function DashboardContactPage() {
           </div>
 
           <p className="mt-5 text-sm font-semibold uppercase tracking-[0.18em] text-red-600">
-            Kontak operasional
+            Operational contacts
           </p>
           <h1 className="mx-auto mt-2 max-w-2xl text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl lg:text-4xl">
-            Informasi bantuan FTM
+            FTM help information
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-zinc-500 sm:text-base">
-            Kanal singkat untuk koordinasi akses, klarifikasi data operasional,
-            dan tindak lanjut perangkat IoT area STO.
+            A short channel for access coordination, operational data
+            clarification, and STO area IoT device follow-up.
           </p>
 
           <div className="mt-6 grid gap-3 text-left sm:grid-cols-3">

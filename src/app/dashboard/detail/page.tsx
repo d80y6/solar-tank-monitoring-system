@@ -28,9 +28,9 @@ import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitor
 import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
 
 export const metadata: Metadata = {
-  title: "Analisis Teknis Tangki Bahan Bakar | FTM",
+  title: "Fuel Tank Technical Analysis | FTM",
   description:
-    "Analisis teknis untuk memantau volume tangki bahan bakar, runtime genset, status perangkat, peta STO, dan log data operasional.",
+    "Technical analysis for monitoring fuel tank volume, generator runtime, device status, STO map, and operational data logs.",
 };
 
 export const runtime = "nodejs";
@@ -53,14 +53,14 @@ const statusMeta: Record<
     text: "text-emerald-700",
   },
   warning: {
-    label: "Waspada",
+    label: "Warning",
     dot: "bg-amber-500",
     badge: "bg-amber-50 text-amber-700 ring-amber-100",
     ring: "ring-amber-200",
     text: "text-amber-700",
   },
   critical: {
-    label: "Kritis",
+    label: "Critical",
     dot: "bg-red-600",
     badge: "bg-red-50 text-red-700 ring-red-100",
     ring: "ring-red-200",
@@ -78,30 +78,30 @@ const statusMeta: Record<
 function buildSummaryCards(dashboardOverview: DashboardOverview) {
   return [
     {
-      label: "STO terpantau",
+      label: "Monitored STOs",
       value: String(dashboardOverview.summary.totalSites),
-      note: `${dashboardOverview.summary.totalTanks} tangki terpantau`,
+      note: `${dashboardOverview.summary.totalTanks} tanks monitored`,
       icon: MapPin,
       tone: "bg-cyan-50 text-cyan-700 ring-cyan-100",
     },
     {
-      label: "Tangki kritis",
+      label: "Critical tanks",
       value: String(dashboardOverview.summary.criticalTanks),
-      note: "berdasarkan runtime, level, dan perangkat",
+      note: "based on runtime, level, and device",
       icon: AlertTriangle,
       tone: "bg-red-50 text-red-700 ring-red-100",
     },
     {
-      label: "Perangkat online",
+      label: "Online devices",
       value: String(dashboardOverview.summary.onlineDevices),
-      note: `${dashboardOverview.summary.delayedDevices} terlambat, ${dashboardOverview.summary.offlineDevices} offline`,
+      note: `${dashboardOverview.summary.delayedDevices} delayed, ${dashboardOverview.summary.offlineDevices} offline`,
       icon: Wifi,
       tone: "bg-emerald-50 text-emerald-700 ring-emerald-100",
     },
     {
-      label: "Rata-rata update",
+      label: "Average update",
       value: dashboardOverview.summary.averageIntervalLabel,
-      note: "target dapat diatur per perangkat",
+      note: "target can be set per device",
       icon: Clock,
       tone: "bg-zinc-100 text-zinc-700 ring-zinc-200",
     },
@@ -109,33 +109,33 @@ function buildSummaryCards(dashboardOverview: DashboardOverview) {
 }
 
 const runtimeBands = [
-  { label: "Kritis", range: "< 13 jam", width: "24%", tone: "bg-red-500" },
+  { label: "Critical", range: "< 13 hrs", width: "24%", tone: "bg-red-500" },
   {
-    label: "Waspada",
-    range: "13 - 16 jam",
+    label: "Warning",
+    range: "13 - 16 hrs",
     width: "24%",
     tone: "bg-amber-500",
   },
   {
-    label: "Aman terbatas",
-    range: "16 - 24 jam",
+    label: "Limited safe",
+    range: "16 - 24 hrs",
     width: "24%",
     tone: "bg-cyan-500",
   },
   {
-    label: "Aman panjang",
-    range: "> 24 jam",
+    label: "Long safe",
+    range: "> 24 hrs",
     width: "28%",
     tone: "bg-emerald-500",
   },
 ];
 
 function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID").format(value);
+  return new Intl.NumberFormat("en-US").format(value);
 }
 
 function formatJakartaTime(value: Date) {
-  const time = new Intl.DateTimeFormat("id-ID", {
+  const time = new Intl.DateTimeFormat("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
@@ -206,7 +206,7 @@ export default async function DashboardPage() {
   const storageBadgeLabel =
     storageSource.activeDriver === "mysql"
       ? "database MySQL"
-      : "memory lokal";
+      : "local memory";
 
   const monitoredSites = dashboardOverview.rows;
   const latestSite = dashboardOverview.latestRow;
@@ -219,11 +219,11 @@ export default async function DashboardPage() {
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { current: true, label: "Analisis Teknis" },
-          { href: "#peta", label: "Peta STO" },
-          { href: "#prioritas", label: "Prioritas" },
-          { href: "#log", label: "Log Perangkat" },
+          { href: "/dashboard", label: "Tank Management" },
+          { current: true, label: "Technical Analysis" },
+          { href: "#map", label: "STO Map" },
+          { href: "#priority", label: "Priority" },
+          { href: "#log", label: "Device Log" },
         ]}
         rightSlot={
           <LiveRefreshControl
@@ -238,7 +238,7 @@ export default async function DashboardPage() {
       <div className="mx-auto max-w-[1540px] px-4 py-5 sm:px-6 lg:px-8">
         {/* Dashboard Toolbar */}
         <section
-          id="ringkasan"
+          id="summary"
           className="animate-soft-fade mb-5 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm"
         >
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -252,18 +252,18 @@ export default async function DashboardPage() {
                 </span>
               </div>
               <h1 className="mt-3 max-w-full break-words text-[1.85rem] font-semibold leading-[1.08] tracking-normal text-zinc-950 sm:text-4xl">
-                Manajemen tangki bahan bakar STO
+                STO fuel tank management
               </h1>
               <p className="mt-2 max-w-3xl break-words text-sm leading-6 text-zinc-500 sm:text-base">
-                Tampilan awal untuk membaca volume, estimasi runtime genset,
-                status perangkat, dan titik lokasi manual dari storage aktif.
+                Initial view for reading volume, generator runtime estimates,
+                device status, and manual location points from the active storage.
               </p>
             </div>
 
             <div className="grid gap-2 text-sm sm:grid-cols-2 lg:w-[28rem]">
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
-                  Waktu lokal
+                  Local time
                 </p>
                 <p className="mt-1 text-lg font-semibold">
                   <LiveClock initialTimeLabel={localTimeLabel} />
@@ -271,7 +271,7 @@ export default async function DashboardPage() {
               </div>
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
-                  Sumber data
+                  Data source
                 </p>
                 <p className="mt-1 text-lg font-semibold">
                   {storageSource.label} / {registrySource.label}
@@ -327,9 +327,9 @@ export default async function DashboardPage() {
                 className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
               >
                 <SectionHeader
-                  label="Prioritas"
-                  title="Tindak lanjut hari ini"
-                  description="Daftar ini membantu memilih lokasi yang perlu dicek lebih dulu."
+                  label="Priority"
+                  title="Today's follow-ups"
+                  description="This list helps pick the locations that need checking first."
                 />
 
                 <div className="mt-5 space-y-3">
@@ -362,19 +362,19 @@ export default async function DashboardPage() {
                   type="button"
                   className="mt-5 w-full rounded-lg bg-zinc-100 px-4 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-200"
                 >
-                  Lihat semua prioritas
+                  View all priorities
                 </button>
               </article>
 
               <article className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <SectionHeader
-                    label="Tren volume"
-                    title="Pergerakan stok 24 jam"
-                    description="Grafik ini membaca seri pembacaan dari storage aktif dan disiapkan untuk riwayat database."
+                    label="Volume trend"
+                    title="24-hour stock movement"
+                    description="This chart reads the reading series from the active storage and is prepared for database history."
                   />
                   <span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
-                    data stabil
+                    stable data
                   </span>
                 </div>
 
@@ -429,9 +429,9 @@ export default async function DashboardPage() {
           <aside className="space-y-5">
             <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
               <SectionHeader
-                label="Kesehatan data"
-                title="Status perangkat"
-                description="Status mengikuti umur data terakhir dibanding interval kirim yang diharapkan."
+                label="Data health"
+                title="Device status"
+                description="Status follows the age of the latest data compared with the expected report interval."
               />
 
               <div className="mt-6 grid grid-cols-2 gap-3">
@@ -458,17 +458,17 @@ export default async function DashboardPage() {
 
             <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
               <SectionHeader
-                label="Alur data"
-                title="Siap disambung bertahap"
-                description="Dashboard membaca storage aktif dan endpoint API lokal, dengan memory untuk development dan MySQL sebagai arah penyimpanan jangka panjang."
+                label="Data flow"
+                title="Ready to connect gradually"
+                description="The dashboard reads the active storage and local API endpoints, with memory for development and MySQL as the long-term storage direction."
               />
 
               <div className="mt-6 space-y-3">
                 {[
-                  [Database, "Storage aktif", "memory lokal atau MySQL"],
-                  [Activity, "API /ingest", "menerima data perangkat"],
-                  [Gauge, "Runtime", "status dihitung dari volume"],
-                  [Droplets, "History", "riwayat dari storage aktif"],
+                  [Database, "Active storage", "local memory or MySQL"],
+                  [Activity, "API /ingest", "receives device data"],
+                  [Gauge, "Runtime", "status calculated from volume"],
+                  [Droplets, "History", "history from the active storage"],
                 ].map(([Icon, title, body]) => (
                   <div
                     key={title as string}
@@ -499,15 +499,15 @@ export default async function DashboardPage() {
         >
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <SectionHeader
-              label="Log perangkat"
-              title="Daftar manajemen tangki"
-              description="Tabel ini membaca data operasional dari storage aktif yang juga dipakai endpoint API."
+              label="Device log"
+              title="Tank management list"
+              description="This table reads operational data from the active storage also used by API endpoints."
             />
             <Link
               href={`/dashboard/tanks/${latestSite.tankId}`}
               className="w-full rounded-lg bg-blue-600 px-5 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 sm:w-auto"
             >
-              Buka detail tangki
+              Open tank details
             </Link>
           </div>
 
@@ -516,14 +516,14 @@ export default async function DashboardPage() {
               <thead>
                 <tr className="text-xs uppercase tracking-[0.12em] text-zinc-400">
                   <th className="px-4 py-2 font-semibold">STO</th>
-                  <th className="px-4 py-2 font-semibold">Tangki</th>
+                  <th className="px-4 py-2 font-semibold">Tank</th>
                   <th className="px-4 py-2 font-semibold">Volume</th>
-                  <th className="px-4 py-2 font-semibold">Isi</th>
+                  <th className="px-4 py-2 font-semibold">Level</th>
                   <th className="px-4 py-2 font-semibold">Runtime</th>
-                <th className="px-4 py-2 font-semibold">Perangkat</th>
+                <th className="px-4 py-2 font-semibold">Device</th>
                 <th className="px-4 py-2 font-semibold">Update</th>
                 <th className="px-4 py-2 font-semibold">Status</th>
-                <th className="px-4 py-2 font-semibold">Aksi</th>
+                <th className="px-4 py-2 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -576,7 +576,7 @@ export default async function DashboardPage() {
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-4">{site.runtimeHour} jam</td>
+                    <td className="px-4 py-4">{site.runtimeHour} hrs</td>
                     <td className="px-4 py-4 text-zinc-600">{site.deviceId}</td>
                     <td className="px-4 py-4 text-zinc-600">
                       {site.updateLabel}
@@ -589,7 +589,7 @@ export default async function DashboardPage() {
                         href={`/dashboard/tanks/${site.tankId}`}
                         className="inline-flex items-center rounded-lg bg-white px-3 py-2 text-xs font-semibold text-zinc-700 ring-1 ring-zinc-200 transition hover:bg-blue-600 hover:text-white hover:ring-blue-600"
                       >
-                        Detail
+                        Details
                       </Link>
                     </td>
                   </tr>

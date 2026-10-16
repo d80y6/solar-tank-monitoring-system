@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const sessionId = String(body.sessionId ?? "").trim();
 
     if (!sessionId) {
-      throw new Error("Sesi tidak valid.");
+      throw new Error("Session is invalid.");
     }
 
     await revokeCurrentUserSessionById({
@@ -32,16 +32,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      data: { message: "Sesi berhasil dicabut." },
+      data: { message: "Session revoked successfully." },
     });
   } catch (error) {
     return NextResponse.json(
       {
         ok: false,
         error: getSafeErrorMessage(error, {
-          fallbackMessage: "Sesi belum bisa dicabut.",
+          fallbackMessage: "Session could not be revoked yet.",
           internalMessage:
-            "Sesi belum bisa dicabut karena layanan sedang disiapkan. Coba lagi nanti.",
+            "Session could not be revoked because the service is being prepared. Try again later.",
         }),
       },
       { status: getSafeErrorStatus(error) },

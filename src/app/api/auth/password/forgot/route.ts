@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error: "Terlalu banyak permintaan reset. Coba lagi nanti.",
+          error: "Too many reset requests. Try again later.",
         },
         {
           status: 429,
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       ok: true,
       data: {
         message:
-          "Jika akun ditemukan, link reset akan dikirim ke email terdaftar.",
+          "If the account is found, a reset link will be sent to the registered email.",
       },
     });
   } catch (error) {
@@ -72,9 +72,9 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         error: getSafeErrorMessage(error, {
-          fallbackMessage: "Permintaan reset belum bisa diproses.",
+          fallbackMessage: "Reset request could not be processed yet.",
           internalMessage:
-            "Permintaan reset belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
+            "Reset request could not be processed because the service is being prepared. Try again later.",
         }),
       },
       { status: getSafeErrorStatus(error) },

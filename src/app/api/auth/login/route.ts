@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error: "Terlalu banyak percobaan masuk. Coba lagi beberapa saat.",
+          error: "Too many sign-in attempts. Try again in a moment.",
         },
         {
           status: 429,
@@ -82,9 +82,9 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         error: getSafeErrorMessage(error, {
-          fallbackMessage: "Login gagal. Periksa kembali data masuk Anda.",
+          fallbackMessage: "Sign-in failed. Please check your credentials again.",
           internalMessage:
-            "Login belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
+            "Sign-in could not be processed because the service is being prepared. Try again later.",
         }),
       },
       { status: getSafeErrorStatus(error, { defaultStatus: 401 }) },

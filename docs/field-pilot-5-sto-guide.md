@@ -1,72 +1,69 @@
-# Panduan Perluasan Pilot Menuju 5 STO
+# Guide to Expanding the Pilot Toward 5 STOs
 
-Dokumen ini menjelaskan cara memperluas uji lapangan menuju target awal 5 STO
-dari awal sampai data tampil di dashboard. Per 13–14 Juli 2026, kondisi yang
-terverifikasi adalah 3 site, 3 tangki, dan 3 perangkat terdaftar. Bahasa sengaja
-dibuat pelan-pelan untuk pembaca non-IT.
+This document explains how to expand the field test toward the initial 5-STO target, from start to finish until data appears on the dashboard. As of 13–14 July 2026, the verified condition is 3 registered sites, 3 tanks, and 3 devices. The language is deliberately kept slow for non-IT readers.
 
-## Gambaran Paling Sederhana
+## Simplest Overview
 
-Alur yang ingin dicapai:
+The flow to achieve:
 
 ```text
-1. Data 5 STO dimasukkan ke database.
-2. Setiap STO punya satu tangki dan satu device.
-3. Setiap device punya key sendiri.
-4. Device mengirim data ke URL aplikasi.
-5. API mengecek device dan key.
-6. Data masuk MySQL.
-7. Dashboard menampilkan titik peta, status, volume, persen isi, runtime, dan update terakhir.
+1. Data for 5 STOs is entered into the database.
+2. Each STO has one tank and one device.
+3. Each device has its own key.
+4. The device sends data to the application URL.
+5. The API checks the device and key.
+6. Data enters MySQL.
+7. The dashboard shows map points, status, volume, fill percent, runtime, and last update.
 ```
 
-Dashboard memakai peta berbasis koordinat. Titik peta tidak berasal dari GPS device, karena perangkat saat ini tidak memakai modul GPS. Titik peta berasal dari registry lokasi yang diisi manual dan disimpan di MySQL.
+The dashboard uses a coordinate-based map. Map points do not come from device GPS, because current devices do not use a GPS module. Map points come from the location registry filled in manually and stored in MySQL.
 
-## Data yang Harus Disiapkan untuk 5 STO
+## Data to Prepare for 5 STOs
 
-Siapkan tabel sederhana seperti ini sebelum menyentuh kode atau device.
+Prepare a simple table like this before touching code or devices.
 
-| Data | Contoh | Catatan |
+| Data | Example | Note |
 |---|---|---|
-| Kode STO | `TPH` | Kode pendek yang mudah dibaca |
-| Nama lokasi | `STO TPH` | Nama yang tampil di dashboard |
-| Regional | `TREG 5` | Kelompok lokasi paling besar |
-| Wilayah | `TIF 3` | Kelompok di bawah Regional |
-| Area | `Pasuruan` | Label area kerja |
-| Latitude | `-7.6500000` | Harus angka koordinat yang disetujui |
-| Longitude | `112.9000000` | Harus angka koordinat yang disetujui |
-| ID tangki | `tank-tph-main` | Gunakan format konsisten |
-| Bentuk tangki | `rectangular` | Contoh awal memakai tangki balok |
-| Kapasitas | `540` | Liter |
-| Panjang | `150` | cm |
-| Lebar | `60` | cm |
-| Tinggi | `60` | cm |
-| Tinggi sensor | `60` | cm dari dasar referensi |
-| Batas rendah | `30` | persen |
-| Batas kritis | `15` | persen |
-| Konsumsi | `25` | liter per jam |
-| Kode device | `pilot-tph-01` | Harus sama dengan firmware |
-| Interval kirim | `20` | detik untuk monitoring live; history tetap diringkas per 5 menit |
-| Hash key | `sha256:...` | Bukan key asli |
+| STO code | `TPH` | Short code that is easy to read |
+| Location name | `STO TPH` | Name shown on the dashboard |
+| Regional | `TREG 5` | Largest location group |
+| Territory | `TIF 3` | Group below regional |
+| Area | `Pasuruan` | Work area label |
+| Latitude | `-7.6500000` | Must be the approved coordinate number |
+| Longitude | `112.9000000` | Must be the approved coordinate number |
+| Tank ID | `tank-tph-main` | Use a consistent format |
+| Tank shape | `rectangular` | The initial example uses a rectangular tank |
+| Capacity | `540` | Liters |
+| Length | `150` | cm |
+| Width | `60` | cm |
+| Height | `60` | cm |
+| Sensor height | `60` | cm from the reference base |
+| Low limit | `30` | percent |
+| Critical limit | `15` | percent |
+| Consumption | `25` | liters per hour |
+| Device code | `pilot-tph-01` | Must match the firmware |
+| Send interval | `20` | seconds for live monitoring; history is still rolled up every 5 minutes |
+| Key hash | `sha256:...` | Not the raw key |
 
-## Cara Mengambil Koordinat
+## How to Get Coordinates
 
-Koordinat boleh diambil dari aplikasi peta yang dipakai tim, misalnya Google Maps, lalu disalin ke registry.
+Coordinates may be taken from the map application the team uses, such as Google Maps, then copied into the registry.
 
-Cara umum di browser:
+Common browser steps:
 
-1. Buka Google Maps.
-2. Cari lokasi STO atau titik genset.
-3. Klik kanan pada titik yang dianggap benar.
-4. Salin angka koordinat yang muncul.
-5. Pastikan formatnya seperti:
+1. Open Google Maps.
+2. Search for the STO location or generator point.
+3. Right-click the point considered correct.
+4. Copy the coordinate numbers that appear.
+5. Make sure the format looks like:
 
 ```text
 -7.650000, 112.900000
 ```
 
-Angka pertama adalah latitude. Angka kedua adalah longitude.
+The first number is latitude. The second number is longitude.
 
-Masukkan ke registry:
+Enter into the registry:
 
 ```json
 {
@@ -76,28 +73,28 @@ Masukkan ke registry:
 }
 ```
 
-Penting:
+Important:
 
-- jangan memakai koordinat perkiraan jika akan demo real;
-- jangan commit koordinat sensitif ke GitHub;
-- titik peta sebaiknya sudah disetujui penanggung jawab lapangan;
-- jika titik masih ragu, jangan set `coordinateStatus` ke `approved`.
+- do not use estimated coordinates for a real demo;
+- do not commit sensitive coordinates to GitHub;
+- map points should be approved by the field owner;
+- if a point is still uncertain, do not set `coordinateStatus` to `approved`.
 
-## Cara Menyiapkan Registry 5 STO
+## How to Prepare the 5-STO Registry
 
-Salin template:
+Copy the template:
 
 ```powershell
 Copy-Item config/pilot-registry.example.json config/pilot-registry.local.json
 ```
 
-Edit file lokal:
+Edit the local file:
 
 ```text
 config/pilot-registry.local.json
 ```
 
-Untuk setiap STO, isi:
+For each STO, fill in:
 
 - `id`;
 - `code`;
@@ -111,129 +108,128 @@ Untuk setiap STO, isi:
 - `tank`;
 - `device`.
 
-File `.local.json` ini tidak boleh di-commit.
+This `.local.json` file must not be committed.
 
-## Cara Membuat Key Device
+## How to Create a Device Key
 
-Setiap device harus punya key sendiri.
+Every device must have its own key.
 
-Jalankan:
+Run:
 
 ```powershell
 pnpm pilot:hash-key
 ```
 
-Simpan dua hasilnya:
+Save both results:
 
 ```text
-DEVICE_KEY_ASLI_SIMPAN_AMAN
-API_KEY_HASH_UNTUK_DATABASE
+RAW_DEVICE_KEY_STORE_SAFELY
+API_KEY_HASH_FOR_DATABASE
 ```
 
-Pembagian pemakaian:
+Usage split:
 
 ```text
-Key asli      -> dipasang di firmware atau dipakai saat smoke test.
-Hash sha256   -> dimasukkan ke registry/database.
+Raw key     -> installed in firmware or used during smoke tests.
+sha256 hash -> entered into registry/database.
 ```
 
-Jangan membalik dua nilai ini.
+Do not swap these two values.
 
-## Validasi dan Apply Registry
+## Validate and Apply the Registry
 
-Validasi tanpa menulis database:
+Validate without writing to the database:
 
 ```powershell
 pnpm pilot:registry -- --dry-run
 ```
 
-Jika masih error, berhenti dulu dan perbaiki file registry lokal.
+If it still errors, stop and fix the local registry file.
 
-Jika sudah sukses:
+If successful:
 
 ```powershell
 pnpm pilot:registry
 ```
 
-Setelah apply, cek readiness:
+After applying, check readiness:
 
 ```powershell
 curl.exe https://solar-tank-monitoring-system.vercel.app/api/ready
 ```
 
-Yang dicari:
+What to look for:
 
 ```text
 ok: true
 status: ready
 storageDriver: mysql
-Registry MySQL aktif: 5 site, 5 tangki, 5 device
+MySQL registry active: 5 sites, 5 tanks, 5 devices
 ```
 
-Jika jumlah site belum mencapai target, berarti registry 5 STO belum sepenuhnya
-masuk ke MySQL yang dipakai Vercel.
+If the site count has not reached the target, the 5-STO registry has not fully entered the MySQL used by Vercel.
 
-## Cara Membaca Peta Dashboard
+## How to Read the Dashboard Map
 
-Buka:
+Open:
 
 ```text
 https://solar-tank-monitoring-system.vercel.app/dashboard
 ```
 
-Bagian peta sekarang bisa:
+The map section can now:
 
-- menampilkan peta real berbasis koordinat;
-- menampilkan marker per STO;
+- show a real coordinate-based map;
+- show a marker per STO;
 - zoom in;
 - zoom out;
-- geser peta;
-- pusatkan ulang peta;
-- search STO, nama lokasi, Regional, Wilayah, Area, atau device;
-- filter Regional, Wilayah, dan Area untuk mempersempit lokasi yang tampil;
-- filter semua, online, waspada, kritis, atau offline;
-- hover, fokus keyboard, atau klik marker untuk mengganti kartu `Detail overview`;
-- klik tombol `Buka detail tangki` pada kartu detail untuk masuk ke halaman detail.
+- pan the map;
+- recenter the map;
+- search STO, location name, regional, territory, area, or device;
+- filter regional, territory, and area to narrow displayed locations;
+- filter all, online, warning, critical, or offline;
+- hover, keyboard focus, or click a marker to switch the `Overview detail` card;
+- click the `Open tank details` button on the detail card to enter the detail page.
 
-Cara membaca peta:
+How to read the map:
 
-1. Cari STO melalui kolom pencarian jika jumlah titik sudah banyak.
-2. Pilih status jika hanya ingin melihat perangkat online, waspada, kritis, atau offline.
-3. Arahkan kursor ke marker untuk melihat ringkasan singkat.
-4. Klik marker jika ingin menjadikan STO tersebut sebagai pilihan aktif.
-5. Baca kartu `Detail overview` di sisi kanan atau di bawah peta pada layar ponsel.
-6. Klik `Buka detail tangki` jika perlu melihat sensor, konfigurasi tangki, payload, dan alur baca lebih lengkap.
+1. Search for the STO through the search field once points are numerous.
+2. Pick a status if you only want to see online, warning, critical, or offline devices.
+3. Hover the cursor over a marker to see a brief summary.
+4. Click a marker to make that STO the active selection.
+5. Read the `Overview detail` card on the right side or below the map on phone screens.
+6. Click `Open tank details` if you need fuller sensor, tank configuration, payload, and reading flow information.
 
-Jika marker tidak muncul:
+If a marker does not appear:
 
-1. Cek latitude dan longitude di registry.
-2. Cek `coordinateStatus` saat apply registry.
-3. Cek apakah registry sudah masuk ke MySQL yang dipakai Vercel.
-4. Cek koneksi internet browser, karena tile peta diambil dari OpenStreetMap.
+1. Check latitude and longitude in the registry.
+2. Check `coordinateStatus` when applying the registry.
+3. Check whether the registry entered the MySQL used by Vercel.
+4. Check browser internet connection, because map tiles come from OpenStreetMap.
 
-## Endpoint Device Real
+## Real Device Endpoint
 
-Device mengirim ke:
+The device sends to:
 
 ```text
 POST https://solar-tank-monitoring-system.vercel.app/api/ingest
 ```
 
-Header:
+Headers:
 
 ```http
 Content-Type: application/json
 X-Device-Id: pilot-tph-01
-X-Device-Key: key-asli-device
+X-Device-Key: real-device-key
 ```
 
-`X-Device-Id` harus sama dengan kode device di registry.
+`X-Device-Id` must equal the device code in the registry.
 
-`X-Device-Key` harus key asli yang hash-nya sudah dimasukkan ke database.
+`X-Device-Key` must be the raw key whose hash is already in the database.
 
-## Payload yang Disarankan dari Device
+## Recommended Payload from the Device
 
-Payload minimal:
+Minimum payload:
 
 ```json
 {
@@ -261,86 +257,86 @@ Payload minimal:
 }
 ```
 
-Yang paling wajib:
+Most required:
 
 - device id;
-- jarak sensor;
-- config tangki;
-- battery jika ada;
-- RSSI jika ada.
+- sensor distance;
+- tank config;
+- battery if available;
+- RSSI if available.
 
-Latitude dan longitude tidak wajib dari payload, karena lokasi peta diambil dari registry manual.
+Latitude and longitude are not required in the payload, because map location comes from the manual registry.
 
-## Yang Perlu Dicek di Firmware ESP8266/NodeMCU
+## What to Check in the ESP8266/NodeMCU Firmware
 
-Firmware perlu memastikan:
+The firmware must ensure:
 
-1. Device tersambung WiFi.
-2. Device tahu URL endpoint:
+1. The device is connected to WiFi.
+2. The device knows the endpoint URL:
 
 ```text
 https://solar-tank-monitoring-system.vercel.app/api/ingest
 ```
 
-3. Device mengirim metode `POST`.
-4. Device mengirim header:
+3. The device sends the `POST` method.
+4. The device sends headers:
 
 ```text
 Content-Type: application/json
-X-Device-Id: kode-device
-X-Device-Key: key-asli-device
+X-Device-Id: device-code
+X-Device-Key: real-device-key
 ```
 
-5. Device mengirim body JSON.
-6. Device mengirim tiap interval yang disepakati. Profil operasional saat ini memakai 20 detik, sedangkan history database diringkas per 5 menit.
-7. Device mencatat response HTTP.
+5. The device sends a JSON body.
+6. The device sends at every agreed interval. The current operational profile uses 20 seconds, while database history is rolled up every 5 minutes.
+7. The device logs the HTTP response.
 
-Arti response umum:
+Meaning of common responses:
 
-| Response | Arti |
+| Response | Meaning |
 |---|---|
-| `201` | data diterima |
-| `400` | payload rusak atau field kurang |
-| `401` | key salah |
-| `404` | device tidak ada di registry |
-| `503` | database/storage belum siap |
+| `201` | data accepted |
+| `400` | payload broken or field missing |
+| `401` | wrong key |
+| `404` | device not in the registry |
+| `503` | database/storage not ready |
 
-Catatan HTTPS:
+HTTPS notes:
 
-- endpoint Vercel memakai HTTPS;
-- ESP8266 perlu client HTTPS yang sesuai;
-- jangan menonaktifkan validasi sertifikat untuk penggunaan final tanpa persetujuan teknis;
-- kalau HTTPS di firmware bermasalah, uji dulu dengan smoke test agar tahu servernya sehat.
+- the Vercel endpoint uses HTTPS;
+- ESP8266 needs a compatible HTTPS client;
+- do not disable certificate validation for final use without technical approval;
+- if HTTPS is problematic in firmware, test with a smoke test first so you know the server is healthy.
 
-## Cara Smoke Test Sebelum Device Real
+## How to Smoke Test Before the Real Device
 
-Smoke test lokal:
+Local smoke test:
 
 ```powershell
 $env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
 $env:PILOT_DEVICE_ID="pilot-tph-01"
-$env:PILOT_DEVICE_KEY="key-asli-device"
+$env:PILOT_DEVICE_KEY="real-device-key"
 pnpm pilot:smoke
 ```
 
-Jika smoke test sukses tetapi device gagal, kemungkinan masalah ada di firmware, jaringan device, header, key, atau format JSON.
+If the smoke test succeeds but the device fails, the problem is likely in the firmware, device network, headers, key, or JSON format.
 
-## Kalau Hari Uji Real Batal
+## If the Real Test Day Is Cancelled
 
-Jangan mengirim data latihan ke database yang sedang dipakai demo resmi jika data itu bisa membingungkan.
+Do not send practice data to the database used for an official demo if that data could confuse.
 
-Pilihan aman:
+Safe options:
 
-1. Pakai local development dengan storage `memory`.
-2. Pakai database staging/latihan.
-3. Pakai device khusus demo yang jelas bukan device lapangan.
-4. Tulis di laporan bahwa data tersebut adalah uji koneksi, bukan data operasional.
+1. Use local development with `memory` storage.
+2. Use a staging/practice database.
+3. Use a dedicated demo device that is clearly not a field device.
+4. Write in the report that the data is a connection test, not operational data.
 
-Jika tetap perlu smoke test ke Vercel, gunakan device pilot yang memang disepakati untuk test dan jangan mengklaim itu data operasional.
+If you still need to smoke test to Vercel, use the pilot device agreed for testing and do not claim it is operational data.
 
-## Checklist Sebelum Demo 5 STO
+## Checklist Before the 5-STO Demo
 
-Sebelum demo:
+Before the demo:
 
 ```powershell
 curl.exe https://solar-tank-monitoring-system.vercel.app/api/health
@@ -348,35 +344,34 @@ curl.exe https://solar-tank-monitoring-system.vercel.app/api/ready
 curl.exe https://solar-tank-monitoring-system.vercel.app/api/dashboard/overview
 ```
 
-Pastikan:
+Make sure:
 
-- `/api/health` sukses;
-- `/api/ready` sukses;
-- registry sudah 5 site, 5 tangki, 5 device;
-- dashboard menampilkan 5 titik;
-- setiap marker peta berada di lokasi yang benar;
-- search menemukan kode STO;
-- filter status bekerja;
-- smoke test minimal satu device sukses;
-- device real minimal satu device sukses;
-- tidak ada credential di layar;
-- data lokasi yang ditampilkan boleh dibagikan.
+- `/api/health` succeeds;
+- `/api/ready` succeeds;
+- the registry has 5 sites, 5 tanks, 5 devices;
+- the dashboard shows 5 points;
+- every map marker is at the correct location;
+- search finds the STO code;
+- status filters work;
+- smoke test succeeds for at least one device;
+- the real device succeeds for at least one device;
+- no credentials are on screen;
+- the displayed location data is allowed to be shared.
 
-## Batas Fase Pilot Ini
+## Limits of This Pilot Phase
 
-Fase ini memperluas pilot dari kondisi terverifikasi saat ini menuju 5 STO dari
-sisi dashboard dan alur data.
+This phase expands the pilot from the current verified condition toward 5 STOs on the dashboard and data flow side.
 
-Namun fase ini belum membuat:
+But this phase does not yet produce:
 
-- konfigurasi SMTP dan Turnstile production final;
-- admin registry di browser;
-- latihan pemulihan backup secara rutin;
-- audit log khusus request ingest gagal;
-- perlindungan jaringan tambahan untuk endpoint ingest;
-- rotasi key otomatis;
+- final production SMTP and Turnstile configuration;
+- registry admin in the browser;
+- routine backup recovery drills;
+- a dedicated audit log for failed ingest requests;
+- extra network protection for the ingest endpoint;
+- automatic key rotation;
 - MQTT;
 - RTU/Modbus;
-- firmware final.
+- final firmware.
 
-Fokusnya adalah memastikan titik peta, registry, device payload, dan dashboard bisa dipakai untuk uji real awal.
+The focus is ensuring map points, registry, device payload, and dashboard can be used for the initial real test.

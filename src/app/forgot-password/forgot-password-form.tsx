@@ -7,7 +7,7 @@ import { ArrowRight, Mail } from "lucide-react";
 import { TurnstileWidget } from "@/features/auth/components/turnstile-widget";
 
 const captchaRequiredMessage =
-  "Selesaikan verifikasi keamanan terlebih dahulu.";
+  "Please complete the security verification first.";
 const isCaptchaEnabled = Boolean(
   process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim(),
 );
@@ -48,19 +48,19 @@ export default function ForgotPasswordForm() {
         | null;
 
       if (!response.ok || !result?.ok) {
-        throw new Error(result?.error ?? "Permintaan reset gagal.");
+        throw new Error(result?.error ?? "Reset request failed.");
       }
 
       setMessage(
         result.data?.message ??
-          "Jika akun ditemukan, link reset akan dikirim ke email terdaftar.",
+          "If the account is found, a reset link will be sent to the registered email.",
       );
       form.reset();
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Permintaan reset belum bisa diproses.",
+          : "The reset request could not be processed yet.",
       );
     } finally {
       if (isCaptchaEnabled) {
@@ -77,7 +77,7 @@ export default function ForgotPasswordForm() {
           className="mb-2 block text-sm font-semibold text-zinc-800"
           htmlFor="identity"
         >
-          Email atau nama pengguna
+          Email or username
         </label>
         <div className="relative">
           <Mail
@@ -91,7 +91,7 @@ export default function ForgotPasswordForm() {
             id="identity"
             inputMode="email"
             name="identity"
-            placeholder="nama@perusahaan.co.id"
+            placeholder="name@company.co.id"
             required
             type="text"
           />
@@ -117,7 +117,7 @@ export default function ForgotPasswordForm() {
         disabled={pending}
         type="submit"
       >
-        {pending ? "Mengirim..." : "Kirim link reset"}
+        {pending ? "Sending..." : "Send reset link"}
         <ArrowRight
           aria-hidden="true"
           className="size-4 transition group-hover:translate-x-0.5"
