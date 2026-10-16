@@ -100,7 +100,8 @@ proves it, because "we believe it is configured" is not evidence.
 - [ ] Tank capacity, sensor mount height, and thresholds were confirmed against
       the physical tank and agreed with the site operator.
 - [ ] A calibration check was performed (sensor reading versus a physical dip)
-      and the result is recorded per tank.
+      and the result is recorded per tank, following
+      `docs/calibration-guide.md`.
 - [ ] Firmware for every field device is built from the registered template and
       the decision in `docs/decision-log.md` (TLS validation) has been applied.
 - [ ] A refuelling event was observed end to end (reading change, alert clear).

@@ -315,6 +315,7 @@ Priorities and readiness requirements are explained in the
 | [Upgrade and Rollback](docs/upgrade-and-rollback.md) | Release procedure, migration rules, and rollback steps |
 | [Incident Response](docs/incident-response.md) | Severity levels, first five minutes, and playbooks |
 | [Production Go-Live Checklist](docs/production-go-live-checklist.md) | Gate for promoting the pilot to production |
+| [Calibration Guide](docs/calibration-guide.md) | Tank and device calibration procedure and record template |
 | [Safety and Limitations](docs/safety-and-limitations.md) | Software, data, physical device, and operational limits |
 | [Reviewer Quickstart](docs/reviewer-quickstart.md) | Technical review flow |
 | [User Manual](docs/ftm-user-manual.html) | End-user guidance |
