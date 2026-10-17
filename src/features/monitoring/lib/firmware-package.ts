@@ -50,7 +50,36 @@ type FirmwarePackageContext = {
   firmwareTemplate: MonitoringFirmwareTemplate;
   hardwareProfile: MonitoringHardwareProfile;
   request: MonitoringDeviceRequest;
+  signingEnabled?: boolean;
+  tlsCaCertificate?: string;
+  tlsCertificateFingerprint?: string;
 };
+
+/**
+ * Device-side TLS material, read from the deployment environment so an operator
+ * can pin the server certificate once instead of editing every generated header.
+ *
+ * SOLARTANK_TLS_CA_CERT holds PEM text with newlines escaped as "\n" when it is
+ * stored in a single environment variable.
+ */
+function readFirmwareTlsDefaults(): {
+  signingEnabled: boolean;
+  tlsCaCertificate: string;
+  tlsCertificateFingerprint: string;
+} {
+  return {
+    signingEnabled:
+      (process.env.SOLARTANK_DEVICE_REQUEST_SIGNING ?? "true")
+        .trim()
+        .toLowerCase() !== "false",
+    tlsCaCertificate: (process.env.SOLARTANK_TLS_CA_CERT ?? "")
+      .replaceAll("\\n", "\n")
+      .trim(),
+    tlsCertificateFingerprint: (
+      process.env.SOLARTANK_TLS_CERT_FINGERPRINT ?? ""
+    ).trim(),
+  };
+}
 
 function toDateStamp(value: Date): string {
   return value.toISOString().slice(0, 10).replaceAll("-", "");
@@ -451,7 +480,14 @@ export function renderDeviceConfigHeader({
   appBaseUrl,
   deviceKey,
   request,
-}: Pick<FirmwarePackageContext, "appBaseUrl" | "deviceKey" | "request">): string {
+  signingEnabled = true,
+  tlsCaCertificate = "",
+  tlsCertificateFingerprint = "",
+}: Pick<FirmwarePackageContext, "appBaseUrl" | "deviceKey" | "request"> & {
+  signingEnabled?: boolean;
+  tlsCaCertificate?: string;
+  tlsCertificateFingerprint?: string;
+}): string {
   return `#pragma once
 
 // This file is generated automatically by FTM.
@@ -484,6 +520,12 @@ export function renderDeviceConfigHeader({
 #define SOLARTANK_LOAD_UNIT ${toCppString(request.loadUnit)}
 #define SOLARTANK_DIESEL_ENGINE_CAPACITY_KVA ${toCppNumber(request.dieselEngineCapacityKva)}
 #define SOLARTANK_COS_PHI ${toCppNumber(request.cosPhi)}
+
+// Transport security. Fill these in before field use so telemetry is not sent
+// over an unvalidated TLS session. See the security notes in README_UPLOAD_STEPS.md.
+#define SOLARTANK_ENABLE_REQUEST_SIGNING ${signingEnabled ? 1 : 0}
+#define SOLARTANK_TLS_CA_CERT ${toCppString(tlsCaCertificate)}
+#define SOLARTANK_TLS_CERT_FINGERPRINT ${toCppString(tlsCertificateFingerprint)}
 `;
 }
 
@@ -507,7 +549,12 @@ export function renderHardwareProfileHeader({
 export function renderFirmwareReadme({
   hardwareProfile,
   request,
-}: Pick<FirmwarePackageContext, "hardwareProfile" | "request">): string {
+  signingEnabled = true,
+}: Pick<FirmwarePackageContext, "hardwareProfile" | "request"> & {
+  signingEnabled?: boolean;
+}): string {
+  const signingEnabledValue = signingEnabled ? "enabled" : "disabled";
+
   return `# FTM Firmware Upload Steps
 
 This package was created for:
@@ -549,6 +596,42 @@ This package was created for:
 ## Security Notes
 
 The device key may only be used for this device. If this file is sent to the wrong recipient or lost, contact an admin so the key can be revoked and a new package created.
+
+### Transport security
+
+Before this device is used in the field, the TLS session must be validated.
+
+1. Preferred: set the deployment variable SOLARTANK_TLS_CA_CERT to the PEM
+   text of the CA that issued the server certificate (escape newlines as \\n),
+   then regenerate this package. device_config.h will carry it as
+   SOLARTANK_TLS_CA_CERT and the firmware will validate the certificate chain.
+2. Alternative: set SOLARTANK_TLS_CERT_FINGERPRINT to the SHA-1 fingerprint of
+   the server certificate. Pin the leaf only when the certificate is stable and
+   you accept that renewing it requires a firmware update.
+
+If neither is set, the build logs
+WARNING: TLS without certificate validation on the serial console on every
+boot and telemetry is sent over an unvalidated connection. That is acceptable
+only for a short local test, never for a field device.
+
+### Request signing
+
+SOLARTANK_ENABLE_REQUEST_SIGNING is ${signingEnabledValue}. When it is 1 the
+device signs each POST with HMAC-SHA256 over <unixSeconds>.<nonce>.<body>
+using the device key and sends X-Request-Timestamp, X-Request-Nonce, and
+X-Request-Signature. Signing needs a synchronized clock; if NTP has not
+finished the device sends the request unsigned and prints
+Clock is not synchronized on the serial console.
+
+The server enforces this according to INGEST_SIGNATURE_MODE:
+
+- off — signatures are ignored (bootstrap only);
+- optional — a signature that is present must be valid, a missing one is
+  accepted and logged;
+- required — every request must carry a valid, fresh signature.
+
+Turn on required only after every field device has been flashed with this
+firmware and confirmed to be reporting with valid signatures.
 `;
 }
 
@@ -606,8 +689,12 @@ export async function createFirmwarePackageBundle({
   firmwareTemplate,
   hardwareProfile,
   request,
+  signingEnabled,
+  tlsCaCertificate,
+  tlsCertificateFingerprint,
 }: FirmwarePackageContext): Promise<FirmwarePackageBundle> {
   const generatedAt = new Date();
+  const tlsDefaults = readFirmwareTlsDefaults();
   const firmwareSource = await readFirmwareTemplateSource(firmwareTemplate);
   const files: FirmwarePackageFile[] = [
     {
@@ -617,7 +704,15 @@ export async function createFirmwarePackageBundle({
     {
       path: "device_config.h",
       content: Buffer.from(
-        renderDeviceConfigHeader({ appBaseUrl, deviceKey, request }),
+        renderDeviceConfigHeader({
+          appBaseUrl,
+          deviceKey,
+          request,
+          signingEnabled: signingEnabled ?? tlsDefaults.signingEnabled,
+          tlsCaCertificate: tlsCaCertificate ?? tlsDefaults.tlsCaCertificate,
+          tlsCertificateFingerprint:
+            tlsCertificateFingerprint ?? tlsDefaults.tlsCertificateFingerprint,
+        }),
         "utf8",
       ),
     },
@@ -628,7 +723,11 @@ export async function createFirmwarePackageBundle({
     {
       path: "README_UPLOAD_STEPS.md",
       content: Buffer.from(
-        renderFirmwareReadme({ hardwareProfile, request }),
+        renderFirmwareReadme({
+          hardwareProfile,
+          request,
+          signingEnabled: signingEnabled ?? tlsDefaults.signingEnabled,
+        }),
         "utf8",
       ),
     },

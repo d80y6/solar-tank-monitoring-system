@@ -1,4 +1,5 @@
 import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { canUserAccessTank } from "@/features/monitoring/lib/scoped-monitoring-data";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -425,6 +426,11 @@ export default async function SimpleTankDetailPage({
 
   await connection();
   const user = await requirePageUser();
+
+  if (!(await canUserAccessTank(user, tankId))) {
+    notFound();
+  }
+
   const isAdmin = user.role === "admin";
 
   const now = new Date();

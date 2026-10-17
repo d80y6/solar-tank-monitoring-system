@@ -42,29 +42,29 @@ const VALUE_FLAGS = new Map([
 
 function printHelp() {
   globalThis.console.log(`
-Simulator device SolarTank
+SolarTank device simulator
 
-Pemakaian:
+Usage:
   pnpm simulate:device --once
   pnpm simulate:device --device demo-tph-01 --interval-ms 5000
   pnpm simulate:device --critical --once
 
-Opsi:
+Options:
   --base-url <url>             Default: http://localhost:3000
   --endpoint <path>            Default: /api/ingest
   --device <id>                Default: demo-tph-01
   --key <key>                  Default: env SOLAR_TANK_DEVICE_KEY, demo device key, or local fallback
-  --interval-ms <angka>        Default: 5000
-  --start-percent <angka>      Default: 84
-  --step-percent <angka>       Default: 1.5
-  --min-percent <angka>        Default: 5
-  --capacity-liter <angka>     Default: 5000
-  --sensor-height-cm <angka>   Default: 150
-  --battery <angka>            Default: 3.86
-  --rssi <angka>               Default: -55
-  --once                       Kirim sekali lalu berhenti
+  --interval-ms <number>       Default: 5000
+  --start-percent <number>     Default: 84
+  --step-percent <number>      Default: 1.5
+  --min-percent <number>       Default: 5
+  --capacity-liter <number>    Default: 5000
+  --sensor-height-cm <number>  Default: 150
+  --battery <number>           Default: 3.86
+  --rssi <number>              Default: -55
+  --once                       Send one payload and exit
   --critical                   Start from 9 percent with step 0
-  --help                       Tampilkan bantuan
+  --help                       Show this help
 `);
 }
 

@@ -33,15 +33,16 @@ Included:
 
 Not yet included:
 
-- full production hardening, including restore drills and recovery SOPs;
+- executed and recorded restore drills on operational data;
 - more detailed operational roles beyond `admin` and `user`;
-- final firmware with TLS hardening and one-click compile;
+- one-click firmware compile/upload (firmware TLS validation and request signing
+  are implemented — see `docs/decision-log.md`);
 - real data in Git;
-- critical-level/offline operational alerts;
+- field-tuned alert thresholds;
 - device approve/reject through Telegram;
 - final-calibrated hardware integration;
 - RTU/Modbus/OPNIMUS integration;
-- final production deployment details;
+- final production approval and deployment details;
 - mobile app.
 
 ## Never Allowed in the Public Repo

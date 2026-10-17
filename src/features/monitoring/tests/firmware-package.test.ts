@@ -123,6 +123,32 @@ describe("firmware package helpers", () => {
     expect(header).not.toContain("{{");
   });
 
+  it("carries the transport-security settings into the generated header", () => {
+    const header = renderDeviceConfigHeader({
+      appBaseUrl: "https://solartank.example.com",
+      deviceKey: "stk_test_device_key",
+      request: DEVICE_REQUEST,
+      signingEnabled: true,
+      tlsCaCertificate: "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----",
+      tlsCertificateFingerprint: "",
+    });
+
+    expect(header).toContain("#define SOLARTANK_ENABLE_REQUEST_SIGNING 1");
+    expect(header).toContain(
+      '#define SOLARTANK_TLS_CA_CERT "-----BEGIN CERTIFICATE-----\\nMIIB\\n-----END CERTIFICATE-----"',
+    );
+    expect(header).toContain('#define SOLARTANK_TLS_CERT_FINGERPRINT ""');
+
+    const unsignedHeader = renderDeviceConfigHeader({
+      appBaseUrl: "https://solartank.example.com",
+      deviceKey: "stk_test_device_key",
+      request: DEVICE_REQUEST,
+      signingEnabled: false,
+    });
+
+    expect(unsignedHeader).toContain("#define SOLARTANK_ENABLE_REQUEST_SIGNING 0");
+  });
+
   it("creates a firmware zip bundle with config, readme, and manifest files", async () => {
     const bundle = await createFirmwarePackageBundle({
       appBaseUrl: "https://solartank.example.com",

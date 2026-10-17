@@ -53,25 +53,25 @@ function printHelp() {
   globalThis.console.log(`
 Smoke test pilot ingest with real-format payloads.
 
-Pemakaian:
+Usage:
   PILOT_DEVICE_KEY="key-real" pnpm pilot:smoke
   pnpm pilot:smoke -- --base-url https://solar-tank-monitoring-system.vercel.app --device pilot-tph-01
 
-Opsi penting:
+Key options:
   --base-url <url>                    Default: PILOT_API_BASE_URL or http://localhost:3000
   --device <id>                       Default: PILOT_DEVICE_ID or pilot-tph-01
   --key <key>                         Default: PILOT_DEVICE_KEY
-  --distance-cm <angka>               Default: 10.2
-  --capacity-liter <angka>            Default: 540
-  --length-cm <angka>                 Default: 150
-  --width-cm <angka>                  Default: 60
-  --height-cm <angka>                 Default: 60
-  --sensor-mount-height-cm <angka>    Default: 60
+  --distance-cm <number>              Default: 10.2
+  --capacity-liter <number>           Default: 540
+  --length-cm <number>                Default: 150
+  --width-cm <number>                 Default: 60
+  --height-cm <number>                Default: 60
+  --sensor-mount-height-cm <number>   Default: 60
   --lat <number> --lng <number>     Optional, only when coordinates may be sent
   --device-ip <ip>                    Optional, do not use an internal IP if it must not be shared
   --dry-run                           Show the payload without sending
   --allow-config-review               Do not fail when response needsReview=true
-  --help                              Tampilkan bantuan
+  --help                              Show this help
 `);
 }
 

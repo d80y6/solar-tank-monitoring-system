@@ -30,6 +30,7 @@ import {
   getMonitoringStorageDriver,
   type MonitoringStorageDriver,
 } from "./monitoring-storage";
+import { evaluateProductionGuardrails } from "@/lib/production-guardrails";
 
 const SERVICE_NAME = "solar-tank-monitoring-system";
 
@@ -593,6 +594,36 @@ function checkDatabaseBackupReadiness(
   };
 }
 
+/**
+ * Summarizes the boot guardrails so a failing deploy can also be inspected from
+ * the readiness probe: fatal findings make readiness "error", warnings only mark
+ * it "degraded". Outside production the check is skipped entirely.
+ */
+function checkProductionGuardrailReadiness(): DeploymentCheck {
+  const findings = evaluateProductionGuardrails();
+
+  if (findings.length === 0) {
+    return {
+      name: "production-guardrails",
+      ok: true,
+      status: "ok",
+      message: "Production configuration is safe.",
+    };
+  }
+
+  const fatal = findings.filter((finding) => finding.severity === "fatal");
+  const labels = findings
+    .map((finding) => `${finding.severity}:${finding.key}`)
+    .join(", ");
+
+  return {
+    name: "production-guardrails",
+    ok: fatal.length === 0,
+    status: fatal.length > 0 ? "error" : "degraded",
+    message: `${findings.length} configuration finding(s): ${labels}. See docs/production-go-live-checklist.md.`,
+  };
+}
+
 export async function getDeploymentReadiness(
   now = new Date(),
 ): Promise<DeploymentReadiness> {
@@ -600,6 +631,7 @@ export async function getDeploymentReadiness(
   const storageCheck = await checkStorageReadiness(storageDriver);
   const checks = [
     storageCheck,
+    checkProductionGuardrailReadiness(),
     checkAuthSecretReadiness(),
     checkAppBaseUrlReadiness(),
     checkAdminOtpReadiness(),

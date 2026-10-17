@@ -1,9 +1,18 @@
 import { spawn } from "node:child_process";
-import { createWriteStream } from "node:fs";
-import { mkdir, readdir, rm, stat } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { createReadStream, createWriteStream } from "node:fs";
+import { mkdir, readdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
+import { createGzip } from "node:zlib";
 import nextEnv from "@next/env";
+
+import {
+  getBackupEncryptionKey,
+  getEncryptionKeyFingerprint,
+  writeEncryptedBackup,
+} from "./lib/backup-crypto.mjs";
 
 const { loadEnvConfig } = nextEnv;
 
@@ -14,6 +23,8 @@ const projectDir = path.resolve(
 
 loadEnvConfig(projectDir);
 
+const BACKUP_FILE_PREFIX = "solar_tank_mysql_";
+
 function getEnv(name) {
   return process.env[name]?.trim() ?? "";
 }
@@ -21,6 +32,10 @@ function getEnv(name) {
 function fail(message) {
   console.error(`MySQL backup failed: ${message}`);
   process.exit(1);
+}
+
+function log(message) {
+  console.log(`[backup] ${message}`);
 }
 
 function getTimestamp() {
@@ -41,6 +56,10 @@ function parseRetentionDays() {
   }
 
   return parsed;
+}
+
+function shouldCompress() {
+  return getEnv("MYSQL_BACKUP_COMPRESS").toLowerCase() !== "false";
 }
 
 function getDatabaseUrl() {
@@ -120,8 +139,8 @@ async function cleanupOldBackups({ outputDir, retentionDays }) {
   for (const entry of entries) {
     if (
       !entry.isFile() ||
-      !entry.name.startsWith("solar_tank_mysql_") ||
-      !entry.name.endsWith(".sql")
+      !entry.name.startsWith(BACKUP_FILE_PREFIX) ||
+      entry.name.endsWith(".json")
     ) {
       continue;
     }
@@ -130,7 +149,8 @@ async function cleanupOldBackups({ outputDir, retentionDays }) {
     const fileStat = await stat(filePath);
 
     if (fileStat.mtimeMs < cutoffMs) {
-      await rm(filePath);
+      await rm(filePath, { force: true });
+      await rm(`${filePath}.json`, { force: true });
       deleted += 1;
     }
   }
@@ -138,9 +158,16 @@ async function cleanupOldBackups({ outputDir, retentionDays }) {
   return deleted;
 }
 
-async function runMysqlDump({ args, outputPath, password }) {
-  const output = createWriteStream(outputPath, { flags: "wx" });
-  const child = spawn("mysqldump", args, {
+async function hashFile(filePath) {
+  const hash = createHash("sha256");
+
+  await pipeline(createReadStream(filePath), hash);
+
+  return hash.digest("hex");
+}
+
+function startMysqlDump({ args, password }) {
+  return spawn("mysqldump", args, {
     env: {
       ...process.env,
       MYSQL_PWD: password,
@@ -148,60 +175,120 @@ async function runMysqlDump({ args, outputPath, password }) {
     stdio: ["ignore", "pipe", "pipe"],
     windowsHide: true,
   });
-  let stderr = "";
-  const outputFinished = new Promise((resolve, reject) => {
-    output.on("finish", resolve);
-    output.on("error", reject);
+}
+
+async function main() {
+  const { database, url } = getDatabaseUrl();
+  const outputDir = path.resolve(
+    projectDir,
+    getEnv("MYSQL_BACKUP_OUTPUT_DIR") || "backups/mysql",
+  );
+  const retentionDays = parseRetentionDays();
+  const compressionEnabled = shouldCompress();
+  const encryptionKey = getBackupEncryptionKey();
+  const baseName = `${BACKUP_FILE_PREFIX}${getTimestamp()}`;
+  const outputPath = path.join(
+    outputDir,
+    `${baseName}.sql${compressionEnabled ? ".gz" : ""}${encryptionKey ? ".enc" : ""}`,
+  );
+
+  await mkdir(outputDir, { recursive: true });
+
+  const child = startMysqlDump({
+    args: buildMysqlDumpArgs({ database, url }),
+    password: decodeURIComponent(url.password),
   });
 
-  child.stdout.pipe(output);
+  const dumpStream = child.stdout;
+  let dumpError = "";
+
   child.stderr.on("data", (chunk) => {
-    stderr += chunk.toString("utf8");
+    dumpError += chunk.toString("utf8");
   });
+
+  const encryptionSummary = encryptionKey
+    ? await writeEncryptedBackup({
+        compressionEnabled,
+        inputStream: dumpStream,
+        key: encryptionKey,
+        outputPath,
+      }).catch(async (error) => {
+        await rm(outputPath, { force: true });
+        throw error;
+      })
+    : await pipeline(
+        dumpStream,
+        ...(compressionEnabled ? [createGzip()] : []),
+        createWriteStream(outputPath, { flags: "wx" }),
+      )
+        .then(() => null)
+        .catch(async (error) => {
+          await rm(outputPath, { force: true });
+          throw error;
+        });
 
   const exitCode = await new Promise((resolve, reject) => {
     child.on("error", reject);
     child.on("close", resolve);
-  }).catch(async (error) => {
-    output.destroy();
-    await rm(outputPath, { force: true });
-
+  }).catch((error) => {
     if (error.code === "ENOENT") {
-      fail("mysqldump command not found. Install the MySQL client and make sure PATH is correct.");
+      fail(
+        "mysqldump command not found. Install the MySQL client and make sure PATH is correct.",
+      );
     }
 
     throw error;
   });
 
-  await outputFinished;
-
   if (exitCode !== 0) {
     await rm(outputPath, { force: true });
-    fail(stderr.trim() || `mysqldump exited with code ${exitCode}.`);
-  }
-}
 
-async function main() {
-  const { database, url } = getDatabaseUrl();
-  const outputDir = path.resolve(projectDir, getEnv("MYSQL_BACKUP_OUTPUT_DIR") || "backups/mysql");
-  const retentionDays = parseRetentionDays();
-  const outputPath = path.join(
-    outputDir,
-    `solar_tank_mysql_${getTimestamp()}.sql`,
+    fail(dumpError.trim() || `mysqldump exited with code ${exitCode}.`);
+  }
+
+  const checksumSha256 = await hashFile(outputPath);
+  const fileStat = await stat(outputPath);
+  const deleted = await cleanupOldBackups({ outputDir, retentionDays });
+  const manifestPath = `${outputPath}.json`;
+
+  await writeFile(
+    manifestPath,
+    `${JSON.stringify(
+      {
+        checksumSha256,
+        compressed: compressionEnabled,
+        createdAt: new Date().toISOString(),
+        database,
+        encrypted: Boolean(encryptionKey),
+        encryption: encryptionSummary
+          ? {
+              algorithm: "aes-256-gcm",
+              keyFingerprint: getEncryptionKeyFingerprint(encryptionKey),
+            }
+          : null,
+        file: path.basename(outputPath),
+        host: url.hostname,
+        sizeBytes: fileStat.size,
+        tool: "mysqldump",
+      },
+      null,
+      2,
+    )}\n`,
+    "utf8",
   );
 
-  await mkdir(outputDir, { recursive: true });
-  await runMysqlDump({
-    args: buildMysqlDumpArgs({ database, url }),
-    outputPath,
-    password: decodeURIComponent(url.password),
-  });
-  const deleted = await cleanupOldBackups({ outputDir, retentionDays });
-  const fileStat = await stat(outputPath);
+  log(`backup completed: ${outputPath}`);
+  log(`checksum: ${checksumSha256}`);
+  log(`manifest: ${manifestPath}`);
+  log(
+    `retention: ${retentionDays} days, removed ${deleted} old backup(s), encrypted: ${Boolean(encryptionKey)}`,
+  );
 
-  console.log(`MySQL backup completed: ${outputPath}`);
-  console.log(`Ukuran file: ${fileStat.size} bytes`);
-  console.log(`Retention: ${retentionDays} days, old files deleted: ${deleted}`);
+  if (!encryptionKey) {
+    log(
+      "WARNING: MYSQL_BACKUP_ENCRYPTION_KEY is not set, so this backup is plain text. Set it before storing backups outside a trusted machine.",
+    );
+  }
 }
 
 main().catch((error) => {

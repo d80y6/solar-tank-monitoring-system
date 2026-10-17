@@ -20,9 +20,17 @@ period-based CSV export, MySQL backup, Telegram, helpdesk, and device
 data cleanup.
 
 The system must not yet be called fully production-ready because firmware
-hardening, restore drills, field device calibration, alerting,
-per-location access restriction, and operational SOPs have not finished
-testing.
+hardening, restore drills, field device calibration, and final production
+approval have not finished.
+
+Software review update (2026-10-16): the deep review in
+`docs/production-readiness-review.md` closed the software gaps for
+observability, operational alerting, device key rotation, encrypted backups
+with a restore path, and per-location access restriction. Those capabilities
+are implemented and covered by `pnpm check`, but the deployment snapshot
+figures in this document are unchanged: nothing here claims that a restore
+drill has already been run, that alerts have been tuned on live data, or that
+per-location enforcement is switched on in the pilot environment.
 
 ## Verified Snapshot 13–14 July 2026
 
@@ -75,17 +83,40 @@ deployment count.
 
 ## Not Final Yet
 
-- Final production approval and long-term operational SOPs.
-- Routinely tested database restore.
-- Production monitoring/log service.
-- Critical-level/offline operational alerts.
-- Telegram device approve/reject. Telegram is currently for binding and notifications, not primary approval.
-- RTU/Modbus/OPNIMUS integration. This is a later phase after the initial rollout stabilizes.
-- Final firmware TLS validation. The current ESP8266 template still needs a security decision before production.
-- One-click firmware compile/upload for field users.
-- More detailed operational roles beyond `admin` and `user`.
-- CRUD UI for hardware profiles and firmware templates.
-- Documented real tank/device calibration.
+Items marked *(software ready)* have working, tested software; what is still
+missing is the operational step, not the code.
+
+- Final production approval.
+- Routinely tested database restore *(software ready)* — tooling and the drill
+  procedure exist (`docs/disaster-recovery-runbook.md`); the first recorded
+  drill on operational data is still pending.
+- Long-term operational SOPs *(software ready)* — daily/weekly/monthly
+  procedures are written down in `docs/operational-runbook.md`; adoption and
+  review cadence still need to be established.
+- Production monitoring/log service *(software ready)* — structured logs,
+  `/api/metrics`, and an error-tracking sink exist; a hosted monitoring
+  backend and dashboards still have to be selected.
+- Critical-level/offline operational alerts *(software ready)* — the rule
+  engine, scheduler, and Telegram/e-mail notifications exist; thresholds still
+  need tuning against live pilot data.
+- Per-location access restriction *(software ready)* — scopes and the
+  enforcement switch exist; they must be assigned and enabled deliberately.
+- Final firmware TLS validation — **decided and implemented**: generated
+  firmware validates TLS against a pinned CA or certificate fingerprint and
+  signs every request with HMAC-SHA256 (`SOLARTANK_TLS_CA_CERT`,
+  `SOLARTANK_TLS_CERT_FINGERPRINT`, `SOLARTANK_ENABLE_REQUEST_SIGNING`); see
+  `docs/decision-log.md`. What remains is operational: flash the field devices
+  and then switch `INGEST_SIGNATURE_MODE` to `required`.
+- One-click firmware compile/upload for field users — the package, upload
+  steps, and generated configuration exist; compiling still happens in the
+  Arduino IDE.
+- More detailed operational roles beyond `admin` and `user` — per-location
+  scope roles (`viewer`/`operator`) exist; any further role separation is still
+  open.
+- Explicitly out of scope for the current rollout: Telegram device
+  approve/reject and RTU/Modbus/OPNIMUS integration stay future work.
+- Documented real tank/device calibration — sensor accuracy must still be
+  validated per tank in the field.
 
 ## Current New Device Flow
 

@@ -1,0 +1,86 @@
+name: Scheduled operations
+
+# Runs the alert evaluation and housekeeping tasks on a schedule.
+#
+# Why GitHub Actions instead of a platform cron: Vercel restricts cron jobs to
+# once per day on the hobby plan, so a Vercel-hosted schedule cannot deliver the
+# ten-minute cadence the alert engine expects. A scheduled workflow works on any
+# hosting plan and keeps the scheduler outside the deployment, which means a
+# failed deploy cannot silently stop alerting.
+#
+# Required repository secrets:
+#   OPS_BASE_URL     e.g. https://solar-tank.example.com (no trailing slash)
+#   OPS_CRON_SECRET  the same value as the deployment's OPS_CRON_SECRET
+#
+# The job is skipped when either secret is missing, so forks and local clones do
+# not report failures.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      tasks:
+        description: Tasks to run
+        required: false
+        default: alerts,housekeeping
+        type: string
+
+concurrency:
+  group: ops-schedule
+  cancel-in-progress: false
+
+jobs:
+  run-ops-tasks:
+    name: Evaluate alerts and run housekeeping
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check configuration
+        id: config
+        env:
+          OPS_BASE_URL: ${{ secrets.OPS_BASE_URL }}
+          OPS_CRON_SECRET: ${{ secrets.OPS_CRON_SECRET }}
+        run: |
+          if [ -z "$OPS_BASE_URL" ] || [ -z "$OPS_CRON_SECRET" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::OPS_BASE_URL and/or OPS_CRON_SECRET are not set; skipping the scheduled run."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run the scheduled tasks
+        if: steps.config.outputs.configured == 'true'
+        env:
+          OPS_BASE_URL: ${{ secrets.OPS_BASE_URL }}
+          OPS_CRON_SECRET: ${{ secrets.OPS_CRON_SECRET }}
+          TASKS: ${{ inputs.tasks || 'alerts,housekeeping' }}
+        run: |
+          set -euo pipefail
+
+          url="${OPS_BASE_URL%/}/api/cron/ops?tasks=${TASKS}"
+          echo "Calling ${url}"
+
+          response_file="$(mktemp)"
+          status="$(
+            curl --silent --show-error \
+              --output "$response_file" \
+              --write-out '%{http_code}' \
+              --max-time 120 \
+              --header "x-solar-tank-ops-token: ${OPS_CRON_SECRET}" \
+              "$url"
+          )"
+
+          echo "HTTP ${status}"
+          cat "$response_file"
+          echo ""
+
+          if [ "$status" != "200" ]; then
+            echo "::error title=Scheduled ops run failed::HTTP ${status} from ${url}"
+            exit 1
+          fi
+
+          if grep -q '"ok":false' "$response_file"; then
+            echo "::error title=Scheduled ops run reported a failure::see the response body above"
+            exit 1
+          fi

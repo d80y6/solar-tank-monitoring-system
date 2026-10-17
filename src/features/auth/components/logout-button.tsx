@@ -36,7 +36,7 @@ export function LogoutButton() {
       type="button"
     >
       <LogOut className="size-4" aria-hidden="true" />
-      {pending ? "Keluar..." : "Keluar"}
+      {pending ? "Signing out…" : "Sign out"}
     </button>
   );
 }

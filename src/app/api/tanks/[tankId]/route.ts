@@ -1,4 +1,5 @@
 import { requireApiUser } from "@/features/auth/lib/auth-guards";
+import { canUserAccessTank } from "@/features/monitoring/lib/scoped-monitoring-data";
 import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-reading";
 import { buildTankDetail } from "@/features/monitoring/lib/tank-detail-view-model";
 import {
@@ -22,6 +23,17 @@ export async function GET(
   }
 
   const { tankId } = await params;
+
+  if (!(await canUserAccessTank(auth.user, tankId))) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Access to this tank is not available for this account.",
+      },
+      { status: 403 },
+    );
+  }
+
   const now = new Date();
   const [latestReadingsResult, readings, referenceData] = await Promise.all([
     listLatestMonitoringReadingsByTankWithSource(),

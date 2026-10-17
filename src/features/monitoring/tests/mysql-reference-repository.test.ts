@@ -63,7 +63,7 @@ describe("mysql reference repository mappers", () => {
     const tank = rowToTank({
       id: "tank-demo-main",
       site_id: "site-demo-01",
-      name: "Tangki utama",
+      name: "Main tank",
       shape: "horizontal-cylinder",
       capacity_liter: "5000.00",
       diameter_cm: "150.00",
@@ -107,6 +107,11 @@ describe("mysql reference repository mappers", () => {
     } as Parameters<typeof rowToDevice>[0]);
 
     expect(device).toEqual({
+      keyRotatedAt: null,
+      keyVersion: 1,
+      lastSeenAt: null,
+      previousApiKeyHash: null,
+      previousKeyValidUntil: null,
       id: "device-demo-main",
       siteId: "site-demo-01",
       tankId: "tank-demo-main",

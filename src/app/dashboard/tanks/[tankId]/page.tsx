@@ -1,4 +1,5 @@
 import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
+import { canUserAccessTank } from "@/features/monitoring/lib/scoped-monitoring-data";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -769,8 +770,8 @@ function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
       label: "Payload",
       shape: payloadConfig?.shape
         ? payloadConfig.shape === "rectangular"
-          ? "Tangki balok"
-          : "Silinder horizontal"
+          ? "Rectangular tank"
+          : "Horizontal cylinder"
         : "-",
       capacity: formatSnapshotItem(payloadConfig?.capacityLiter, " L"),
       source: "device report",
@@ -1059,6 +1060,10 @@ export default async function TankDetailPage({
 
   await connection();
   const admin = await requirePageAdmin();
+
+  if (!(await canUserAccessTank(admin, tankId))) {
+    notFound();
+  }
 
   const now = new Date();
   const [latestReadingsResult, tankHistoryReadings, referenceData] =

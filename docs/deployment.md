@@ -268,7 +268,13 @@ TELEGRAM_BOT_USERNAME
 - HTTPS is active.
 - The ingest endpoint has rate limiting.
 - User sign-in, roles, admin approval, and account deactivation are tested.
-- Database backup is prepared.
+- Database backup is prepared, encrypted, and restorable.
+- The scheduler is registered: the `Scheduled operations` GitHub workflow needs
+  the `OPS_BASE_URL` and `OPS_CRON_SECRET` repository secrets, or an equivalent
+  platform cron that can run at least every ten minutes.
+- The production guardrails accept the environment: a boot with an unsafe
+  configuration exits with the offending variable named in the log
+  (`src/lib/production-guardrails.ts`).
 - Site, tank, device, and key registry come from the managed database.
 - Volume formulas are calibrated.
 - Physical devices are tested safe.
@@ -282,4 +288,14 @@ The memory store is currently for development only.
 
 If the server restarts, simulator data is lost.
 
-Deployments that need history must use database storage. The MySQL foundation is available for the monitoring registry, readings, and auth. Production still requires SMTP, Turnstile, HTTPS, backup/restore, ingest rate limiting, device key rotation, server monitoring, and operational procedures. Final deployment choices are postponed until the next team decision.
+Deployments that need history must use database storage. MySQL holds the
+monitoring registry, readings, device keys, ops alerting, and auth.
+
+Setting `SOLAR_TANK_STORAGE_DRIVER` to anything other than `mysql` while
+`NODE_ENV=production` makes the process refuse to start, because an in-memory
+store loses every reading on restart.
+
+Vercel's hobby plan caps cron jobs at one run per day, which is why the ten
+minute alert schedule runs from `.github/workflows/ops-schedule.yml` instead of
+`vercel.json`. Promote to a platform cron only if the plan allows sub-daily
+schedules.

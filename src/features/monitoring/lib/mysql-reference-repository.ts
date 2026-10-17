@@ -45,6 +45,11 @@ type DeviceRow = RowDataPacket & {
   expected_report_interval_sec: number | string;
   api_key_hash: string | null;
   is_active: number | boolean;
+  key_version?: number | null;
+  previous_api_key_hash?: string | null;
+  previous_key_valid_until?: Date | string | null;
+  key_rotated_at?: Date | string | null;
+  last_seen_at?: Date | string | null;
 };
 
 type ReferenceCountRow = RowDataPacket & {
@@ -132,6 +137,16 @@ export function rowToTank(row: TankRow): Tank {
   };
 }
 
+function toIsoStringOrNull(value?: Date | string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const date = value instanceof Date ? value : new Date(value);
+
+  return Number.isFinite(date.getTime()) ? date.toISOString() : null;
+}
+
 export function rowToDevice(row: DeviceRow): Device {
   return {
     id: row.id,
@@ -142,6 +157,13 @@ export function rowToDevice(row: DeviceRow): Device {
     expectedReportIntervalSec: toNumber(row.expected_report_interval_sec),
     apiKeyHash: row.api_key_hash,
     isActive: toBoolean(row.is_active),
+    keyVersion: row.key_version === undefined || row.key_version === null
+      ? 1
+      : toNumber(row.key_version),
+    previousApiKeyHash: row.previous_api_key_hash ?? null,
+    previousKeyValidUntil: toIsoStringOrNull(row.previous_key_valid_until),
+    keyRotatedAt: toIsoStringOrNull(row.key_rotated_at),
+    lastSeenAt: toIsoStringOrNull(row.last_seen_at),
   };
 }
 
@@ -225,6 +247,11 @@ export async function listMonitoringDevicesFromMysql(): Promise<Device[]> {
         label,
         expected_report_interval_sec,
         api_key_hash,
+        key_version,
+        previous_api_key_hash,
+        previous_key_valid_until,
+        key_rotated_at,
+        last_seen_at,
         is_active
       FROM monitoring_devices
       WHERE is_active = TRUE

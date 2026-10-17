@@ -274,6 +274,14 @@ export type Device = {
   expectedReportIntervalSec: number;
   apiKeyHash?: string | null;
   isActive: boolean;
+  /** Monotonic key version, incremented on every rotation. */
+  keyVersion?: number;
+  /** Previous key hash, accepted only until the grace window closes. */
+  previousApiKeyHash?: string | null;
+  previousKeyValidUntil?: string | null;
+  keyRotatedAt?: string | null;
+  /** Last telemetry received, maintained by the ingest path. */
+  lastSeenAt?: string | null;
 };
 
 export type Reading = {

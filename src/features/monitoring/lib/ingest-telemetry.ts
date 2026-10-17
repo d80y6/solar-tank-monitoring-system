@@ -15,6 +15,13 @@ import {
   verifyDeviceKey,
 } from "./device-key";
 import { provisionMonitoringDevice } from "./device-provisioning";
+import { recordIngestNonce } from "./mysql-ingest-event-repository";
+import {
+  checkIngestSignature,
+  getIngestSignatureMode,
+  getIngestSignatureToleranceSeconds,
+  type IngestSignatureMode,
+} from "./ingest-signature";
 import { normalizeCatPayload } from "./normalize-reading";
 import {
   saveMonitoringReading,
@@ -38,6 +45,12 @@ type IngestTelemetryInput = {
   expectedProvisioningKey?: string | null;
   payload: unknown;
   receivedAt?: Date;
+  /** Raw request body, required when request signing is enabled. */
+  rawBody?: string;
+  /** Request headers, used to read the signature, nonce, and timestamp. */
+  headers?: Headers;
+  signatureMode?: IngestSignatureMode;
+  signatureToleranceSeconds?: number;
 };
 
 type IngestTelemetrySuccess = {
@@ -64,12 +77,13 @@ type IngestTelemetrySuccess = {
     storage: MonitoringStorageDriver;
     provisioned: boolean;
     activated: boolean;
+    signed: boolean;
   };
 };
 
 type IngestTelemetryFailure = {
   ok: false;
-  status: 400 | 401 | 403 | 404 | 500;
+  status: 400 | 401 | 403 | 404 | 409 | 413 | 500;
   error: string;
 };
 
@@ -164,6 +178,10 @@ export async function ingestTelemetry({
   expectedProvisioningKey,
   payload,
   receivedAt = new Date(),
+  rawBody,
+  headers,
+  signatureMode = getIngestSignatureMode(),
+  signatureToleranceSeconds = getIngestSignatureToleranceSeconds(),
 }: IngestTelemetryInput): Promise<IngestTelemetryResult> {
   const cleanDeviceIdentifier = deviceIdentifier?.trim();
 
@@ -332,6 +350,7 @@ export async function ingestTelemetry({
       suppliedDeviceKey: cleanDeviceKey,
       fallbackDeviceKey: expectedDeviceKey,
       allowGlobalFallback: allowGlobalDeviceKeyFallback,
+      now: receivedAt,
     })
   ) {
     return {
@@ -339,6 +358,46 @@ export async function ingestTelemetry({
       status: 401,
       error: "Device key is invalid.",
     };
+  }
+
+  if (signatureMode !== "off" && rawBody !== undefined && headers) {
+    const signatureCheck = checkIngestSignature({
+      body: rawBody,
+      deviceKey: cleanDeviceKey,
+      headers,
+      mode: signatureMode,
+      now: receivedAt,
+      toleranceSeconds: signatureToleranceSeconds,
+    });
+
+    if (!signatureCheck.ok) {
+      return {
+        ok: false,
+        status: signatureCheck.reason === "clock-skew" ? 400 : 401,
+        error:
+          signatureCheck.reason === "clock-skew"
+            ? "Device clock is outside the accepted window. Synchronise the device time."
+            : "Telemetry signature is missing or invalid.",
+      };
+    }
+
+    if (signatureCheck.signed) {
+      const nonceAccepted = await recordIngestNonce({
+        deviceId: device.id,
+        nonce: signatureCheck.nonce,
+        now: receivedAt,
+        requestTimestamp: new Date(signatureCheck.timestampSeconds * 1_000),
+      });
+
+      if (!nonceAccepted) {
+        return {
+          ok: false,
+          status: 409,
+          error:
+            "Duplicate telemetry signature rejected. The payload was already received.",
+        };
+      }
+    }
   }
 
   const payloadDeviceIdentifier = readPayloadDeviceIdentifier(payload);
@@ -427,6 +486,7 @@ export async function ingestTelemetry({
         storage: stored.storage,
         provisioned,
         activated,
+        signed: signatureMode !== "off" && rawBody !== undefined,
       },
     };
   } catch {

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getRequestSessionUser } from "@/features/auth/lib/auth-session";
 import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { requireSameOrigin } from "@/features/auth/lib/request-origin";
 import {
   addUserHelpdeskMessage,
   getOrCreateHelpdeskSession,
@@ -9,6 +10,7 @@ import {
 } from "@/features/helpdesk/lib/helpdesk-repository";
 import { notifyAdminsHelpdeskMessageCreated } from "@/features/helpdesk/lib/helpdesk-notifications";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
+import { readJsonBodyOrReject } from "@/lib/request-body";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -66,6 +68,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const originBlock = requireSameOrigin(request);
+
+  if (originBlock) {
+    return originBlock;
+  }
+
   try {
     const rateLimit = await checkRateLimit({
       key: `helpdesk-message:${getClientKey(request)}`,
@@ -83,7 +91,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const payload = await request.json().catch(() => ({}));
+    const { body: payloadValue, response: bodyBlock } =
+      await readJsonBodyOrReject(request);
+
+    if (bodyBlock) {
+      return bodyBlock;
+    }
+
+    const payload = (payloadValue ?? {}) as Record<string, unknown>;
     const user = await getRequestSessionUser(request);
     const result = await addUserHelpdeskMessage({
       body: normalizeHelpdeskMessage(getStringPayloadValue(payload, "message")),

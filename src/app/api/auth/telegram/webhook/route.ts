@@ -12,6 +12,7 @@ import {
   handleTelegramHelpdeskCommand,
   handleTelegramTopicInfoCommand,
 } from "@/features/helpdesk/lib/helpdesk-telegram";
+import { readJsonBodyOrReject } from "@/lib/request-body";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -24,7 +25,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const message = parseTelegramMessage(await request.json());
+  const { body: telegramBody, response: bodyBlock } =
+    await readJsonBodyOrReject(request);
+
+  if (bodyBlock) {
+    return bodyBlock;
+  }
+
+  const message = parseTelegramMessage(telegramBody);
 
   if (!message) {
     return NextResponse.json({ ok: true });

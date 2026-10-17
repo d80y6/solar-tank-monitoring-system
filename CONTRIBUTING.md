@@ -1,19 +1,23 @@
-# Panduan Kontribusi
+# Contributing Guide
 
-Dokumen ini menjelaskan cara berkontribusi ke FTM (Fuel Tank Management) agar pekerjaan tetap rapi, mudah ditinjau, dan aman untuk repositori publik.
+This document explains how to contribute to FTM (Fuel Tank Management) so that
+work stays tidy, reviewable, and safe for a public repository.
 
-## Prinsip Utama
+## Core Principles
 
-- Gunakan Bahasa Indonesia untuk teks aplikasi dan dokumentasi utama.
-- Gunakan nama file, folder, fungsi, dan variable yang konsisten serta mudah dicari.
-- Jangan memasukkan data internal, credential, API key asli, password, domain produksi, atau konfigurasi jaringan privat.
-- Jangan mengubah banyak hal sekaligus tanpa alasan yang jelas.
-- Jalankan pengecekan lokal sebelum commit dan push.
-- Jika ragu terhadap data lapangan atau keamanan, tulis asumsi di dokumentasi dan jangan mengklaim final.
+- Use English for application text, code, and documentation.
+- Use file, folder, function, and variable names that are consistent and easy to
+  find.
+- Never include internal data, credentials, real API keys, passwords, production
+  domains, or private network configuration.
+- Do not change many things at once without a clear reason.
+- Run the local checks before committing and pushing.
+- When unsure about field data or security, write the assumption down in the
+  documentation instead of claiming it is final.
 
-## Alur Kerja Harian
+## Daily Workflow
 
-Sebelum mulai:
+Before starting:
 
 ```powershell
 git status
@@ -21,30 +25,30 @@ git pull --rebase origin main
 pnpm install
 ```
 
-Saat mengerjakan:
+While working:
 
 ```powershell
 pnpm dev
 ```
 
-Sebelum commit:
+Before committing:
 
 ```powershell
 pnpm check
 git status
 ```
 
-Setelah semua aman:
+Once everything is clean:
 
 ```powershell
 git add .
-git commit -m "type(scope): ringkasan perubahan"
+git commit -m "type(scope): short summary of the change"
 git push origin main
 ```
 
-## Aturan untuk Yattaqi dan Kontributor Baru
+## Getting Started From GitHub
 
-Jika baru mulai dari GitHub:
+If you are starting from scratch:
 
 ```powershell
 git clone https://github.com/Zendin110206/solar-tank-monitoring-system.git
@@ -53,123 +57,131 @@ pnpm install
 pnpm check
 ```
 
-Setiap sebelum mengerjakan perubahan baru:
+Before each new piece of work:
 
 ```powershell
 git pull --rebase origin main
 ```
 
-Jika muncul konflik:
+If a conflict appears:
 
 ```text
-Berhenti dulu. Jangan asal pilih file sendiri atau file orang lain.
+Stop first. Do not decide by yourself whose files or changes to keep.
 ```
 
-Hal yang tidak boleh dilakukan tanpa diskusi:
+Never do these without discussing it first:
 
 - `git push --force`;
-- menghapus file orang lain;
-- mengubah struktur besar;
-- mengubah kontrak API;
-- menghapus test;
-- memasukkan data real;
-- commit file `.env.local`.
+- deleting someone else's files;
+- large structural changes;
+- changing the API contract;
+- deleting tests;
+- committing real data;
+- committing `.env.local`.
 
-## Format Commit
+## Commit Format
 
-Gunakan format:
-
-```text
-type(scope): ringkasan singkat
-```
-
-Contoh:
+Use:
 
 ```text
-docs(readme): rapikan dokumentasi proyek
-feat(simulator): tambah simulator payload device
-feat(api): tambah endpoint ingest telemetry
-fix(domain): perbaiki status runtime rendah
-test(telemetry): tambah test memory store
-chore(repo): bersihkan folder placeholder
+type(scope): short summary
 ```
 
-Jenis commit yang umum:
+Examples:
 
-| Type | Kapan dipakai |
+```text
+docs(readme): tidy the project documentation
+feat(simulator): add a device payload simulator
+feat(api): add the telemetry ingest endpoint
+fix(domain): correct the low runtime status
+test(telemetry): add a memory store test
+chore(repo): clean placeholder folders
+```
+
+Common commit types:
+
+| Type | When to use it |
 |---|---|
-| `feat` | Menambah fitur |
-| `fix` | Memperbaiki bug |
-| `docs` | Mengubah dokumentasi |
-| `test` | Menambah atau memperbaiki test |
-| `refactor` | Merapikan kode tanpa mengubah perilaku |
-| `chore` | Maintenance repo, config, dependency |
-| `style` | Perubahan format atau tampilan kecil |
+| `feat` | Adding a feature |
+| `fix` | Fixing a bug |
+| `docs` | Changing documentation |
+| `test` | Adding or fixing tests |
+| `refactor` | Tidying code without changing behaviour |
+| `chore` | Repository maintenance, config, dependencies |
+| `style` | Formatting or small presentational changes |
 
-## Standar Kode
+## Code Standards
 
-- Pisahkan logika domain dari UI.
-- Jangan menaruh rumus penting langsung di komponen halaman.
-- Gunakan TypeScript type untuk bentuk data penting.
-- Tambahkan test untuk logika yang memengaruhi angka operasional.
-- Hindari dependency baru jika masalah bisa diselesaikan dengan fitur bawaan.
-- Simpan data contoh di file data, bukan tersebar di banyak tempat.
+- Keep domain logic out of the UI.
+- Never put an important formula directly inside a page component.
+- Use TypeScript types for important data shapes.
+- Add tests for logic that affects operational numbers.
+- Avoid new dependencies when a built-in feature solves the problem.
+- Keep example data in data files rather than scattered across the codebase.
 
-## Standar Dokumentasi
+## Documentation Standards
 
-Dokumentasi harus:
+Documentation must:
 
-- memakai Bahasa Indonesia yang jelas;
-- menjelaskan istilah teknis dengan bahasa awam jika memungkinkan;
-- membedakan data contoh, simulator, dan data real;
-- menyebut batasan dengan jujur;
-- tidak memakai gaya percakapan personal;
-- tidak memuat data privat.
+- be written in clear English;
+- explain technical terms in plain language where possible;
+- distinguish example data, simulator data, and real data;
+- state limitations honestly;
+- avoid a personal conversational style;
+- never contain private data.
 
-## Pengecekan Wajib
+## Required Checks
 
-Sebelum push:
+Before pushing:
 
 ```powershell
 pnpm check
 ```
 
-Isi `pnpm check`:
+What `pnpm check` runs:
 
 ```text
-typecheck -> lint -> test -> build
+typecheck -> lint -> test -> build -> build:webpack
 ```
 
-Jika salah satu gagal, perbaiki dulu sebelum push.
+If any step fails, fix it before pushing.
 
-## Checklist Pull atau Push
+Both builds are required, and they are not redundant:
 
-Sebelum push ke `main`:
+- `pnpm build` is the fast Turbopack build;
+- `pnpm build:webpack` runs Next.js's own validation of route and page
+  exports. Turbopack does not run that check, so a stray `export` in a
+  `route.ts` file passes the first build and then **fails on the hosting
+  platform**. Keep helper functions in a feature module, not in a route file.
 
-- `git pull --rebase origin main` sudah dilakukan.
-- Tidak ada file rahasia.
-- Tidak ada data real.
-- `pnpm check` lulus.
-- Commit message jelas.
-- Perubahan sesuai scope.
+## Pull or Push Checklist
 
-## Catatan Tentang Branch
+Before pushing to `main`:
 
-Untuk pekerjaan kecil dan terkoordinasi, branch `main` masih dapat dipakai.
+- `git pull --rebase origin main` has been run.
+- No secret files are included.
+- No real data is included.
+- `pnpm check` passes.
+- The commit message is clear.
+- The change matches the intended scope.
 
-Untuk fitur yang lebih besar, gunakan branch:
+## Notes About Branches
+
+Small, coordinated work can still happen on `main`.
+
+For larger features, create a branch:
 
 ```powershell
-git checkout -b feat/nama-fitur
+git checkout -b feat/<feature-name>
 ```
 
-Contoh:
+Example:
 
 ```powershell
 git checkout -b feat/dashboard-fetch-api
 ```
 
-Setelah itu push branch:
+Then push the branch:
 
 ```powershell
 git push -u origin feat/dashboard-fetch-api

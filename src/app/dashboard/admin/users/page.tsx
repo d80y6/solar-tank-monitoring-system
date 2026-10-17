@@ -775,11 +775,15 @@ export default async function AdminUsersPage({
       <DashboardHeader
         navItems={[
           { href: "/dashboard", label: "Tank Management" },
-          { current: true, label: "Manajemen Pengguna" },
+          { current: true, label: "User Management" },
           {
             href: "/dashboard/admin/device-requests",
             label: "Review requests",
           },
+          { href: "/dashboard/admin/alerts", label: "Alert Centre" },
+          { href: "/dashboard/admin/devices", label: "Device Registry" },
+          { href: "/dashboard/admin/access-scopes", label: "Location Access" },
+          { href: "/dashboard/admin/hardware-registry", label: "Hardware Registry" },
           { href: "/dashboard/admin/audit", label: "Security audit" },
         ]}
         user={admin}
@@ -1065,7 +1069,7 @@ export default async function AdminUsersPage({
                         </div>
                         <div>
                           <p className="font-semibold uppercase tracking-[0.14em] text-zinc-400">
-                            Dibuat
+                            Created
                           </p>
                           <p className="mt-1 leading-5">
                             {formatDate(user.createdAt)}

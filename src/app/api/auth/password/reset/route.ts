@@ -7,6 +7,7 @@ import {
   getSafeErrorMessage,
   getSafeErrorStatus,
 } from "@/lib/safe-error-message";
+import { readJsonBodyOrReject } from "@/lib/request-body";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -21,7 +22,14 @@ function getClientIp(request: NextRequest): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = parseResetPasswordPayload(await request.json());
+    const { body: payloadRaw, response: payloadBlock } =
+      await readJsonBodyOrReject(request);
+
+    if (payloadBlock) {
+      return payloadBlock;
+    }
+
+    const payload = parseResetPasswordPayload(payloadRaw);
     const rateLimit = await checkRateLimit({
       key: `reset-password:${getClientIp(request)}`,
       limit: 8,

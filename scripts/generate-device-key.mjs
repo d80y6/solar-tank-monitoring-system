@@ -7,13 +7,13 @@ function printHelp() {
   globalThis.console.log(`
 Generate pilot device key and hash.
 
-Pemakaian:
+Usage:
   pnpm pilot:hash-key
   DEVICE_KEY="existing-key" pnpm pilot:hash-key
 
-Catatan:
-  - Simpan device key asli di tempat aman.
-  - Jangan commit device key asli.
+Notes:
+  - Keep the real device key in a safe place.
+  - Never commit the real device key.
   - The database only needs the sha256 hash value:...
 `);
 }
@@ -37,14 +37,14 @@ if (providedKey) {
   globalThis.console.log("Mode: hash from DEVICE_KEY environment");
   globalThis.console.log("The raw device key is not printed again by the script.");
 } else {
-  globalThis.console.log("Mode: generate key baru");
+  globalThis.console.log("Mode: generate a new key");
   globalThis.console.log("");
-  globalThis.console.log("DEVICE_KEY_ASLI_SIMPAN_AMAN:");
+  globalThis.console.log("RAW_DEVICE_KEY_STORE_SAFELY:");
   globalThis.console.log(generatedKey);
 }
 
 globalThis.console.log("");
-globalThis.console.log("API_KEY_HASH_UNTUK_DATABASE:");
+globalThis.console.log("API_KEY_HASH_FOR_THE_DATABASE:");
 globalThis.console.log(hash);
 globalThis.console.log("");
 globalThis.console.log(
